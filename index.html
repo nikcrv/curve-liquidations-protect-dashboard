@@ -805,7 +805,7 @@
                 totalHardDebt: 'Total Hard Debt',
                 apply: 'Apply',
                 cancel: 'Cancel',
-                softLiquidationsInPositions: 'Soft Liquidations (positions in soft liquidation)',
+                softLiquidationsInPositions: 'Positions in Liquidation Protection Mode (in soft liquidation)',
                 dateFrom: 'From',
                 dateTo: 'To',
                 loadingData: 'Loading data...',
@@ -820,7 +820,7 @@
                 platformBreakdown: '🏦 Platform Breakdown',
                 positions: 'positions',
                 protectedFromLiquidation: '🛡️ PROTECTED FROM LIQUIDATION',
-                ofTVLInSoft: 'of TVL in soft liquidation',
+                ofTVLInSoft: 'of TVL in liquidation protection<br>(soft liquidation)',
                 softLiquidationsLabel: '💧 SOFT LIQUIDATIONS',
                 positionsLabel: 'Positions',
                 totalDebt: 'Total debt',
@@ -881,7 +881,7 @@
                 totalHardDebt: 'Общий хард долг',
                 apply: 'Применить',
                 cancel: 'Отмена',
-                softLiquidationsInPositions: 'Мягкие ликвидации (позиции в софт ликвидации)',
+                softLiquidationsInPositions: 'Позиции в режиме защиты от ликвидации (в софт ликвидации)',
                 dateFrom: 'От',
                 dateTo: 'До',
                 loadingData: 'Загрузка данных...',
@@ -896,7 +896,7 @@
                 platformBreakdown: '🏦 Разбивка по платформам',
                 positions: 'позиций',
                 protectedFromLiquidation: '🛡️ ЗАЩИЩЕНО ОТ ЛИКВИДАЦИИ',
-                ofTVLInSoft: 'от TVL в софт ликвидации',
+                ofTVLInSoft: 'от TVL в диапазоне защиты<br>(в софт ликвидации)',
                 softLiquidationsLabel: '💧 СОФТ ЛИКВИДАЦИИ',
                 positionsLabel: 'Позиций',
                 totalDebt: 'Общий долг',
@@ -1620,7 +1620,8 @@
                         <div class="stat-label">${t('protectedFromLiquidation')}</div>
                         <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
                         <div class="protection-percent">
-                            ${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% ${t('ofTVLInSoft')}
+                            <span>${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% ${t('ofTVLInSoft').split('<br>')[0]}</span>
+                            <span style="display: block; font-size: 0.9em; opacity: 0.8;">${t('ofTVLInSoft').split('<br>')[1] || ''}</span>
                         </div>
                     </div>
                 `;
