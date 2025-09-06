@@ -658,7 +658,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Curve Finance Liquidation Analysis</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 style="margin: 0;">🚀 Curve Finance Liquidation Analysis</h1>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="setLanguage('en')" style="padding: 8px 16px; border: none; border-radius: 5px; background: white; cursor: pointer; font-weight: 500;" id="langEn">🇬🇧 EN</button>
+                <button onclick="setLanguage('ru')" style="padding: 8px 16px; border: none; border-radius: 5px; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-weight: 500;" id="langRu">🇷🇺 RU</button>
+            </div>
+        </div>
         
         <div class="stats-grid" id="statsGrid"></div>
         
@@ -697,7 +703,7 @@
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; color: #666;">
                         <span id="startLabel" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500;">Начало</span>
-                        <span style="color: #999; font-size: 11px;">Выбранный период</span>
+                        <span id="selectedPeriodLabel" style="color: #999; font-size: 11px;">Выбранный период</span>
                         <span id="endLabel" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500;">Конец</span>
                     </div>
                 </div>
@@ -710,7 +716,7 @@
                 <span class="filter-title">🔍 Фильтры:</span>
                 <div class="filter-grid">
                     <select id="platformFilter" style="padding: 5px 10px; font-size: 13px;">
-                        <option value="all">Все платформы</option>
+                        <option value="all" id="allPlatformsOption">All platforms</option>
                         <option value="LlamaLend">LlamaLend</option>
                         <option value="crvUSD">crvUSD</option>
                     </select>
@@ -723,29 +729,287 @@
                         <option value="all">Все токены</option>
                     </select>
                     
-                    <input type="text" id="addressFilter" placeholder="Адрес (0x...)" style="padding: 5px 10px; font-size: 13px; width: 150px;">
+                    <input type="text" id="addressFilter" placeholder="Address (0x...)" style="padding: 5px 10px; font-size: 13px; width: 150px;">
                     
-                    <button class="btn btn-primary" onclick="applyFilters()" style="padding: 5px 12px; font-size: 13px;">Применить</button>
-                    <button class="btn btn-secondary" onclick="resetFilters()" style="padding: 5px 12px; font-size: 13px;">Сбросить</button>
+                    <button class="btn btn-primary" onclick="applyFilters()" style="padding: 5px 12px; font-size: 13px;" id="applyFiltersBtn">Apply</button>
+                    <button class="btn btn-secondary" onclick="resetFilters()" style="padding: 5px 12px; font-size: 13px;" id="resetFiltersBtn">Reset</button>
                 </div>
             </div>
             <div class="filter-stats" id="filterStats"></div>
         </div>
         
         <div class="tabs">
-            <button class="tab active" data-tab="soft">💧 Мягкие ликвидации</button>
-            <button class="tab" data-tab="hard">🔥 Жёсткие ликвидации</button>
-            <button class="tab" data-tab="comparison">📊 Сравнение</button>
+            <button class="tab active" data-tab="soft">💧 Soft Liquidations</button>
+            <button class="tab" data-tab="hard">🔥 Hard Liquidations</button>
+            <button class="tab" data-tab="comparison">📊 Comparison</button>
         </div>
         
         <div class="data-table" id="dataTable">
-            <div class="loading">Загрузка данных...</div>
+            <div class="loading" id="loadingText">Loading data...</div>
         </div>
         
         <div class="pagination" id="pagination" style="display: none;"></div>
     </div>
 
     <script>
+        // Language system
+        let currentLang = localStorage.getItem('liquidationLang') || 'en';
+        
+        const translations = {
+            en: {
+                title: '🚀 Curve Finance Liquidation Analysis',
+                softLiquidations: 'Soft Liquidations',
+                hardLiquidations: 'Hard Liquidations',
+                comparison: 'Comparison',
+                filters: 'Filters',
+                platform: 'Platform',
+                allPlatforms: 'All Platforms',
+                network: 'Network',
+                allNetworks: 'All Networks',
+                token: 'Token',
+                allTokens: 'All Tokens',
+                market: 'Market',
+                user: 'User',
+                liquidator: 'Liquidator',
+                debt: 'Debt',
+                discount: 'Discount',
+                date: 'Date',
+                dateAndTime: 'Date and Time',
+                dateFilter: 'Date Filter',
+                applyFilters: 'Apply Filters',
+                resetFilters: 'Reset Filters',
+                chartByDays: 'Liquidations by Days',
+                count: 'Count',
+                sum: 'Size ($)',
+                start: 'Start',
+                end: 'End',
+                maxTVL: 'Max TVL',
+                txHash: 'Tx Hash',
+                noData: 'No data',
+                noEventsMatchingFilters: 'No events matching filters',
+                noPositionsMatchingFilters: 'No positions matching filters',
+                showing: 'Showing',
+                of: 'of',
+                softLiquidationsCount: 'soft liquidations',
+                hardLiquidationsCount: 'hard liquidations',
+                byMarkets: 'By Markets',
+                byPlatforms: 'By Platforms',
+                byTokens: 'By Tokens',
+                byNetworks: 'By Networks',
+                softPositions: 'Soft Positions',
+                hardEvents: 'Hard Events',
+                totalSoftTVL: 'Total Soft TVL',
+                totalHardDebt: 'Total Hard Debt',
+                apply: 'Apply',
+                cancel: 'Cancel',
+                softLiquidationsInPositions: 'Soft Liquidations (positions in soft liquidation)',
+                dateFrom: 'From',
+                dateTo: 'To',
+                loadingData: 'Loading data...',
+                averageSize: 'Average size',
+                averageDiscount: 'Average discount',
+                softPositionsCount: 'Soft positions',
+                totalTVL: 'Total TVL',
+                debtWithoutDiscount: 'Debt without discount',
+                debtWithDiscount: 'Debt with discount',
+                events: 'Events',
+                hardLiquidationsLabel: '🔥 HARD LIQUIDATIONS',
+                platformBreakdown: '🏦 Platform Breakdown',
+                positions: 'positions',
+                protectedFromLiquidation: '🛡️ PROTECTED FROM LIQUIDATION',
+                ofTVLInSoft: 'of TVL in soft liquidation',
+                softLiquidationsLabel: '💧 SOFT LIQUIDATIONS',
+                positionsLabel: 'Positions',
+                totalDebt: 'Total debt',
+                averageLTV: 'Average LTV',
+                averagePosition: 'Average position',
+                protected: 'Protected',
+                chain: 'Chain',
+                softDebt: 'Soft Debt',
+                addressPlaceholder: 'Address (0x...)',
+                pageText: 'Page',
+                ofPages: 'of',
+                records: 'records',
+                selectedPeriod: 'Selected period'
+            },
+            ru: {
+                title: '🚀 Анализ ликвидаций Curve Finance',
+                softLiquidations: 'Мягкие ликвидации',
+                hardLiquidations: 'Жёсткие ликвидации',
+                comparison: 'Сравнение',
+                filters: 'Фильтры',
+                platform: 'Платформа',
+                allPlatforms: 'Все платформы',
+                network: 'Сеть',
+                allNetworks: 'Все сети',
+                token: 'Токен',
+                allTokens: 'Все токены',
+                market: 'Маркет',
+                user: 'Пользователь',
+                liquidator: 'Ликвидатор',
+                debt: 'Долг',
+                discount: 'Дисконт',
+                date: 'Дата',
+                dateAndTime: 'Дата и время',
+                dateFilter: 'Фильтр по дате',
+                applyFilters: 'Применить фильтры',
+                resetFilters: 'Сбросить фильтры',
+                chartByDays: 'Ликвидации по дням',
+                count: 'Количество',
+                sum: 'Размер ($)',
+                start: 'Начало',
+                end: 'Конец',
+                maxTVL: 'Max TVL',
+                txHash: 'Tx Hash',
+                noData: 'Нет данных',
+                noEventsMatchingFilters: 'Нет событий, соответствующих фильтрам',
+                noPositionsMatchingFilters: 'Нет позиций, соответствующих фильтрам',
+                showing: 'Показано',
+                of: 'из',
+                softLiquidationsCount: 'софт ликвидаций',
+                hardLiquidationsCount: 'хард ликвидаций',
+                byMarkets: 'По маркетам',
+                byPlatforms: 'По платформам',
+                byTokens: 'По токенам',
+                byNetworks: 'По сетям',
+                softPositions: 'Софт позиции',
+                hardEvents: 'Хард события',
+                totalSoftTVL: 'Общий софт TVL',
+                totalHardDebt: 'Общий хард долг',
+                apply: 'Применить',
+                cancel: 'Отмена',
+                softLiquidationsInPositions: 'Мягкие ликвидации (позиции в софт ликвидации)',
+                dateFrom: 'От',
+                dateTo: 'До',
+                loadingData: 'Загрузка данных...',
+                averageSize: 'Средний размер',
+                averageDiscount: 'Средний дисконт',
+                softPositionsCount: 'Софт позиций',
+                totalTVL: 'Общий TVL',
+                debtWithoutDiscount: 'Долг без дисконта',
+                debtWithDiscount: 'Долг с дисконтом',
+                events: 'Событий',
+                hardLiquidationsLabel: '🔥 ХАРД ЛИКВИДАЦИИ',
+                platformBreakdown: '🏦 Разбивка по платформам',
+                positions: 'позиций',
+                protectedFromLiquidation: '🛡️ ЗАЩИЩЕНО ОТ ЛИКВИДАЦИИ',
+                ofTVLInSoft: 'от TVL в софт ликвидации',
+                softLiquidationsLabel: '💧 СОФТ ЛИКВИДАЦИИ',
+                positionsLabel: 'Позиций',
+                totalDebt: 'Общий долг',
+                averageLTV: 'Средний LTV',
+                averagePosition: 'Средняя позиция',
+                protected: 'Защищено',
+                chain: 'Сеть',
+                softDebt: 'Софт долг',
+                addressPlaceholder: 'Адрес (0x...)',
+                pageText: 'Страница',
+                ofPages: 'из',
+                records: 'записей',
+                selectedPeriod: 'Выбранный период'
+            }
+        };
+        
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+        
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('liquidationLang', lang);
+            
+            // Update button styles
+            const enBtn = document.getElementById('langEn');
+            const ruBtn = document.getElementById('langRu');
+            if (lang === 'en') {
+                enBtn.style.background = 'white';
+                enBtn.style.color = '#333';
+                ruBtn.style.background = 'rgba(255,255,255,0.2)';
+                ruBtn.style.color = 'white';
+            } else {
+                ruBtn.style.background = 'white';
+                ruBtn.style.color = '#333';
+                enBtn.style.background = 'rgba(255,255,255,0.2)';
+                enBtn.style.color = 'white';
+            }
+            
+            updateUILanguage();
+            renderStats();  // Add this to update stats when language changes
+            renderData();
+            renderChart();  // Fixed: was updateChart, should be renderChart
+            updateFilters();
+            updateFilterOptions();  // Update filter dropdown options when language changes
+            updateFilterStats();  // Update filter stats text when language changes
+        }
+        
+        function updateUILanguage() {
+            // Update static texts
+            document.querySelector('h1').textContent = t('title');
+            const chartTitle = document.querySelector('#chartTitle');
+            if (chartTitle) chartTitle.textContent = `📈 ${t('chartByDays')}`;
+            const startLabel = document.querySelector('#startLabel');
+            if (startLabel) startLabel.textContent = t('start');
+            const endLabel = document.querySelector('#endLabel');
+            if (endLabel) endLabel.textContent = t('end');
+            
+            // Update filter texts
+            const filterTitle = document.querySelector('#filterTitle');
+            if (filterTitle) filterTitle.textContent = `🔍 ${t('filters')}:`;
+            const applyBtn = document.querySelector('#applyFiltersBtn');
+            if (applyBtn) applyBtn.textContent = t('apply');
+            const resetBtn = document.querySelector('#resetFiltersBtn');
+            if (resetBtn) resetBtn.textContent = t('resetFilters').replace('Filters', '');
+            
+            // Update platform filter
+            const allPlatformsOption = document.querySelector('#allPlatformsOption');
+            if (allPlatformsOption) allPlatformsOption.textContent = t('allPlatforms');
+            
+            // Update address placeholder
+            const addressFilter = document.querySelector('#addressFilter');
+            if (addressFilter) addressFilter.placeholder = t('addressPlaceholder');
+            const allNetworks = document.querySelector('#allNetworksOption');
+            if (allNetworks) allNetworks.textContent = t('allNetworks');
+            const allTokens = document.querySelector('#allTokensOption');
+            if (allTokens) allTokens.textContent = t('allTokens');
+            
+            // Update selected period label
+            const selectedPeriodLabel = document.querySelector('#selectedPeriodLabel');
+            if (selectedPeriodLabel) selectedPeriodLabel.textContent = t('selectedPeriod');
+            
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                const tabType = tab.dataset.tab;
+                if (tabType === 'soft') tab.innerHTML = `💧 ${t('softLiquidations')}`;
+                if (tabType === 'hard') tab.innerHTML = `🔥 ${t('hardLiquidations')}`;
+                if (tabType === 'comparison') tab.innerHTML = `📊 ${t('comparison')}`;
+            });
+            
+            // Update legend
+            const legendItems = document.querySelectorAll('.legend-item span');
+            if (legendItems[0]) legendItems[0].textContent = t('softLiquidations');
+            if (legendItems[1]) legendItems[1].textContent = t('hardLiquidations');
+            
+            // Update radio buttons
+            const radioLabels = document.querySelectorAll('input[name="chartMode"]');
+            radioLabels.forEach(radio => {
+                const label = radio.parentElement;
+                if (radio.value === 'count') {
+                    label.childNodes[2].textContent = t('count');
+                } else if (radio.value === 'sum') {
+                    label.childNodes[2].textContent = t('sum');
+                }
+            });
+            
+            // Update loading text
+            const loadingEl = document.querySelector('#loadingText');
+            if (loadingEl) loadingEl.textContent = t('loadingData');
+        }
+        
+        function updateFilters() {
+            // This function is called when language changes to update filter options
+            updateUILanguage();
+        }
+        
         let softData = null;
         let hardData = null;
         let filteredSoftData = null;
@@ -787,6 +1051,9 @@
         
         // Обработка переключения режима графика
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize language on page load
+            setLanguage(currentLang);
+            
             document.querySelectorAll('input[name="chartMode"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     chartMode = e.target.value;
@@ -903,20 +1170,24 @@
             selectedEndDate = new Date(minDate.getTime() + parseInt(rangeEnd.value) * 24 * 60 * 60 * 1000);
             
             // Обновляем метки
-            document.getElementById('startLabel').textContent = selectedStartDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
-            document.getElementById('endLabel').textContent = selectedEndDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+            const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+            document.getElementById('startLabel').textContent = selectedStartDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
+            document.getElementById('endLabel').textContent = selectedEndDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
             
             // Обновляем фильтры
             updateFilterOptions();
             
             // Применяем фильтры по умолчанию
             applyFilters();
+            
+            // Force update filter stats with current language
+            setTimeout(() => updateFilterStats(), 100);
         }
 
         function updateFilterOptions() {
             // Обновляем сети
             const networkFilter = document.getElementById('networkFilter');
-            networkFilter.innerHTML = '<option value="all">Все сети</option>';
+            networkFilter.innerHTML = `<option value="all">${t('allNetworks')}</option>`;
             Array.from(availableNetworks).sort().forEach(network => {
                 const option = document.createElement('option');
                 option.value = network;
@@ -926,7 +1197,7 @@
             
             // Обновляем токены
             const tokenFilter = document.getElementById('tokenFilter');
-            tokenFilter.innerHTML = '<option value="all">Все токены</option>';
+            tokenFilter.innerHTML = `<option value="all">${t('allTokens')}</option>`;
             Array.from(availableTokens).sort().forEach(token => {
                 const option = document.createElement('option');
                 option.value = token;
@@ -972,7 +1243,7 @@
             }
             
             // Обновляем статистику фильтров
-            updateFilterStats();
+            setTimeout(() => updateFilterStats(), 0);  // Defer to ensure DOM is ready
             
             // Сбрасываем на первую страницу
             currentPage = 1;
@@ -1056,8 +1327,9 @@
                 sliderRange.style.width = (endPercent - startPercent) + '%';
                 
                 // Обновляем метки
-                document.getElementById('startLabel').textContent = newStartDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
-                document.getElementById('endLabel').textContent = newEndDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+                const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+                document.getElementById('startLabel').textContent = newStartDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
+                document.getElementById('endLabel').textContent = newEndDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
             }
             
             renderChart();
@@ -1066,15 +1338,25 @@
 
         function updateFilterStats() {
             const stats = document.getElementById('filterStats');
-            const softCount = filteredSoftData ? filteredSoftData.positions.length : 0;
-            const hardCount = filteredHardData ? filteredHardData.events.length : 0;
-            const originalSoftCount = softData ? softData.positions.length : 0;
-            const originalHardCount = hardData ? hardData.events.length : 0;
+            if (!stats) {
+                console.warn('filterStats element not found');
+                return;
+            }
             
-            stats.innerHTML = `
-                Показано: <strong>${softCount}</strong> из ${originalSoftCount} софт ликвидаций, 
-                <strong>${hardCount}</strong> из ${originalHardCount} хард ликвидаций
-            `;
+            // Determine what data to show
+            const softCount = filteredSoftData?.positions?.length || softData?.positions?.length || 0;
+            const hardCount = filteredHardData?.events?.length || hardData?.events?.length || 0;
+            const originalSoftCount = softData?.positions?.length || 0;
+            const originalHardCount = hardData?.events?.length || 0;
+            
+            // Force language update by recreating the entire text
+            const showingText = t('showing');
+            const ofText = t('of');
+            const softText = t('softLiquidationsCount');
+            const hardText = t('hardLiquidationsCount');
+            
+            // Always update the text using current language
+            stats.innerHTML = `${showingText}: <strong>${softCount}</strong> ${ofText} ${originalSoftCount} ${softText}, <strong>${hardCount}</strong> ${ofText} ${originalHardCount} ${hardText}`;
         }
 
         function resetFilters() {
@@ -1089,6 +1371,7 @@
             renderStats();
             renderChart();
             renderData();
+            updateFilterStats();  // Ensure filter stats are updated after data loads
         }
         
         function renderChart() {
@@ -1099,7 +1382,7 @@
             const hardDataToUse = filteredHardData || hardData;
             
             if (!softDataToUse || !hardDataToUse) {
-                chartContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Нет данных для диаграммы</div>';
+                chartContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;">${t('noData')}</div>`;
                 return;
             }
             
@@ -1152,9 +1435,11 @@
             
             // Обновляем заголовок
             const title = document.getElementById('chartTitle');
-            const startStr = startDate.toLocaleDateString('ru-RU');
-            const endStr = endDate.toLocaleDateString('ru-RU');
-            title.textContent = `📈 Ликвидации по дням (${startStr} - ${endStr})`;
+            const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+            const startStr = startDate.toLocaleDateString(locale);
+            const endStr = endDate.toLocaleDateString(locale);
+            const dateRange = `${startStr} - ${endStr}`;
+            title.textContent = `📈 ${t('chartByDays')} (${dateRange})`;
             
             // Подготавливаем данные по дням
             const dailyData = {};
@@ -1275,7 +1560,8 @@
         function showChartTooltip(event, dateStr, soft, hard, softTVL, hardDebt) {
             const tooltip = document.getElementById('chartTooltip');
             const date = new Date(dateStr);
-            const formattedDate = date.toLocaleDateString('ru-RU');
+            const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+            const formattedDate = date.toLocaleDateString(locale);
             
             if (chartMode === 'sum') {
                 tooltip.innerHTML = `
@@ -1304,7 +1590,7 @@
             const statsGrid = document.getElementById('statsGrid');
             
             if (!softData && !hardData) {
-                statsGrid.innerHTML = '<div class="loading">Нет данных</div>';
+                statsGrid.innerHTML = `<div class="loading">${t('noData')}</div>`;
                 return;
             }
 
@@ -1321,10 +1607,10 @@
                 const isPositive = protectedAmount > 0;
                 html += `
                     <div class="stat-card protection ${!isPositive ? 'negative' : ''}">
-                        <div class="stat-label">🛡️ ЗАЩИЩЕНО ОТ ЛИКВИДАЦИИ</div>
+                        <div class="stat-label">${t('protectedFromLiquidation')}</div>
                         <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
                         <div class="protection-percent">
-                            ${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% от TVL в софт ликвидации
+                            ${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% ${t('ofTVLInSoft')}
                         </div>
                     </div>
                 `;
@@ -1333,30 +1619,34 @@
             // Софт ликвидации - расширенная информация
             if (softData) {
                 const summary = softData.summary || {};
-                const avgDebtRatio = summary.total_tvl > 0 ? (summary.total_debt / summary.total_tvl * 100) : 0;
                 const avgPositionSize = summary.total_positions > 0 ? (summary.total_tvl / summary.total_positions) : 0;
+                
+                // Count positions by platform
+                let llamaLendCount = summary.llamalend_positions || 0;
+                let crvusdCount = summary.crvusd_positions || 0;
                 
                 html += `
                     <div class="stat-card">
-                        <div class="stat-label">💧 СОФТ ЛИКВИДАЦИИ</div>
+                        <div class="stat-label">${t('softLiquidationsLabel')}</div>
                         <div class="stat-value">$${formatNumber(summary.total_tvl || 0)}</div>
                         <div style="font-size: 14px; margin-top: 12px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">Позиций:</span>
+                                <span style="color: #666;">${t('positionsLabel')}:</span>
                                 <strong>${summary.total_positions || 0}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">Общий долг:</span>
+                                <span style="color: #666;">${t('totalDebt')}:</span>
                                 <strong>$${formatNumber(summary.total_debt || 0)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">Средний LTV:</span>
-                                <strong style="color: ${avgDebtRatio > 80 ? '#f44336' : avgDebtRatio > 60 ? '#ff9800' : '#4caf50'}">
-                                    ${avgDebtRatio.toFixed(1)}%
+                                <span style="color: #666;">${t('byPlatforms')}:</span>
+                                <strong>
+                                    <span style="color: #667eea;">${llamaLendCount}</span> / 
+                                    <span style="color: #764ba2;">${crvusdCount}</span>
                                 </strong>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: #666;">Средняя позиция:</span>
+                                <span style="color: #666;">${t('averagePosition')}:</span>
                                 <strong>$${formatNumber(avgPositionSize)}</strong>
                             </div>
                         </div>
@@ -1383,27 +1673,27 @@
                 
                 html += `
                     <div class="stat-card">
-                        <div class="stat-label">🔥 ХАРД ЛИКВИДАЦИИ</div>
+                        <div class="stat-label">${t('hardLiquidationsLabel')}</div>
                         <div class="stat-value">$${formatNumber(totalHard.debt_with_discount || totalHard.debt || 0)}</div>
                         <div style="font-size: 14px; margin-top: 12px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">Событий:</span>
+                                <span style="color: #666;">${t('events')}:</span>
                                 <strong>${totalHard.count || 0}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">Долг без дисконта:</span>
+                                <span style="color: #666;">${t('debtWithoutDiscount')}:</span>
                                 <strong>$${formatNumber(totalHard.debt || 0)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">Средний дисконт:</span>
+                                <span style="color: #666;">${t('averageDiscount')}:</span>
                                 <strong style="color: #f44336">${avgDiscount.toFixed(1)}%</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">Средний размер:</span>
+                                <span style="color: #666;">${t('averageSize')}:</span>
                                 <strong>$${formatNumber(avgLiquidationSize)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: #666;">По платформам:</span>
+                                <span style="color: #666;">${t('byPlatforms')}:</span>
                                 <strong>
                                     <span style="color: #667eea;">${lendingCount}</span> / 
                                     <span style="color: #764ba2;">${crvusdCount}</span>
@@ -1418,20 +1708,20 @@
             if (softData?.summary) {
                 html += `
                     <div class="stat-card">
-                        <div class="stat-label">🏦 Разбивка по платформам</div>
+                        <div class="stat-label">${t('platformBreakdown')}</div>
                         <div style="font-size: 16px; margin-top: 15px;">
                             <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
                                 <strong style="color: #667eea;">🦙 LlamaLend</strong><br>
                                 <span style="font-size: 20px; font-weight: bold;">$${formatNumber(softData.summary.llamalend_tvl || 0)}</span><br>
                                 <span style="font-size: 14px; color: #666;">
-                                    ${softData.summary.llamalend_positions || 0} позиций • Долг: $${formatNumber(softData.summary.llamalend_debt || 0)}
+                                    ${softData.summary.llamalend_positions || 0} ${t('positions')} • ${t('debt')}: $${formatNumber(softData.summary.llamalend_debt || 0)}
                                 </span>
                             </div>
                             <div>
                                 <strong style="color: #764ba2;">💱 crvUSD</strong><br>
                                 <span style="font-size: 20px; font-weight: bold;">$${formatNumber(softData.summary.crvusd_tvl || 0)}</span><br>
                                 <span style="font-size: 14px; color: #666;">
-                                    ${softData.summary.crvusd_positions || 0} позиций • Долг: $${formatNumber(softData.summary.crvusd_debt || 0)}
+                                    ${softData.summary.crvusd_positions || 0} ${t('positions')} • ${t('debt')}: $${formatNumber(softData.summary.crvusd_debt || 0)}
                                 </span>
                             </div>
                         </div>
@@ -1456,7 +1746,7 @@
 
         function renderSoftLiquidations(container) {
             if (!filteredSoftData || !filteredSoftData.positions) {
-                container.innerHTML = '<div class="no-data">Нет данных о мягких ликвидациях</div>';
+                container.innerHTML = `<div class="no-data">${t('noData')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1474,7 +1764,7 @@
                 });
             }
             if (positions.length === 0) {
-                container.innerHTML = '<div class="no-data">Нет позиций, соответствующих фильтрам</div>';
+                container.innerHTML = `<div class="no-data">${t('noPositionsMatchingFilters')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1519,48 +1809,48 @@
             let html = `
                 <div class="table-wrapper">
                     <div class="table-header">
-                        <h2 style="margin: 0;">💧 Мягкие ликвидации (позиции в софт ликвидации)</h2>
+                        <h2 style="margin: 0;">💧 ${t('softLiquidationsInPositions')}</h2>
                         <span class="calendar-icon" onclick="toggleDatePicker('soft')">
-                            📅 Фильтр по дате
+                            📅 ${t('dateFilter')}
                         </span>
                     </div>
                     <div id="softDatePicker" class="date-range-picker">
                     <div class="date-input-group">
-                        <label>От даты:</label>
+                        <label>${t('dateFrom')}:</label>
                         <input type="date" id="softDateStart" value="${tableDateStart ? tableDateStart.toISOString().split('T')[0] : ''}">
                     </div>
                     <div class="date-input-group">
-                        <label>До даты:</label>
+                        <label>${t('dateTo')}:</label>
                         <input type="date" id="softDateEnd" value="${tableDateEnd ? tableDateEnd.toISOString().split('T')[0] : ''}">
                     </div>
                     <div class="date-range-buttons">
-                        <button class="btn-apply" onclick="applyDateRange('soft')">Применить</button>
-                        <button class="btn-cancel" onclick="clearDateRange('soft')">Сбросить</button>
+                        <button class="btn-apply" onclick="applyDateRange('soft')">${t('apply')}</button>
+                        <button class="btn-cancel" onclick="clearDateRange('soft')">${t('cancel')}</button>
                     </div>
                 </div>
                 <table>
                     <thead>
                         <tr>
                             <th class="sortable" onclick="sortTable('first_dt')">
-                                Дата ${getSortArrow('first_dt')}
+                                ${t('date')} ${getSortArrow('first_dt')}
                             </th>
                             <th class="sortable" onclick="sortTable('platform')">
-                                Платформа ${getSortArrow('platform')}
+                                ${t('platform')} ${getSortArrow('platform')}
                             </th>
                             <th class="sortable" onclick="sortTable('market_name')">
-                                Маркет ${getSortArrow('market_name')}
+                                ${t('market')} ${getSortArrow('market_name')}
                             </th>
                             <th class="sortable" onclick="sortTable('chain')">
-                                Сеть ${getSortArrow('chain')}
+                                ${t('network')} ${getSortArrow('chain')}
                             </th>
                             <th class="sortable" onclick="sortTable('user')">
-                                Пользователь ${getSortArrow('user')}
+                                ${t('user')} ${getSortArrow('user')}
                             </th>
                             <th class="sortable" onclick="sortTable('collateral_token')">
-                                Токен ${getSortArrow('collateral_token')}
+                                ${t('token')} ${getSortArrow('collateral_token')}
                             </th>
                             <th class="sortable" onclick="sortTable('tvl')">
-                                Max TVL ${getSortArrow('tvl')}
+                                ${t('maxTVL')} ${getSortArrow('tvl')}
                             </th>
                         </tr>
                     </thead>
@@ -1568,7 +1858,8 @@
             `;
 
             pageData.forEach(pos => {
-                const dateOnly = pos.first_dt ? new Date(pos.first_dt).toLocaleDateString('ru-RU') : 'N/A';
+                const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+                const dateOnly = pos.first_dt ? new Date(pos.first_dt).toLocaleDateString(locale) : 'N/A';
                 
                 // Определяем базовый URL для адресов в зависимости от сети
                 let addressBaseUrl = '';
@@ -1623,7 +1914,7 @@
 
         function renderHardLiquidations(container) {
             if (!filteredHardData || !filteredHardData.events) {
-                container.innerHTML = '<div class="no-data">Нет данных о жёстких ликвидациях</div>';
+                container.innerHTML = `<div class="no-data">${t('noData')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1641,7 +1932,7 @@
                 });
             }
             if (events.length === 0) {
-                container.innerHTML = '<div class="no-data">Нет событий, соответствующих фильтрам</div>';
+                container.innerHTML = `<div class="no-data">${t('noEventsMatchingFilters')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1691,56 +1982,56 @@
             let html = `
                 <div class="table-wrapper">
                     <div class="table-header">
-                        <h2 style="margin: 0;">🔥 Жёсткие ликвидации</h2>
+                        <h2 style="margin: 0;">🔥 ${t('hardLiquidations')}</h2>
                         <span class="calendar-icon" onclick="toggleDatePicker('hard')">
-                            📅 Фильтр по дате
+                            📅 ${t('dateFilter')}
                         </span>
                     </div>
                     <div id="hardDatePicker" class="date-range-picker">
                     <div class="date-input-group">
-                        <label>От даты:</label>
+                        <label>${t('dateFrom')}:</label>
                         <input type="date" id="hardDateStart" value="${tableDateStart ? tableDateStart.toISOString().split('T')[0] : ''}">
                     </div>
                     <div class="date-input-group">
-                        <label>До даты:</label>
+                        <label>${t('dateTo')}:</label>
                         <input type="date" id="hardDateEnd" value="${tableDateEnd ? tableDateEnd.toISOString().split('T')[0] : ''}">
                     </div>
                     <div class="date-range-buttons">
-                        <button class="btn-apply" onclick="applyDateRange('hard')">Применить</button>
-                        <button class="btn-cancel" onclick="clearDateRange('hard')">Сбросить</button>
+                        <button class="btn-apply" onclick="applyDateRange('hard')">${t('apply')}</button>
+                        <button class="btn-cancel" onclick="clearDateRange('hard')">${t('cancel')}</button>
                     </div>
                 </div>
                 <table>
                     <thead>
                         <tr>
                             <th class="sortable" onclick="sortHardTable('timestamp')">
-                                Дата и время ${getHardSortArrow('timestamp')}
+                                ${t('dateAndTime')} ${getHardSortArrow('timestamp')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('platform')">
-                                Платформа ${getHardSortArrow('platform')}
+                                ${t('platform')} ${getHardSortArrow('platform')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('market_name')">
-                                Маркет ${getHardSortArrow('market_name')}
+                                ${t('market')} ${getHardSortArrow('market_name')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('chain')">
-                                Сеть ${getHardSortArrow('chain')}
+                                ${t('network')} ${getHardSortArrow('chain')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('user')">
-                                Пользователь ${getHardSortArrow('user')}
+                                ${t('user')} ${getHardSortArrow('user')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('liquidator')">
-                                Ликвидатор ${getHardSortArrow('liquidator')}
+                                ${t('liquidator')} ${getHardSortArrow('liquidator')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('collateral_token')">
-                                Токен ${getHardSortArrow('collateral_token')}
+                                ${t('token')} ${getHardSortArrow('collateral_token')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('debt')">
-                                Долг ${getHardSortArrow('debt')}
+                                ${t('debt')} ${getHardSortArrow('debt')}
                             </th>
                             <th class="sortable" onclick="sortHardTable('liquidation_discount')">
-                                Дисконт ${getHardSortArrow('liquidation_discount')}
+                                ${t('discount')} ${getHardSortArrow('liquidation_discount')}
                             </th>
-                            <th>Tx Hash</th>
+                            <th>${t('txHash')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1748,7 +2039,8 @@
 
             pageData.forEach(event => {
                 const date = new Date(event.timestamp);
-                const dateTimeStr = `${date.toLocaleDateString('ru-RU')} ${date.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit', second: '2-digit'})}`;
+                const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+                const dateTimeStr = `${date.toLocaleDateString(locale)} ${date.toLocaleTimeString(locale, {hour: '2-digit', minute: '2-digit', second: '2-digit'})}`;
                 
                 // Определяем правильный explorer в зависимости от сети
                 let explorerUrl = '';
@@ -1853,7 +2145,7 @@
         
         function renderComparison(container) {
             if (!filteredSoftData || !filteredHardData) {
-                container.innerHTML = '<div class="no-data">Недостаточно данных для сравнения</div>';
+                container.innerHTML = `<div class="no-data">${currentLang === 'en' ? 'Insufficient data for comparison' : 'Недостаточно данных для сравнения'}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1999,7 +2291,7 @@
             });
             
             if (statsArray.length === 0) {
-                container.innerHTML = '<div class="no-data">Нет данных для сравнения</div>';
+                container.innerHTML = `<div class="no-data">${t('noData')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -2013,12 +2305,12 @@
             
             let html = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 style="margin: 0;">📊 Сравнение</h2>
+                    <h2 style="margin: 0;">📊 ${t('comparison')}</h2>
                     <select id="comparisonGroup" onchange="changeComparisonGroup()" style="padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd;">
-                        <option value="market" ${currentValue === 'market' ? 'selected' : ''}>По маркетам</option>
-                        <option value="platform" ${currentValue === 'platform' ? 'selected' : ''}>По платформам</option>
-                        <option value="token" ${currentValue === 'token' ? 'selected' : ''}>По токенам</option>
-                        <option value="chain" ${currentValue === 'chain' ? 'selected' : ''}>По сетям</option>
+                        <option value="market" ${currentValue === 'market' ? 'selected' : ''}>${t('byMarkets')}</option>
+                        <option value="platform" ${currentValue === 'platform' ? 'selected' : ''}>${t('byPlatforms')}</option>
+                        <option value="token" ${currentValue === 'token' ? 'selected' : ''}>${t('byTokens')}</option>
+                        <option value="chain" ${currentValue === 'chain' ? 'selected' : ''}>${t('byNetworks')}</option>
                     </select>
                 </div>
                 <table>
@@ -2030,50 +2322,50 @@
                 case 'platform':
                     html += `
                         <th class="sortable" onclick="sortCompareTable('label')">
-                            Платформа ${getCompareSortArrow('label')}
+                            ${t('platform')} ${getCompareSortArrow('label')}
                         </th>`;
                     break;
                 case 'token':
                     html += `
                         <th class="sortable" onclick="sortCompareTable('label')">
-                            Токен ${getCompareSortArrow('label')}
+                            ${t('token')} ${getCompareSortArrow('label')}
                         </th>`;
                     break;
                 case 'chain':
                     html += `
                         <th class="sortable" onclick="sortCompareTable('label')">
-                            Сеть ${getCompareSortArrow('label')}
+                            ${t('chain')} ${getCompareSortArrow('label')}
                         </th>`;
                     break;
                 default: // market
                     html += `
                         <th class="sortable" onclick="sortCompareTable('platform')">
-                            Платформа ${getCompareSortArrow('platform')}
+                            ${t('platform')} ${getCompareSortArrow('platform')}
                         </th>
                         <th class="sortable" onclick="sortCompareTable('label')">
-                            Маркет ${getCompareSortArrow('label')}
+                            ${t('market')} ${getCompareSortArrow('label')}
                         </th>`;
                     break;
             }
             
             html += `
                             <th class="sortable" onclick="sortCompareTable('softCount')">
-                                Софт позиций ${getCompareSortArrow('softCount')}
+                                ${t('softPositions')} ${getCompareSortArrow('softCount')}
                             </th>
                             <th class="sortable" onclick="sortCompareTable('softTVL')">
-                                Софт TVL ${getCompareSortArrow('softTVL')}
+                                ${t('totalSoftTVL')} ${getCompareSortArrow('softTVL')}
                             </th>
                             <th class="sortable" onclick="sortCompareTable('softDebt')">
-                                Софт долг ${getCompareSortArrow('softDebt')}
+                                ${t('softDebt')} ${getCompareSortArrow('softDebt')}
                             </th>
                             <th class="sortable" onclick="sortCompareTable('hardCount')">
-                                Хард событий ${getCompareSortArrow('hardCount')}
+                                ${t('hardEvents')} ${getCompareSortArrow('hardCount')}
                             </th>
                             <th class="sortable" onclick="sortCompareTable('hardDebt')">
-                                Хард долг ${getCompareSortArrow('hardDebt')}
+                                ${t('totalHardDebt')} ${getCompareSortArrow('hardDebt')}
                             </th>
                             <th class="sortable" onclick="sortCompareTable('protected')">
-                                Защищено ${getCompareSortArrow('protected')}
+                                ${t('protected')} ${getCompareSortArrow('protected')}
                             </th>
                         </tr>
                     </thead>
@@ -2165,8 +2457,8 @@
                      ${currentPage === totalPages ? 'disabled' : ''}>▶</button>`;
             
             // Информация о странице
-            html += `<span class="page-info">Страница ${currentPage} из ${totalPages} 
-                     (${totalItems} записей)</span>`;
+            html += `<span class="page-info">${t('pageText')} ${currentPage} ${t('ofPages')} ${totalPages} 
+                     (${totalItems} ${t('records')})</span>`;
             
             pagination.innerHTML = html;
             pagination.style.display = 'flex';
@@ -2404,8 +2696,9 @@
                 selectedStartDate = new Date(minDate.getTime() + start * 24 * 60 * 60 * 1000);
                 selectedEndDate = new Date(minDate.getTime() + end * 24 * 60 * 60 * 1000);
                 
-                startLabel.textContent = selectedStartDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
-                endLabel.textContent = selectedEndDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+                const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+                startLabel.textContent = selectedStartDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
+                endLabel.textContent = selectedEndDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
                 
                 // Перерисовываем график
                 renderChart();
@@ -2418,10 +2711,17 @@
                 await loadScriptByName('latest_liquidations.js');
                 if (window.SOFT_LIQUIDATIONS_DATA) {
                     processLoadedData(window.SOFT_LIQUIDATIONS_DATA);
-                    document.getElementById('fileName').textContent = 'latest_liquidations.js загружен';
+                    const fileNameElement = document.getElementById('fileName');
+                    if (fileNameElement) {
+                        fileNameElement.textContent = currentLang === 'en' ? 'latest_liquidations.js loaded' : 'latest_liquidations.js загружен';
+                    }
                 }
             } catch (error) {
-                document.getElementById('fileName').textContent = 'Выберите файл для загрузки';
+                const fileNameElement = document.getElementById('fileName');
+                if (fileNameElement) {
+                    fileNameElement.textContent = currentLang === 'en' ? 'Select file to load' : 'Выберите файл для загрузки';
+                }
+                console.error('Error loading data:', error);
             }
         });
     </script>
