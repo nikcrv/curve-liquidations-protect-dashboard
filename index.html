@@ -33,28 +33,39 @@
         .controls {
             background: white;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .filter-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .filter-title {
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: #333;
-            font-size: 16px;
+            font-size: 14px;
+            display: inline-block;
+            margin-right: 15px;
         }
         
         .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
         }
         
         .filter-group {
@@ -84,9 +95,9 @@
         }
         
         .filter-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            display: inline-flex;
+            gap: 8px;
+            margin-left: 10px;
         }
         
         .btn {
@@ -163,11 +174,191 @@
             margin-bottom: 20px;
         }
         
+        .chart-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 3px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        }
+        
+        .chart-inner {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        #liquidationChart {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            background: linear-gradient(to top, rgba(240,240,240,0.3) 0%, transparent 100%);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .bar-soft {
+            background: linear-gradient(180deg, rgba(76, 175, 80, 0.8) 0%, rgba(69, 160, 73, 0.8) 100%);
+            width: 80%;
+            position: absolute;
+            left: 10%;
+            bottom: 30px;
+            transition: all 0.3s;
+            border-radius: 3px 3px 0 0;
+            box-shadow: 0 -2px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .bar-hard {
+            background: linear-gradient(180deg, rgba(255, 107, 107, 0.9) 0%, rgba(255, 82, 82, 0.9) 100%);
+            width: 80%;
+            position: absolute;
+            left: 10%;
+            bottom: 30px;
+            transition: all 0.3s;
+            border-radius: 3px 3px 0 0;
+            box-shadow: 0 -2px 10px rgba(255, 107, 107, 0.3);
+            z-index: 2;
+        }
+        
+        .chart-bar:hover .bar-soft {
+            transform: translateY(-2px);
+            box-shadow: 0 -4px 15px rgba(76, 175, 80, 0.5);
+        }
+        
+        .chart-bar:hover .bar-hard {
+            transform: translateY(-2px);
+            box-shadow: 0 -4px 15px rgba(255, 107, 107, 0.5);
+        }
+        
+        .chart-axis {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            border-top: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #666;
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.8);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #4caf50;
+            border-radius: 50%;
+            cursor: pointer;
+            pointer-events: all;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #4caf50;
+            border-radius: 50%;
+            cursor: pointer;
+            pointer-events: all;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+        
         .stat-card {
             background: white;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card.protection {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .stat-card.protection.negative {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+        
+        .stat-card.protection .stat-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card.protection .stat-value {
+            font-size: 42px;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .protection-percent {
+            font-size: 24px;
+            opacity: 0.95;
+            font-weight: 600;
         }
         
         .stat-label {
@@ -182,6 +373,12 @@
             font-size: 24px;
             font-weight: bold;
             color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .stat-card.protection {
+                grid-column: span 1;
+            }
         }
         
         .tabs {
@@ -229,6 +426,27 @@
             position: sticky;
             top: 0;
             z-index: 10;
+        }
+        
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        
+        th.sortable:hover {
+            background: linear-gradient(135deg, #7684ec 0%, #8659b4 100%);
+        }
+        
+        .explorer-link {
+            color: #6b46a3;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .explorer-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
         }
         
         td {
@@ -297,15 +515,29 @@
         
         .filter-stats {
             background: #f8f9fa;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 5px;
-            margin-top: 15px;
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
+            margin-left: 15px;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            max-width: 100%;
         }
         
         .filter-stats strong {
             color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-stats {
+                display: block;
+                margin-left: 0;
+                margin-top: 10px;
+                font-size: 12px;
+                line-height: 1.6;
+            }
         }
         
         .no-data {
@@ -324,73 +556,181 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        .date-range-picker {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1001;
+            min-width: 280px;
+        }
+        
+        .date-range-picker.active {
+            display: block;
+        }
+        
+        .calendar-icon {
+            cursor: pointer;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 5px;
+            transition: all 0.2s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+        
+        .calendar-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .date-input-group {
+            margin-bottom: 10px;
+        }
+        
+        .date-input-group label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .date-input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .date-range-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .date-range-buttons button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        
+        .date-range-buttons button:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn-apply {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .table-wrapper {
+            position: relative;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🚀 Curve Finance Liquidation Analysis</h1>
         
-        <div class="controls">
-            <div class="file-input-wrapper">
-                <div class="file-input-group">
-                    <label>Загрузить файл данных (JSONP):</label>
-                    <label for="fileInput" class="file-input-btn">📁 Выбрать файл</label>
-                    <input type="file" id="fileInput" accept=".js,.jsonp">
-                    <div class="file-name" id="fileName">Автозагрузка latest_liquidations.js...</div>
-                </div>
-            </div>
-            
-            <div class="filter-section">
-                <div class="filter-title">🔍 Фильтры</div>
-                <div class="filter-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Тип ликвидации</label>
-                        <select id="typeFilter">
-                            <option value="all">Все</option>
-                            <option value="soft">Только Soft</option>
-                            <option value="hard">Только Hard</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Платформа</label>
-                        <select id="platformFilter">
-                            <option value="all">Все платформы</option>
-                            <option value="LlamaLend">LlamaLend</option>
-                            <option value="crvUSD">crvUSD</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Сеть</label>
-                        <select id="networkFilter">
-                            <option value="all">Все сети</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Токен</label>
-                        <select id="tokenFilter">
-                            <option value="all">Все токены</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Поиск по адресу</label>
-                        <input type="text" id="addressFilter" placeholder="0x...">
+        <div class="stats-grid" id="statsGrid"></div>
+        
+        <div class="chart-container">
+            <div class="chart-inner">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="chart-title" id="chartTitle" style="font-size: 18px; font-weight: 600; color: #333;">📈 Ликвидации по дням</div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="chartMode" value="count" style="margin-right: 5px;">
+                            Количество
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="chartMode" value="sum" checked style="margin-right: 5px;">
+                            Сумма ($)
+                        </label>
                     </div>
                 </div>
-                
-                <div class="filter-buttons">
-                    <button class="btn btn-primary" onclick="applyFilters()">Применить фильтры</button>
-                    <button class="btn btn-secondary" onclick="resetFilters()">Сбросить</button>
+                <div id="liquidationChart"></div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(76, 175, 80, 0.8);"></div>
+                        <span>Мягкие ликвидации</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(255, 107, 107, 0.9);"></div>
+                        <span>Жёсткие ликвидации</span>
+                    </div>
                 </div>
-                
-                <div class="filter-stats" id="filterStats"></div>
+                <div class="chart-controls" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                    <div style="position: relative; width: 100%; height: 30px; margin: 10px 0;">
+                        <div style="position: absolute; width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; top: 13px;"></div>
+                        <div id="sliderRange" style="position: absolute; height: 4px; background: linear-gradient(90deg, #4caf50 0%, #45a049 100%); border-radius: 2px; top: 13px;"></div>
+                        <input type="range" id="rangeStart" min="0" max="1000" value="0" step="1" style="position: absolute; width: 100%; height: 4px; background: transparent; pointer-events: none; -webkit-appearance: none; top: 13px;">
+                        <input type="range" id="rangeEnd" min="0" max="1000" value="30" step="1" style="position: absolute; width: 100%; height: 4px; background: transparent; pointer-events: none; -webkit-appearance: none; top: 13px;">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; color: #666;">
+                        <span id="startLabel" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500;">Начало</span>
+                        <span style="color: #999; font-size: 11px;">Выбранный период</span>
+                        <span id="endLabel" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500;">Конец</span>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="chart-tooltip" id="chartTooltip"></div>
         
-        <div class="stats-grid" id="statsGrid"></div>
+        <div class="controls">
+            <div class="filter-section">
+                <span class="filter-title">🔍 Фильтры:</span>
+                <div class="filter-grid">
+                    <select id="platformFilter" style="padding: 5px 10px; font-size: 13px;">
+                        <option value="all">Все платформы</option>
+                        <option value="LlamaLend">LlamaLend</option>
+                        <option value="crvUSD">crvUSD</option>
+                    </select>
+                    
+                    <select id="networkFilter" style="padding: 5px 10px; font-size: 13px;">
+                        <option value="all">Все сети</option>
+                    </select>
+                    
+                    <select id="tokenFilter" style="padding: 5px 10px; font-size: 13px;">
+                        <option value="all">Все токены</option>
+                    </select>
+                    
+                    <input type="text" id="addressFilter" placeholder="Адрес (0x...)" style="padding: 5px 10px; font-size: 13px; width: 150px;">
+                    
+                    <button class="btn btn-primary" onclick="applyFilters()" style="padding: 5px 12px; font-size: 13px;">Применить</button>
+                    <button class="btn btn-secondary" onclick="resetFilters()" style="padding: 5px 12px; font-size: 13px;">Сбросить</button>
+                </div>
+            </div>
+            <div class="filter-stats" id="filterStats"></div>
+        </div>
         
         <div class="tabs">
             <button class="tab active" data-tab="soft">💧 Мягкие ликвидации</button>
@@ -415,15 +755,24 @@
         const itemsPerPage = 50;
         let availableNetworks = new Set();
         let availableTokens = new Set();
+        let sortColumn = 'first_dt'; // По умолчанию сортируем по дате входа
+        let sortDirection = 'desc'; // По умолчанию новые сначала
+        let hardSortColumn = 'timestamp'; // Сортировка для хард ликвидаций
+        let hardSortDirection = 'desc';
+        let compareSortColumn = 'softTVL'; // Сортировка для сравнения
+        let compareSortDirection = 'desc';
+        
+        // Глобальные переменные для хранения выбранных дат
+        let selectedStartDate = null;
+        let selectedEndDate = null;
+        let globalMinDate = null;
+        let globalMaxDate = null;
+        let chartMode = 'sum'; // 'count' или 'sum'
+        let comparisonGroupBy = 'market'; // 'market', 'platform', 'token', 'chain'
+        let tableDateStart = null; // Начальная дата для фильтрации таблиц
+        let tableDateEnd = null; // Конечная дата для фильтрации таблиц
 
-        // Обработка выбора файла
-        document.getElementById('fileInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('fileName').textContent = file.name;
-                await loadFile(file);
-            }
-        });
+        // Удален обработчик выбора файла - автозагрузка из latest_liquidations.js
 
         // Обработка вкладок
         document.querySelectorAll('.tab').forEach(tab => {
@@ -433,6 +782,25 @@
                 currentTab = e.target.dataset.tab;
                 currentPage = 1;
                 renderData();
+            });
+        });
+        
+        // Обработка переключения режима графика
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input[name="chartMode"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    chartMode = e.target.value;
+                    renderChart();
+                });
+            });
+            
+            // Закрытие календаря при клике вне его
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.date-range-picker') && !e.target.closest('.calendar-icon')) {
+                    document.querySelectorAll('.date-range-picker').forEach(picker => {
+                        picker.classList.remove('active');
+                    });
+                }
             });
         });
 
@@ -474,6 +842,10 @@
             softData = data.soft_liquidations;
             hardData = data.hard_liquidations;
             
+            // Находим полный диапазон данных
+            let minDate = new Date();
+            let maxDate = new Date(0);
+            
             // Собираем доступные сети и токены
             availableNetworks.clear();
             availableTokens.clear();
@@ -483,6 +855,11 @@
                 softData.positions.forEach(pos => {
                     if (pos.chain) availableNetworks.add(pos.chain);
                     if (pos.collateral_token) availableTokens.add(pos.collateral_token);
+                    if (pos.first_dt) {
+                        const date = new Date(pos.first_dt);
+                        if (date < minDate) minDate = date;
+                        if (date > maxDate) maxDate = date;
+                    }
                 });
             }
             
@@ -491,8 +868,43 @@
                 hardData.events.forEach(event => {
                     if (event.chain) availableNetworks.add(event.chain);
                     if (event.collateral_token) availableTokens.add(event.collateral_token);
+                    if (event.timestamp) {
+                        const date = new Date(event.timestamp);
+                        if (date < minDate) minDate = date;
+                        if (date > maxDate) maxDate = date;
+                    }
                 });
             }
+            
+            // Сохраняем глобальные даты
+            globalMinDate = minDate;
+            globalMaxDate = maxDate;
+            
+            // Устанавливаем диапазон ползунков на весь период данных
+            const totalDays = Math.ceil((maxDate - minDate) / (24 * 60 * 60 * 1000)) + 1;
+            const rangeStart = document.getElementById('rangeStart');
+            const rangeEnd = document.getElementById('rangeEnd');
+            const sliderRange = document.getElementById('sliderRange');
+            
+            // Устанавливаем максимум на полный диапазон данных
+            rangeStart.max = totalDays;
+            rangeEnd.max = totalDays;
+            rangeStart.value = Math.max(0, totalDays - 30); // Начало за 30 дней до конца
+            rangeEnd.value = totalDays; // Конец на последней дате
+            
+            // Обновляем визуальный диапазон
+            const startPercent = (rangeStart.value / rangeEnd.max) * 100;
+            const endPercent = (rangeEnd.value / rangeEnd.max) * 100;
+            sliderRange.style.left = startPercent + '%';
+            sliderRange.style.width = (endPercent - startPercent) + '%';
+            
+            // Устанавливаем начальные выбранные даты
+            selectedStartDate = new Date(minDate.getTime() + parseInt(rangeStart.value) * 24 * 60 * 60 * 1000);
+            selectedEndDate = new Date(minDate.getTime() + parseInt(rangeEnd.value) * 24 * 60 * 60 * 1000);
+            
+            // Обновляем метки
+            document.getElementById('startLabel').textContent = selectedStartDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+            document.getElementById('endLabel').textContent = selectedEndDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
             
             // Обновляем фильтры
             updateFilterOptions();
@@ -524,7 +936,7 @@
         }
 
         function applyFilters() {
-            const typeFilter = document.getElementById('typeFilter').value;
+            const typeFilter = 'all'; // Убрали фильтр по типу
             const platformFilter = document.getElementById('platformFilter').value;
             const networkFilter = document.getElementById('networkFilter').value;
             const tokenFilter = document.getElementById('tokenFilter').value;
@@ -576,8 +988,79 @@
                 document.querySelector('[data-tab="hard"]').classList.add('active');
             }
             
-            // Обновляем статистику и данные
+            // Обновляем статистику, диаграмму и данные
             renderStats();
+            
+            // Обновляем диапазон слайдера при фильтрации, но сохраняем выбранные даты
+            if (filteredSoftData && filteredHardData) {
+                let minDate = new Date();
+                let maxDate = new Date(0);
+                
+                // Находим новый диапазон дат в отфильтрованных данных
+                if (filteredSoftData.positions) {
+                    filteredSoftData.positions.forEach(pos => {
+                        if (pos.first_dt) {
+                            const date = new Date(pos.first_dt);
+                            if (date < minDate) minDate = date;
+                            if (date > maxDate) maxDate = date;
+                        }
+                    });
+                }
+                
+                if (filteredHardData.events) {
+                    filteredHardData.events.forEach(event => {
+                        if (event.timestamp) {
+                            const date = new Date(event.timestamp);
+                            if (date < minDate) minDate = date;
+                            if (date > maxDate) maxDate = date;
+                        }
+                    });
+                }
+                
+                // Если отфильтрованных данных нет, используем глобальный диапазон
+                if (minDate > maxDate) {
+                    minDate = globalMinDate;
+                    maxDate = globalMaxDate;
+                }
+                
+                // Обновляем слайдеры
+                const totalDays = Math.ceil((maxDate - minDate) / (24 * 60 * 60 * 1000)) + 1;
+                const rangeStart = document.getElementById('rangeStart');
+                const rangeEnd = document.getElementById('rangeEnd');
+                const sliderRange = document.getElementById('sliderRange');
+                
+                rangeStart.max = totalDays;
+                rangeEnd.max = totalDays;
+                
+                // Пересчитываем позиции слайдера на основе сохраненных дат
+                // Если выбранные даты выходят за пределы нового диапазона, корректируем их
+                let newStartDate = selectedStartDate;
+                let newEndDate = selectedEndDate;
+                
+                if (newStartDate < minDate) newStartDate = minDate;
+                if (newEndDate > maxDate) newEndDate = maxDate;
+                if (newStartDate > maxDate) newStartDate = new Date(maxDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+                if (newEndDate < minDate) newEndDate = minDate;
+                
+                // Конвертируем даты обратно в значения слайдера
+                const startValue = Math.max(0, Math.floor((newStartDate - minDate) / (24 * 60 * 60 * 1000)));
+                const endValue = Math.min(totalDays, Math.ceil((newEndDate - minDate) / (24 * 60 * 60 * 1000)));
+                
+                rangeStart.value = startValue;
+                rangeEnd.value = endValue;
+                
+                // Обновляем визуальный диапазон
+                const startPercent = (rangeStart.value / rangeEnd.max) * 100;
+                const endPercent = (rangeEnd.value / rangeEnd.max) * 100;
+                sliderRange.style.left = startPercent + '%';
+                sliderRange.style.width = (endPercent - startPercent) + '%';
+                
+                // Обновляем метки
+                document.getElementById('startLabel').textContent = newStartDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+                document.getElementById('endLabel').textContent = newEndDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+            }
+            
+            renderChart();
             renderData();
         }
 
@@ -595,7 +1078,6 @@
         }
 
         function resetFilters() {
-            document.getElementById('typeFilter').value = 'all';
             document.getElementById('platformFilter').value = 'all';
             document.getElementById('networkFilter').value = 'all';
             document.getElementById('tokenFilter').value = 'all';
@@ -605,7 +1087,217 @@
 
         function processData() {
             renderStats();
+            renderChart();
             renderData();
+        }
+        
+        function renderChart() {
+            const chartContainer = document.getElementById('liquidationChart');
+            
+            // Используем отфильтрованные данные если они есть, иначе полные
+            const softDataToUse = filteredSoftData || softData;
+            const hardDataToUse = filteredHardData || hardData;
+            
+            if (!softDataToUse || !hardDataToUse) {
+                chartContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Нет данных для диаграммы</div>';
+                return;
+            }
+            
+            // Определяем диапазон дат
+            let startDate, endDate;
+            
+            // Находим минимальную и максимальную даты в ОТФИЛЬТРОВАННЫХ данных
+            let minDate = new Date();
+            let maxDate = new Date(0);
+            
+            if (softDataToUse.positions) {
+                softDataToUse.positions.forEach(pos => {
+                    if (pos.first_dt) {
+                        const date = new Date(pos.first_dt);
+                        if (date < minDate) minDate = date;
+                        if (date > maxDate) maxDate = date;
+                    }
+                });
+            }
+            
+            if (hardDataToUse.events) {
+                hardDataToUse.events.forEach(event => {
+                    if (event.timestamp) {
+                        const date = new Date(event.timestamp);
+                        if (date < minDate) minDate = date;
+                        if (date > maxDate) maxDate = date;
+                    }
+                });
+            }
+            
+            // Используем сохраненные даты если они есть
+            if (selectedStartDate && selectedEndDate) {
+                startDate = selectedStartDate;
+                endDate = selectedEndDate;
+            } else {
+                // Если нет сохраненных дат, используем значения слайдеров
+                const rangeStart = document.getElementById('rangeStart');
+                const rangeEnd = document.getElementById('rangeEnd');
+                const startDaysFromMin = parseInt(rangeStart.value) || 0;
+                const endDaysFromMin = parseInt(rangeEnd.value) || 30;
+                
+                startDate = new Date(minDate.getTime() + startDaysFromMin * 24 * 60 * 60 * 1000);
+                endDate = new Date(minDate.getTime() + endDaysFromMin * 24 * 60 * 60 * 1000);
+            }
+            
+            // Если запрошенный диапазон больше доступных данных
+            if (startDate < minDate) {
+                startDate = minDate;
+            }
+            
+            // Обновляем заголовок
+            const title = document.getElementById('chartTitle');
+            const startStr = startDate.toLocaleDateString('ru-RU');
+            const endStr = endDate.toLocaleDateString('ru-RU');
+            title.textContent = `📈 Ликвидации по дням (${startStr} - ${endStr})`;
+            
+            // Подготавливаем данные по дням
+            const dailyData = {};
+            const totalDays = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
+            
+            // Инициализируем все дни
+            for (let i = 0; i < totalDays; i++) {
+                const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+                const dateStr = date.toISOString().split('T')[0];
+                dailyData[dateStr] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0 };
+            }
+            
+            // Считаем софт ликвидации (используем те же отфильтрованные данные)
+            if (softDataToUse.positions) {
+                softDataToUse.positions.forEach(pos => {
+                    if (pos.first_dt) {
+                        const date = new Date(pos.first_dt);
+                        if (date >= startDate && date <= endDate) {
+                            const dateStr = date.toISOString().split('T')[0];
+                            if (dailyData[dateStr]) {
+                                dailyData[dateStr].soft++;
+                                dailyData[dateStr].softTVL += pos.tvl || 0;
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Считаем хард ликвидации (используем те же отфильтрованные данные)
+            if (hardDataToUse.events) {
+                hardDataToUse.events.forEach(event => {
+                    if (event.timestamp) {
+                        const date = new Date(event.timestamp);
+                        if (date >= startDate && date <= endDate) {
+                            const dateStr = date.toISOString().split('T')[0];
+                            if (dailyData[dateStr]) {
+                                dailyData[dateStr].hard++;
+                                dailyData[dateStr].hardDebt += event.debt || 0;
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Находим максимальные значения в зависимости от режима
+            let maxSoft = 0;
+            let maxHard = 0;
+            Object.values(dailyData).forEach(day => {
+                if (chartMode === 'sum') {
+                    maxSoft = Math.max(maxSoft, day.softTVL);
+                    maxHard = Math.max(maxHard, day.hardDebt);
+                } else {
+                    maxSoft = Math.max(maxSoft, day.soft);
+                    maxHard = Math.max(maxHard, day.hard);
+                }
+            });
+            const maxValue = Math.max(maxSoft, maxHard);
+            
+            // Рисуем диаграмму
+            let html = '';
+            const dates = Object.keys(dailyData).sort();
+            const barWidth = 100 / dates.length;
+            
+            dates.forEach((dateStr, index) => {
+                const day = dailyData[dateStr];
+                let softValue, hardValue;
+                
+                if (chartMode === 'sum') {
+                    softValue = day.softTVL;
+                    hardValue = day.hardDebt;
+                } else {
+                    softValue = day.soft;
+                    hardValue = day.hard;
+                }
+                
+                const softHeight = maxValue > 0 ? (softValue / maxValue * 200) : 0;
+                const hardHeight = maxValue > 0 ? (hardValue / maxValue * 200) : 0;
+                
+                // Определяем порядок столбиков - меньший сзади, больший спереди
+                let barsHtml = '';
+                if (hardValue > softValue) {
+                    // Если хард больше - сначала рисуем хард (сзади), потом софт (спереди)
+                    barsHtml = `
+                        <div class="bar-hard" style="height: ${hardHeight}px; z-index: 1;"></div>
+                        <div class="bar-soft" style="height: ${softHeight}px; z-index: 2;"></div>
+                    `;
+                } else {
+                    // Если софт больше или равен - сначала рисуем софт (сзади), потом хард (спереди)
+                    barsHtml = `
+                        <div class="bar-soft" style="height: ${softHeight}px; z-index: 1;"></div>
+                        <div class="bar-hard" style="height: ${hardHeight}px; z-index: 2;"></div>
+                    `;
+                }
+                
+                html += `
+                    <div class="chart-bar" style="left: ${index * barWidth}%; width: ${barWidth}%;" 
+                         onmouseover="showChartTooltip(event, '${dateStr}', ${day.soft}, ${day.hard}, ${day.softTVL}, ${day.hardDebt})"
+                         onmouseout="hideChartTooltip()">
+                        ${barsHtml}
+                    </div>
+                `;
+            });
+            
+            // Добавляем ось X
+            html += '<div class="chart-axis">';
+            const labelInterval = Math.max(1, Math.floor(dates.length / 6));
+            for (let i = 0; i < dates.length; i += labelInterval) {
+                if (dates[i]) {
+                    const date = new Date(dates[i]);
+                    html += `<span>${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}</span>`;
+                }
+            }
+            html += '</div>';
+            
+            chartContainer.innerHTML = html;
+        }
+        
+        function showChartTooltip(event, dateStr, soft, hard, softTVL, hardDebt) {
+            const tooltip = document.getElementById('chartTooltip');
+            const date = new Date(dateStr);
+            const formattedDate = date.toLocaleDateString('ru-RU');
+            
+            if (chartMode === 'sum') {
+                tooltip.innerHTML = `
+                    <strong>${formattedDate}</strong><br>
+                    💧 Мягких: $${formatNumber(softTVL)} (${soft} поз.)<br>
+                    🔥 Жёстких: $${formatNumber(hardDebt)} (${hard} соб.)
+                `;
+            } else {
+                tooltip.innerHTML = `
+                    <strong>${formattedDate}</strong><br>
+                    💧 Мягких: ${soft} ($${formatNumber(softTVL)})<br>
+                    🔥 Жёстких: ${hard} ($${formatNumber(hardDebt)})
+                `;
+            }
+            
+            tooltip.style.display = 'block';
+            tooltip.style.left = event.pageX + 10 + 'px';
+            tooltip.style.top = event.pageY - 40 + 'px';
+        }
+        
+        function hideChartTooltip() {
+            document.getElementById('chartTooltip').style.display = 'none';
         }
 
         function renderStats() {
@@ -623,70 +1315,128 @@
             const hardDebtWithDiscount = hardData?.total?.debt_with_discount || 0;
             const protectedAmount = softTVL - hardDebtWithDiscount;
             const protectionPercent = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
+            
+            // ГЛАВНЫЙ БЛОК - Защищено депозитов (занимает 2 колонки)
+            if (softData && hardData) {
+                const isPositive = protectedAmount > 0;
+                html += `
+                    <div class="stat-card protection ${!isPositive ? 'negative' : ''}">
+                        <div class="stat-label">🛡️ ЗАЩИЩЕНО ОТ ЛИКВИДАЦИИ</div>
+                        <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
+                        <div class="protection-percent">
+                            ${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% от TVL в софт ликвидации
+                        </div>
+                    </div>
+                `;
+            }
 
-            // Софт ликвидации
+            // Софт ликвидации - расширенная информация
             if (softData) {
                 const summary = softData.summary || {};
+                const avgDebtRatio = summary.total_tvl > 0 ? (summary.total_debt / summary.total_tvl * 100) : 0;
+                const avgPositionSize = summary.total_positions > 0 ? (summary.total_tvl / summary.total_positions) : 0;
+                
                 html += `
                     <div class="stat-card">
-                        <div class="stat-label">💧 Софт ликвидации TVL</div>
+                        <div class="stat-label">💧 СОФТ ЛИКВИДАЦИИ</div>
                         <div class="stat-value">$${formatNumber(summary.total_tvl || 0)}</div>
-                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
-                            ${summary.total_positions || 0} позиций
+                        <div style="font-size: 14px; margin-top: 12px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">Позиций:</span>
+                                <strong>${summary.total_positions || 0}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">Общий долг:</span>
+                                <strong>$${formatNumber(summary.total_debt || 0)}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">Средний LTV:</span>
+                                <strong style="color: ${avgDebtRatio > 80 ? '#f44336' : avgDebtRatio > 60 ? '#ff9800' : '#4caf50'}">
+                                    ${avgDebtRatio.toFixed(1)}%
+                                </strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #666;">Средняя позиция:</span>
+                                <strong>$${formatNumber(avgPositionSize)}</strong>
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
-            // Хард ликвидации
+            // Хард ликвидации - расширенная информация  
             if (hardData) {
                 const totalHard = hardData.total || {};
-                html += `
-                    <div class="stat-card">
-                        <div class="stat-label">🔥 Хард ликвидации</div>
-                        <div class="stat-value">$${formatNumber(totalHard.debt_with_discount || totalHard.debt || 0)}</div>
-                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
-                            ${totalHard.count || 0} событий
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Защищено депозитов
-            if (softData && hardData) {
-                const color = protectedAmount > 0 ? '#4caf50' : '#f44336';
-                html += `
-                    <div class="stat-card">
-                        <div class="stat-label">🛡️ Защищено депозитов</div>
-                        <div class="stat-value" style="color: ${color}">
-                            $${formatNumber(Math.abs(protectedAmount))}
-                        </div>
-                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
-                            ${protectionPercent.toFixed(1)}% защиты
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Дополнительная статистика по платформам
-            if (softData || hardData) {
-                let platformStats = '<div class="stat-card"><div class="stat-label">🏦 По платформам</div>';
+                const avgDiscount = totalHard.debt > 0 ? 
+                    ((totalHard.debt_with_discount - totalHard.debt) / totalHard.debt * 100) : 0;
+                const avgLiquidationSize = totalHard.count > 0 ? 
+                    (totalHard.debt / totalHard.count) : 0;
                 
-                if (softData?.summary) {
-                    platformStats += `
-                        <div style="font-size: 14px; margin-top: 10px;">
-                            <strong>LlamaLend:</strong> ${softData.summary.llamalend_positions || 0} позиций, 
-                            $${formatNumber(softData.summary.llamalend_tvl || 0)}
-                        </div>
-                        <div style="font-size: 14px; margin-top: 5px;">
-                            <strong>crvUSD:</strong> ${softData.summary.crvusd_positions || 0} позиций, 
-                            $${formatNumber(softData.summary.crvusd_tvl || 0)}
-                        </div>
-                    `;
+                // Подсчет по платформам
+                let lendingCount = 0, crvusdCount = 0;
+                if (hardData.events) {
+                    hardData.events.forEach(e => {
+                        if (e.platform === 'LlamaLend') lendingCount++;
+                        else if (e.platform === 'crvUSD') crvusdCount++;
+                    });
                 }
                 
-                platformStats += '</div>';
-                html += platformStats;
+                html += `
+                    <div class="stat-card">
+                        <div class="stat-label">🔥 ХАРД ЛИКВИДАЦИИ</div>
+                        <div class="stat-value">$${formatNumber(totalHard.debt_with_discount || totalHard.debt || 0)}</div>
+                        <div style="font-size: 14px; margin-top: 12px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">Событий:</span>
+                                <strong>${totalHard.count || 0}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">Долг без дисконта:</span>
+                                <strong>$${formatNumber(totalHard.debt || 0)}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">Средний дисконт:</span>
+                                <strong style="color: #f44336">${avgDiscount.toFixed(1)}%</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">Средний размер:</span>
+                                <strong>$${formatNumber(avgLiquidationSize)}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #666;">По платформам:</span>
+                                <strong>
+                                    <span style="color: #667eea;">${lendingCount}</span> / 
+                                    <span style="color: #764ba2;">${crvusdCount}</span>
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Статистика по платформам - объединенная
+            if (softData?.summary) {
+                html += `
+                    <div class="stat-card">
+                        <div class="stat-label">🏦 Разбивка по платформам</div>
+                        <div style="font-size: 16px; margin-top: 15px;">
+                            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
+                                <strong style="color: #667eea;">🦙 LlamaLend</strong><br>
+                                <span style="font-size: 20px; font-weight: bold;">$${formatNumber(softData.summary.llamalend_tvl || 0)}</span><br>
+                                <span style="font-size: 14px; color: #666;">
+                                    ${softData.summary.llamalend_positions || 0} позиций • Долг: $${formatNumber(softData.summary.llamalend_debt || 0)}
+                                </span>
+                            </div>
+                            <div>
+                                <strong style="color: #764ba2;">💱 crvUSD</strong><br>
+                                <span style="font-size: 20px; font-weight: bold;">$${formatNumber(softData.summary.crvusd_tvl || 0)}</span><br>
+                                <span style="font-size: 14px; color: #666;">
+                                    ${softData.summary.crvusd_positions || 0} позиций • Долг: $${formatNumber(softData.summary.crvusd_debt || 0)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
 
             statsGrid.innerHTML = html;
@@ -711,51 +1461,161 @@
                 return;
             }
 
-            const positions = filteredSoftData.positions;
+            let positions = [...filteredSoftData.positions];
+            
+            // Фильтрация по датам если указаны
+            if (tableDateStart || tableDateEnd) {
+                positions = positions.filter(pos => {
+                    if (!pos.first_dt) return false;
+                    const date = new Date(pos.first_dt);
+                    if (tableDateStart && date < tableDateStart) return false;
+                    if (tableDateEnd && date > tableDateEnd) return false;
+                    return true;
+                });
+            }
             if (positions.length === 0) {
                 container.innerHTML = '<div class="no-data">Нет позиций, соответствующих фильтрам</div>';
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
             
+            // Сортировка
+            positions.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(sortColumn) {
+                    case 'first_dt':
+                        aVal = a[sortColumn] ? new Date(a[sortColumn]).getTime() : 0;
+                        bVal = b[sortColumn] ? new Date(b[sortColumn]).getTime() : 0;
+                        break;
+                    case 'tvl':
+                        aVal = a[sortColumn] || 0;
+                        bVal = b[sortColumn] || 0;
+                        break;
+                    case 'market_name':
+                    case 'platform':
+                    case 'chain':
+                    case 'user':
+                    case 'collateral_token':
+                        aVal = (a[sortColumn] || '').toLowerCase();
+                        bVal = (b[sortColumn] || '').toLowerCase();
+                        break;
+                    default:
+                        aVal = a[sortColumn];
+                        bVal = b[sortColumn];
+                }
+                
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                } else {
+                    return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+                }
+            });
+            
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
             const pageData = positions.slice(start, end);
 
             let html = `
-                <h2>💧 Мягкие ликвидации (позиции в софт ликвидации)</h2>
+                <div class="table-wrapper">
+                    <div class="table-header">
+                        <h2 style="margin: 0;">💧 Мягкие ликвидации (позиции в софт ликвидации)</h2>
+                        <span class="calendar-icon" onclick="toggleDatePicker('soft')">
+                            📅 Фильтр по дате
+                        </span>
+                    </div>
+                    <div id="softDatePicker" class="date-range-picker">
+                    <div class="date-input-group">
+                        <label>От даты:</label>
+                        <input type="date" id="softDateStart" value="${tableDateStart ? tableDateStart.toISOString().split('T')[0] : ''}">
+                    </div>
+                    <div class="date-input-group">
+                        <label>До даты:</label>
+                        <input type="date" id="softDateEnd" value="${tableDateEnd ? tableDateEnd.toISOString().split('T')[0] : ''}">
+                    </div>
+                    <div class="date-range-buttons">
+                        <button class="btn-apply" onclick="applyDateRange('soft')">Применить</button>
+                        <button class="btn-cancel" onclick="clearDateRange('soft')">Сбросить</button>
+                    </div>
+                </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Маркет</th>
-                            <th>Платформа</th>
-                            <th>Сеть</th>
-                            <th>Пользователь</th>
-                            <th>Токен</th>
-                            <th>TVL</th>
-                            <th>Долг</th>
-                            <th>Цена</th>
+                            <th class="sortable" onclick="sortTable('first_dt')">
+                                Дата ${getSortArrow('first_dt')}
+                            </th>
+                            <th class="sortable" onclick="sortTable('platform')">
+                                Платформа ${getSortArrow('platform')}
+                            </th>
+                            <th class="sortable" onclick="sortTable('market_name')">
+                                Маркет ${getSortArrow('market_name')}
+                            </th>
+                            <th class="sortable" onclick="sortTable('chain')">
+                                Сеть ${getSortArrow('chain')}
+                            </th>
+                            <th class="sortable" onclick="sortTable('user')">
+                                Пользователь ${getSortArrow('user')}
+                            </th>
+                            <th class="sortable" onclick="sortTable('collateral_token')">
+                                Токен ${getSortArrow('collateral_token')}
+                            </th>
+                            <th class="sortable" onclick="sortTable('tvl')">
+                                Max TVL ${getSortArrow('tvl')}
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
             pageData.forEach(pos => {
+                const dateOnly = pos.first_dt ? new Date(pos.first_dt).toLocaleDateString('ru-RU') : 'N/A';
+                
+                // Определяем базовый URL для адресов в зависимости от сети
+                let addressBaseUrl = '';
+                switch(pos.chain) {
+                    case 'ETHEREUM':
+                        addressBaseUrl = 'https://etherscan.io/address/';
+                        break;
+                    case 'ARBITRUM':
+                        addressBaseUrl = 'https://arbiscan.io/address/';
+                        break;
+                    case 'OPTIMISM':
+                        addressBaseUrl = 'https://optimistic.etherscan.io/address/';
+                        break;
+                    case 'POLYGON':
+                        addressBaseUrl = 'https://polygonscan.com/address/';
+                        break;
+                    case 'GNOSIS':
+                        addressBaseUrl = 'https://gnosisscan.io/address/';
+                        break;
+                    case 'BASE':
+                        addressBaseUrl = 'https://basescan.org/address/';
+                        break;
+                    case 'FRAXTAL':
+                        addressBaseUrl = 'https://fraxscan.com/address/';
+                        break;
+                    default:
+                        addressBaseUrl = 'https://etherscan.io/address/';
+                }
+                
+                const userDisplay = pos.user ? 
+                    `<a href="${addressBaseUrl}${pos.user}" target="_blank" title="${pos.user}" class="explorer-link">${formatAddress(pos.user)}</a>` : 
+                    'N/A';
+                
                 html += `
                     <tr>
-                        <td>${pos.market_name || 'N/A'}</td>
+                        <td>${dateOnly}</td>
                         <td>${pos.platform || 'N/A'}</td>
+                        <td>${pos.market_name || 'N/A'}</td>
                         <td>${pos.chain || 'N/A'}</td>
-                        <td>${formatAddress(pos.user)}</td>
+                        <td>${userDisplay}</td>
                         <td>${pos.collateral_token || 'N/A'}</td>
                         <td>$${formatNumber(pos.tvl || 0)}</td>
-                        <td>$${formatNumber(pos.debt || 0)}</td>
-                        <td>$${formatNumber(pos.price || 0)}</td>
                     </tr>
                 `;
             });
 
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
             container.innerHTML = html;
             
             renderPagination(positions.length);
@@ -768,31 +1628,119 @@
                 return;
             }
 
-            const events = filteredHardData.events;
+            let events = [...filteredHardData.events];
+            
+            // Фильтрация по датам если указаны
+            if (tableDateStart || tableDateEnd) {
+                events = events.filter(event => {
+                    if (!event.timestamp) return false;
+                    const date = new Date(event.timestamp);
+                    if (tableDateStart && date < tableDateStart) return false;
+                    if (tableDateEnd && date > tableDateEnd) return false;
+                    return true;
+                });
+            }
             if (events.length === 0) {
                 container.innerHTML = '<div class="no-data">Нет событий, соответствующих фильтрам</div>';
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
             
+            // Сортировка хард ликвидаций
+            events.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(hardSortColumn) {
+                    case 'timestamp':
+                        aVal = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                        bVal = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                        break;
+                    case 'debt':
+                        aVal = a.debt || 0;
+                        bVal = b.debt || 0;
+                        break;
+                    case 'liquidation_discount':
+                        aVal = a.liquidation_discount || 0;
+                        bVal = b.liquidation_discount || 0;
+                        break;
+                    case 'market_name':
+                    case 'platform':
+                    case 'chain':
+                    case 'user':
+                    case 'liquidator':
+                    case 'collateral_token':
+                        aVal = (a[hardSortColumn] || '').toLowerCase();
+                        bVal = (b[hardSortColumn] || '').toLowerCase();
+                        break;
+                    default:
+                        aVal = a[hardSortColumn];
+                        bVal = b[hardSortColumn];
+                }
+                
+                if (hardSortDirection === 'asc') {
+                    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                } else {
+                    return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+                }
+            });
+            
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
             const pageData = events.slice(start, end);
 
             let html = `
-                <h2>🔥 Жёсткие ликвидации</h2>
+                <div class="table-wrapper">
+                    <div class="table-header">
+                        <h2 style="margin: 0;">🔥 Жёсткие ликвидации</h2>
+                        <span class="calendar-icon" onclick="toggleDatePicker('hard')">
+                            📅 Фильтр по дате
+                        </span>
+                    </div>
+                    <div id="hardDatePicker" class="date-range-picker">
+                    <div class="date-input-group">
+                        <label>От даты:</label>
+                        <input type="date" id="hardDateStart" value="${tableDateStart ? tableDateStart.toISOString().split('T')[0] : ''}">
+                    </div>
+                    <div class="date-input-group">
+                        <label>До даты:</label>
+                        <input type="date" id="hardDateEnd" value="${tableDateEnd ? tableDateEnd.toISOString().split('T')[0] : ''}">
+                    </div>
+                    <div class="date-range-buttons">
+                        <button class="btn-apply" onclick="applyDateRange('hard')">Применить</button>
+                        <button class="btn-cancel" onclick="clearDateRange('hard')">Сбросить</button>
+                    </div>
+                </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Дата</th>
-                            <th>Маркет</th>
-                            <th>Платформа</th>
-                            <th>Сеть</th>
-                            <th>Пользователь</th>
-                            <th>Ликвидатор</th>
-                            <th>Токен</th>
-                            <th>Долг</th>
-                            <th>Дисконт</th>
+                            <th class="sortable" onclick="sortHardTable('timestamp')">
+                                Дата и время ${getHardSortArrow('timestamp')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('platform')">
+                                Платформа ${getHardSortArrow('platform')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('market_name')">
+                                Маркет ${getHardSortArrow('market_name')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('chain')">
+                                Сеть ${getHardSortArrow('chain')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('user')">
+                                Пользователь ${getHardSortArrow('user')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('liquidator')">
+                                Ликвидатор ${getHardSortArrow('liquidator')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('collateral_token')">
+                                Токен ${getHardSortArrow('collateral_token')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('debt')">
+                                Долг ${getHardSortArrow('debt')}
+                            </th>
+                            <th class="sortable" onclick="sortHardTable('liquidation_discount')">
+                                Дисконт ${getHardSortArrow('liquidation_discount')}
+                            </th>
+                            <th>Tx Hash</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -800,27 +1748,109 @@
 
             pageData.forEach(event => {
                 const date = new Date(event.timestamp);
+                const dateTimeStr = `${date.toLocaleDateString('ru-RU')} ${date.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit', second: '2-digit'})}`;
+                
+                // Определяем правильный explorer в зависимости от сети
+                let explorerUrl = '';
+                if (event.transaction_hash) {
+                    switch(event.chain) {
+                        case 'ETHEREUM':
+                            explorerUrl = `https://etherscan.io/tx/${event.transaction_hash}`;
+                            break;
+                        case 'ARBITRUM':
+                            explorerUrl = `https://arbiscan.io/tx/${event.transaction_hash}`;
+                            break;
+                        case 'OPTIMISM':
+                            explorerUrl = `https://optimistic.etherscan.io/tx/${event.transaction_hash}`;
+                            break;
+                        case 'POLYGON':
+                            explorerUrl = `https://polygonscan.com/tx/${event.transaction_hash}`;
+                            break;
+                        case 'GNOSIS':
+                            explorerUrl = `https://gnosisscan.io/tx/${event.transaction_hash}`;
+                            break;
+                        case 'BASE':
+                            explorerUrl = `https://basescan.org/tx/${event.transaction_hash}`;
+                            break;
+                        case 'FRAXTAL':
+                            explorerUrl = `https://fraxscan.com/tx/${event.transaction_hash}`;
+                            break;
+                        default:
+                            explorerUrl = `https://etherscan.io/tx/${event.transaction_hash}`;
+                    }
+                }
+                
+                // Определяем базовый URL для адресов
+                let addressBaseUrl = '';
+                switch(event.chain) {
+                    case 'ETHEREUM':
+                        addressBaseUrl = 'https://etherscan.io/address/';
+                        break;
+                    case 'ARBITRUM':
+                        addressBaseUrl = 'https://arbiscan.io/address/';
+                        break;
+                    case 'OPTIMISM':
+                        addressBaseUrl = 'https://optimistic.etherscan.io/address/';
+                        break;
+                    case 'POLYGON':
+                        addressBaseUrl = 'https://polygonscan.com/address/';
+                        break;
+                    case 'GNOSIS':
+                        addressBaseUrl = 'https://gnosisscan.io/address/';
+                        break;
+                    case 'BASE':
+                        addressBaseUrl = 'https://basescan.org/address/';
+                        break;
+                    case 'FRAXTAL':
+                        addressBaseUrl = 'https://fraxscan.com/address/';
+                        break;
+                    default:
+                        addressBaseUrl = 'https://etherscan.io/address/';
+                }
+                
+                const txHashDisplay = event.transaction_hash ? 
+                    `<a href="${explorerUrl}" target="_blank" title="${event.transaction_hash}" class="explorer-link">${event.transaction_hash.substring(0, 8)}...</a>` : 
+                    'N/A';
+                
+                const userDisplay = event.user ? 
+                    `<a href="${addressBaseUrl}${event.user}" target="_blank" title="${event.user}" class="explorer-link">${formatAddress(event.user)}</a>` : 
+                    'N/A';
+                
+                const liquidatorDisplay = event.liquidator ? 
+                    `<a href="${addressBaseUrl}${event.liquidator}" target="_blank" title="${event.liquidator}" class="explorer-link">${formatAddress(event.liquidator)}</a>` : 
+                    'N/A';
+                
                 html += `
                     <tr>
-                        <td>${date.toLocaleDateString()}</td>
-                        <td>${event.market_name || 'N/A'}</td>
+                        <td>${dateTimeStr}</td>
                         <td>${event.platform || 'N/A'}</td>
+                        <td>${event.market_name || 'N/A'}</td>
                         <td>${event.chain || 'N/A'}</td>
-                        <td>${formatAddress(event.user)}</td>
-                        <td>${formatAddress(event.liquidator)}</td>
+                        <td>${userDisplay}</td>
+                        <td>${liquidatorDisplay}</td>
                         <td>${event.collateral_token || 'N/A'}</td>
                         <td>$${formatNumber(event.debt || 0)}</td>
                         <td>${((event.liquidation_discount || 0) * 100).toFixed(2)}%</td>
+                        <td>${txHashDisplay}</td>
                     </tr>
                 `;
             });
 
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
             container.innerHTML = html;
             
             renderPagination(events.length);
         }
 
+        function changeComparisonGroup() {
+            const select = document.getElementById('comparisonGroup');
+            if (select) {
+                comparisonGroupBy = select.value;
+                currentPage = 1;
+                renderData();
+            }
+        }
+        
         function renderComparison(container) {
             if (!filteredSoftData || !filteredHardData) {
                 container.innerHTML = '<div class="no-data">Недостаточно данных для сравнения</div>';
@@ -828,18 +1858,40 @@
                 return;
             }
 
-            // Собираем статистику по маркетам
-            const marketStats = {};
+            // Собираем статистику в зависимости от типа группировки
+            const stats = {};
             
             // Софт ликвидации
             if (filteredSoftData.positions) {
                 filteredSoftData.positions.forEach(pos => {
-                    const key = `${pos.market_name}_${pos.platform}`;
-                    if (!marketStats[key]) {
-                        marketStats[key] = {
+                    let key, label;
+                    
+                    switch(comparisonGroupBy) {
+                        case 'platform':
+                            key = pos.platform;
+                            label = pos.platform;
+                            break;
+                        case 'token':
+                            key = pos.collateral_token;
+                            label = pos.collateral_token;
+                            break;
+                        case 'chain':
+                            key = pos.chain;
+                            label = pos.chain;
+                            break;
+                        default: // market
+                            key = `${pos.market_name}_${pos.platform}`;
+                            label = pos.market_name;
+                            break;
+                    }
+                    
+                    if (!stats[key]) {
+                        stats[key] = {
+                            label: label,
                             market: pos.market_name,
                             platform: pos.platform,
                             chain: pos.chain,
+                            token: pos.collateral_token,
                             softCount: 0,
                             softTVL: 0,
                             softDebt: 0,
@@ -847,21 +1899,43 @@
                             hardDebt: 0
                         };
                     }
-                    marketStats[key].softCount++;
-                    marketStats[key].softTVL += pos.tvl || 0;
-                    marketStats[key].softDebt += pos.debt || 0;
+                    stats[key].softCount++;
+                    stats[key].softTVL += pos.tvl || 0;
+                    stats[key].softDebt += pos.debt || 0;
                 });
             }
             
             // Хард ликвидации
             if (filteredHardData.events) {
                 filteredHardData.events.forEach(event => {
-                    const key = `${event.market_name}_${event.platform}`;
-                    if (!marketStats[key]) {
-                        marketStats[key] = {
+                    let key, label;
+                    
+                    switch(comparisonGroupBy) {
+                        case 'platform':
+                            key = event.platform;
+                            label = event.platform;
+                            break;
+                        case 'token':
+                            key = event.collateral_token;
+                            label = event.collateral_token;
+                            break;
+                        case 'chain':
+                            key = event.chain;
+                            label = event.chain;
+                            break;
+                        default: // market
+                            key = `${event.market_name}_${event.platform}`;
+                            label = event.market_name;
+                            break;
+                    }
+                    
+                    if (!stats[key]) {
+                        stats[key] = {
+                            label: label,
                             market: event.market_name,
                             platform: event.platform,
                             chain: event.chain,
+                            token: event.collateral_token,
                             softCount: 0,
                             softTVL: 0,
                             softDebt: 0,
@@ -869,14 +1943,60 @@
                             hardDebt: 0
                         };
                     }
-                    marketStats[key].hardCount++;
-                    marketStats[key].hardDebt += event.debt_with_discount || event.debt || 0;
+                    stats[key].hardCount++;
+                    stats[key].hardDebt += event.debt_with_discount || event.debt || 0;
                 });
             }
             
-            const statsArray = Object.values(marketStats).sort((a, b) => 
-                (b.softTVL + b.hardDebt) - (a.softTVL + a.hardDebt)
-            );
+            let statsArray = Object.values(stats);
+            
+            // Сортировка сравнения
+            statsArray.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(compareSortColumn) {
+                    case 'softTVL':
+                        aVal = a.softTVL;
+                        bVal = b.softTVL;
+                        break;
+                    case 'softDebt':
+                        aVal = a.softDebt;
+                        bVal = b.softDebt;
+                        break;
+                    case 'softCount':
+                        aVal = a.softCount;
+                        bVal = b.softCount;
+                        break;
+                    case 'hardDebt':
+                        aVal = a.hardDebt;
+                        bVal = b.hardDebt;
+                        break;
+                    case 'hardCount':
+                        aVal = a.hardCount;
+                        bVal = b.hardCount;
+                        break;
+                    case 'protected':
+                        aVal = a.softTVL - a.hardDebt;
+                        bVal = b.softTVL - b.hardDebt;
+                        break;
+                    case 'label':
+                    case 'market':
+                    case 'platform':
+                    case 'chain':
+                        aVal = (a[compareSortColumn] || '').toLowerCase();
+                        bVal = (b[compareSortColumn] || '').toLowerCase();
+                        break;
+                    default:
+                        aVal = a[compareSortColumn];
+                        bVal = b[compareSortColumn];
+                }
+                
+                if (compareSortDirection === 'asc') {
+                    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                } else {
+                    return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+                }
+            });
             
             if (statsArray.length === 0) {
                 container.innerHTML = '<div class="no-data">Нет данных для сравнения</div>';
@@ -888,20 +2008,73 @@
             const end = start + itemsPerPage;
             const pageData = statsArray.slice(start, end);
 
+            // Сохраняем текущее значение выбора
+            const currentValue = comparisonGroupBy;
+            
             let html = `
-                <h2>📊 Сравнение по маркетам</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="margin: 0;">📊 Сравнение</h2>
+                    <select id="comparisonGroup" onchange="changeComparisonGroup()" style="padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <option value="market" ${currentValue === 'market' ? 'selected' : ''}>По маркетам</option>
+                        <option value="platform" ${currentValue === 'platform' ? 'selected' : ''}>По платформам</option>
+                        <option value="token" ${currentValue === 'token' ? 'selected' : ''}>По токенам</option>
+                        <option value="chain" ${currentValue === 'chain' ? 'selected' : ''}>По сетям</option>
+                    </select>
+                </div>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Маркет</th>
-                            <th>Платформа</th>
-                            <th>Сеть</th>
-                            <th>Софт позиций</th>
-                            <th>Софт TVL</th>
-                            <th>Софт долг</th>
-                            <th>Хард событий</th>
-                            <th>Хард долг</th>
-                            <th>Защищено</th>
+                        <tr>`;
+            
+            // Динамические заголовки в зависимости от типа группировки
+            switch(comparisonGroupBy) {
+                case 'platform':
+                    html += `
+                        <th class="sortable" onclick="sortCompareTable('label')">
+                            Платформа ${getCompareSortArrow('label')}
+                        </th>`;
+                    break;
+                case 'token':
+                    html += `
+                        <th class="sortable" onclick="sortCompareTable('label')">
+                            Токен ${getCompareSortArrow('label')}
+                        </th>`;
+                    break;
+                case 'chain':
+                    html += `
+                        <th class="sortable" onclick="sortCompareTable('label')">
+                            Сеть ${getCompareSortArrow('label')}
+                        </th>`;
+                    break;
+                default: // market
+                    html += `
+                        <th class="sortable" onclick="sortCompareTable('platform')">
+                            Платформа ${getCompareSortArrow('platform')}
+                        </th>
+                        <th class="sortable" onclick="sortCompareTable('label')">
+                            Маркет ${getCompareSortArrow('label')}
+                        </th>`;
+                    break;
+            }
+            
+            html += `
+                            <th class="sortable" onclick="sortCompareTable('softCount')">
+                                Софт позиций ${getCompareSortArrow('softCount')}
+                            </th>
+                            <th class="sortable" onclick="sortCompareTable('softTVL')">
+                                Софт TVL ${getCompareSortArrow('softTVL')}
+                            </th>
+                            <th class="sortable" onclick="sortCompareTable('softDebt')">
+                                Софт долг ${getCompareSortArrow('softDebt')}
+                            </th>
+                            <th class="sortable" onclick="sortCompareTable('hardCount')">
+                                Хард событий ${getCompareSortArrow('hardCount')}
+                            </th>
+                            <th class="sortable" onclick="sortCompareTable('hardDebt')">
+                                Хард долг ${getCompareSortArrow('hardDebt')}
+                            </th>
+                            <th class="sortable" onclick="sortCompareTable('protected')">
+                                Защищено ${getCompareSortArrow('protected')}
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -912,11 +2085,23 @@
                 const protectedPercent = stat.softTVL > 0 ? (protected / stat.softTVL * 100) : 0;
                 const protectedColor = protected > 0 ? 'green' : 'red';
                 
+                html += '<tr>';
+                
+                // Динамические колонки в зависимости от типа группировки
+                switch(comparisonGroupBy) {
+                    case 'platform':
+                    case 'token':
+                    case 'chain':
+                        html += `<td>${stat.label || 'N/A'}</td>`;
+                        break;
+                    default: // market
+                        html += `
+                            <td>${stat.platform || 'N/A'}</td>
+                            <td>${stat.label || 'N/A'}</td>`;
+                        break;
+                }
+                
                 html += `
-                    <tr>
-                        <td>${stat.market || 'N/A'}</td>
-                        <td>${stat.platform || 'N/A'}</td>
-                        <td>${stat.chain || 'N/A'}</td>
                         <td>${stat.softCount}</td>
                         <td>$${formatNumber(stat.softTVL)}</td>
                         <td>$${formatNumber(stat.softDebt)}</td>
@@ -992,6 +2177,120 @@
             renderData();
             window.scrollTo(0, 0);
         }
+        
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'desc';
+            }
+            currentPage = 1;
+            renderData();
+        }
+        
+        function getSortArrow(column) {
+            if (sortColumn !== column) return '';
+            return sortDirection === 'asc' ? '↑' : '↓';
+        }
+        
+        function sortHardTable(column) {
+            if (hardSortColumn === column) {
+                hardSortDirection = hardSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                hardSortColumn = column;
+                hardSortDirection = 'desc';
+            }
+            currentPage = 1;
+            renderData();
+        }
+        
+        function getHardSortArrow(column) {
+            if (hardSortColumn !== column) return '';
+            return hardSortDirection === 'asc' ? '↑' : '↓';
+        }
+        
+        function sortCompareTable(column) {
+            if (compareSortColumn === column) {
+                compareSortDirection = compareSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                compareSortColumn = column;
+                compareSortDirection = 'desc';
+            }
+            currentPage = 1;
+            renderData();
+        }
+        
+        window.toggleDatePicker = function(type) {
+            const pickerId = type === 'soft' ? 'softDatePicker' : 'hardDatePicker';
+            const picker = document.getElementById(pickerId);
+            if (picker) {
+                picker.classList.toggle('active');
+                // Закрываем другой календарь если открыт
+                const otherId = type === 'soft' ? 'hardDatePicker' : 'softDatePicker';
+                const otherPicker = document.getElementById(otherId);
+                if (otherPicker) {
+                    otherPicker.classList.remove('active');
+                }
+            }
+        }
+        
+        window.applyDateRange = function(type) {
+            const startInput = document.getElementById(type + 'DateStart');
+            const endInput = document.getElementById(type + 'DateEnd');
+            
+            if (startInput && startInput.value) {
+                tableDateStart = new Date(startInput.value);
+            } else {
+                tableDateStart = null;
+            }
+            
+            if (endInput && endInput.value) {
+                tableDateEnd = new Date(endInput.value);
+                // Устанавливаем время на конец дня
+                tableDateEnd.setHours(23, 59, 59, 999);
+            } else {
+                tableDateEnd = null;
+            }
+            
+            // Закрываем календарь
+            const pickerId = type === 'soft' ? 'softDatePicker' : 'hardDatePicker';
+            const picker = document.getElementById(pickerId);
+            if (picker) {
+                picker.classList.remove('active');
+            }
+            
+            // Перерисовываем данные
+            currentPage = 1;
+            renderData();
+        }
+        
+        window.clearDateRange = function(type) {
+            tableDateStart = null;
+            tableDateEnd = null;
+            
+            // Очищаем поля ввода
+            const startInput = document.getElementById(type + 'DateStart');
+            const endInput = document.getElementById(type + 'DateEnd');
+            if (startInput) startInput.value = '';
+            if (endInput) endInput.value = '';
+            
+            // Закрываем календарь
+            const pickerId = type === 'soft' ? 'softDatePicker' : 'hardDatePicker';
+            const picker = document.getElementById(pickerId);
+            if (picker) {
+                picker.classList.remove('active');
+            }
+            
+            // Перерисовываем данные
+            currentPage = 1;
+            renderData();
+        }
+        
+        function getCompareSortArrow(column) {
+            if (compareSortColumn !== column) return '';
+            return compareSortDirection === 'asc' ? '↑' : '↓';
+        }
 
         function formatNumber(num) {
             if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
@@ -1004,6 +2303,33 @@
             if (!address) return 'N/A';
             return address.slice(0, 6) + '...' + address.slice(-4);
         }
+        
+        function formatDateTime(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            const options = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleString('ru-RU', options);
+        }
+        
+        function formatDuration(hours) {
+            const roundedHours = Math.round(hours * 10) / 10; // Округляем до 1 знака после запятой
+            if (roundedHours < 24) {
+                return `${roundedHours.toFixed(1)} ч`;
+            } else {
+                const days = Math.floor(roundedHours / 24);
+                const remainingHours = Math.round(roundedHours % 24);
+                if (remainingHours === 0) {
+                    return `${days}д`;
+                }
+                return `${days}д ${remainingHours}ч`;
+            }
+        }
 
         function showError(message) {
             const dataTable = document.getElementById('dataTable');
@@ -1012,6 +2338,82 @@
 
         // Автозагрузка при открытии страницы
         window.addEventListener('DOMContentLoaded', async () => {
+            // Добавляем обработчики для двустороннего слайдера
+            const rangeStart = document.getElementById('rangeStart');
+            const rangeEnd = document.getElementById('rangeEnd');
+            const sliderRange = document.getElementById('sliderRange');
+            const startLabel = document.getElementById('startLabel');
+            const endLabel = document.getElementById('endLabel');
+            
+            function updateSliderRange() {
+                const start = parseInt(rangeStart.value);
+                const end = parseInt(rangeEnd.value);
+                const max = parseInt(rangeStart.max);
+                
+                // Не даем слайдерам пересекаться
+                if (start >= end) {
+                    if (this === rangeStart) {
+                        rangeStart.value = end - 1;
+                    } else {
+                        rangeEnd.value = start + 1;
+                    }
+                    return;
+                }
+                
+                // Обновляем визуальный диапазон
+                const startPercent = (start / max) * 100;
+                const endPercent = (end / max) * 100;
+                sliderRange.style.left = startPercent + '%';
+                sliderRange.style.width = (endPercent - startPercent) + '%';
+                
+                // Обновляем метки с учетом текущего диапазона дат (фильтрованных или полных)
+                let minDate = new Date();
+                let maxDate = new Date(0);
+                
+                // Используем отфильтрованные данные если есть
+                const softToUse = filteredSoftData || softData;
+                const hardToUse = filteredHardData || hardData;
+                
+                if (softToUse && softToUse.positions) {
+                    softToUse.positions.forEach(pos => {
+                        if (pos.first_dt) {
+                            const date = new Date(pos.first_dt);
+                            if (date < minDate) minDate = date;
+                            if (date > maxDate) maxDate = date;
+                        }
+                    });
+                }
+                
+                if (hardToUse && hardToUse.events) {
+                    hardToUse.events.forEach(event => {
+                        if (event.timestamp) {
+                            const date = new Date(event.timestamp);
+                            if (date < minDate) minDate = date;
+                            if (date > maxDate) maxDate = date;
+                        }
+                    });
+                }
+                
+                // Если данных нет, используем глобальный диапазон
+                if (minDate > maxDate && globalMinDate && globalMaxDate) {
+                    minDate = globalMinDate;
+                    maxDate = globalMaxDate;
+                }
+                
+                // Вычисляем и сохраняем выбранные даты
+                selectedStartDate = new Date(minDate.getTime() + start * 24 * 60 * 60 * 1000);
+                selectedEndDate = new Date(minDate.getTime() + end * 24 * 60 * 60 * 1000);
+                
+                startLabel.textContent = selectedStartDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+                endLabel.textContent = selectedEndDate.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short', year: '2-digit'});
+                
+                // Перерисовываем график
+                renderChart();
+            }
+            
+            rangeStart.addEventListener('input', updateSliderRange);
+            rangeEnd.addEventListener('input', updateSliderRange);
+            
             try {
                 await loadScriptByName('latest_liquidations.js');
                 if (window.SOFT_LIQUIDATIONS_DATA) {
