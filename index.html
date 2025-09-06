@@ -659,7 +659,10 @@
 <body>
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1 style="margin: 0;">🚀 Curve Finance Liquidation Analysis</h1>
+            <h1 style="margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="curve-logo.png" alt="Curve Logo" style="height: 40px; width: auto;">
+                Curve Finance Liquidation Analysis 🦙
+            </h1>
             <div style="display: flex; gap: 10px;">
                 <button onclick="setLanguage('en')" style="padding: 8px 16px; border: none; border-radius: 5px; background: white; cursor: pointer; font-weight: 500;" id="langEn">🇬🇧 EN</button>
                 <button onclick="setLanguage('ru')" style="padding: 8px 16px; border: none; border-radius: 5px; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-weight: 500;" id="langRu">🇷🇺 RU</button>
@@ -713,7 +716,7 @@
         
         <div class="controls">
             <div class="filter-section">
-                <span class="filter-title">🔍 Фильтры:</span>
+                <span class="filter-title" id="filterTitle">🔍 Фильтры:</span>
                 <div class="filter-grid">
                     <select id="platformFilter" style="padding: 5px 10px; font-size: 13px;">
                         <option value="all" id="allPlatformsOption">All platforms</option>
@@ -757,7 +760,7 @@
         
         const translations = {
             en: {
-                title: '🚀 Curve Finance Liquidation Analysis',
+                title: 'Curve Finance Liquidation Protection Analysis 🦙',
                 softLiquidations: 'Soft Liquidations',
                 hardLiquidations: 'Hard Liquidations',
                 comparison: 'Comparison',
@@ -777,7 +780,7 @@
                 dateAndTime: 'Date and Time',
                 dateFilter: 'Date Filter',
                 applyFilters: 'Apply Filters',
-                resetFilters: 'Reset Filters',
+                resetFilters: 'Reset',
                 chartByDays: 'Liquidations by Days',
                 count: 'Count',
                 sum: 'Size ($)',
@@ -833,7 +836,7 @@
                 selectedPeriod: 'Selected period'
             },
             ru: {
-                title: '🚀 Анализ ликвидаций Curve Finance',
+                title: 'Анализ защиты от ликвидаций Curve Finance 🦙',
                 softLiquidations: 'Мягкие ликвидации',
                 hardLiquidations: 'Жёсткие ликвидации',
                 comparison: 'Сравнение',
@@ -853,7 +856,7 @@
                 dateAndTime: 'Дата и время',
                 dateFilter: 'Фильтр по дате',
                 applyFilters: 'Применить фильтры',
-                resetFilters: 'Сбросить фильтры',
+                resetFilters: 'Сбросить',
                 chartByDays: 'Ликвидации по дням',
                 count: 'Количество',
                 sum: 'Размер ($)',
@@ -944,7 +947,14 @@
         
         function updateUILanguage() {
             // Update static texts
-            document.querySelector('h1').textContent = t('title');
+            const h1 = document.querySelector('h1');
+            if (h1) {
+                // Keep the image and update only the text
+                h1.innerHTML = `
+                    <img src="curve-logo.png" alt="Curve Logo" style="height: 40px; width: auto;">
+                    ${t('title')}
+                `;
+            }
             const chartTitle = document.querySelector('#chartTitle');
             if (chartTitle) chartTitle.textContent = `📈 ${t('chartByDays')}`;
             const startLabel = document.querySelector('#startLabel');
