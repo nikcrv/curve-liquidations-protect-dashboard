@@ -1,6 +1,6 @@
 // Auto-generated JSONP file
 // Date range: 2023-05-01 to 2025-09-08
-// Generated at: 2025-09-07T19:40:04.780035
+// Generated at: 2025-09-07T23:43:26.814059
 // Generated for use with liquidation_viewer.html
 
 window.SOFT_LIQUIDATIONS_DATA = {
@@ -37844,13 +37844,13 @@ window.SOFT_LIQUIDATIONS_DATA = {
     "summary": {
       "total_positions": 3767,
       "total_tvl": 642870792.1965116,
-      "total_debt": 432246038.1416247,
+      "total_debt": 432246071.06451035,
       "llamalend_positions": 1439,
       "llamalend_tvl": 336003516.4291069,
-      "llamalend_debt": 141326189.70304465,
+      "llamalend_debt": 141326222.60089216,
       "crvusd_positions": 2328,
       "crvusd_tvl": 306867275.76740736,
-      "crvusd_debt": 290919848.4385801
+      "crvusd_debt": 290919848.4636183
     },
     "positions": [
       {
@@ -38533,9 +38533,9 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "debt": 397800.99812192976,
         "price": 0.8346432959393885,
         "tvl": 1180616.4611660943,
-        "records_count": 94,
+        "records_count": 95,
         "first_dt": "2025-08-19T19:31:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -39556,12 +39556,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "tBTC",
         "collateral": 1.4647765758840814,
         "collateral_up": 1.4647894233323335,
-        "debt": 137923.92874789957,
+        "debt": 137935.5535772451,
         "price": 112575.25600838465,
         "tvl": 164899.06281465886,
-        "records_count": 52,
+        "records_count": 53,
         "first_dt": "2025-08-30T04:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -40171,9 +40171,9 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "debt": 89498.02706561825,
         "price": 0.8692410237468587,
         "tvl": 259920.855727839,
-        "records_count": 103,
+        "records_count": 104,
         "first_dt": "2025-07-05T20:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -40438,12 +40438,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "SQUID",
         "collateral": 1789252.2091497073,
         "collateral_up": 2476812.804192877,
-        "debt": 72619.09423282415,
+        "debt": 72625.4047530093,
         "price": 0.017281051568461953,
         "tvl": 2507732.9638881776,
-        "records_count": 892,
+        "records_count": 894,
         "first_dt": "2025-06-22T19:59:13Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -41986,12 +41986,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 61275.4895668856,
         "collateral_up": 61987.75944768522,
-        "debt": 38365.25070474851,
+        "debt": 38367.080981936175,
         "price": 0.8346432959393885,
         "tvl": 113130.93602009022,
-        "records_count": 81,
+        "records_count": 82,
         "first_dt": "2025-08-19T20:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -42094,12 +42094,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "UwU",
         "collateral": 5547.792777270652,
         "collateral_up": 8820.455936259335,
-        "debt": 37233.55949882466,
+        "debt": 37237.18125978554,
         "price": 1.0392721597827568,
         "tvl": 14586.122517920583,
-        "records_count": 4158,
+        "records_count": 4159,
         "first_dt": "2024-07-02T11:58:23Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -42112,12 +42112,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WBTC",
         "collateral": 0.39146843,
         "collateral_up": 3.9147203e-11,
-        "debt": 37196.86927697054,
+        "debt": 37198.30455241741,
         "price": 112718.01423741903,
         "tvl": 44125.54406624011,
-        "records_count": 16,
+        "records_count": 17,
         "first_dt": "2025-09-05T04:00:20Z",
-        "last_dt": "2025-09-07T16:00:10Z"
+        "last_dt": "2025-09-07T20:00:18Z"
       },
       {
         "platform": "LlamaLend",
@@ -42511,9 +42511,9 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "debt": 34306.050997413346,
         "price": 4832.163957536844,
         "tvl": 40165.062846219414,
-        "records_count": 127,
+        "records_count": 128,
         "first_dt": "2025-08-18T08:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -43030,12 +43030,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "sDOLA",
         "collateral": 25230.675349125027,
         "collateral_up": 26100.29626124337,
-        "debt": 29075.275247984715,
+        "debt": 29075.920823493678,
         "price": 1.1502607975159669,
         "tvl": 55122.153010194364,
-        "records_count": 33,
+        "records_count": 34,
         "first_dt": "2025-09-02T08:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -43588,12 +43588,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WBTC",
         "collateral": 0.23809765,
         "collateral_up": 2.3809984e-11,
-        "debt": 23159.096938670715,
+        "debt": 23159.99055374784,
         "price": 112718.01423741903,
         "tvl": 26837.89430259604,
-        "records_count": 16,
+        "records_count": 17,
         "first_dt": "2025-09-05T04:00:20Z",
-        "last_dt": "2025-09-07T16:00:10Z"
+        "last_dt": "2025-09-07T20:00:18Z"
       },
       {
         "platform": "LlamaLend",
@@ -43696,12 +43696,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "FXN",
         "collateral": 3.329213435212e-06,
         "collateral_up": 2.9570399421662903,
-        "debt": 22875.001932761956,
+        "debt": 22877.147497525497,
         "price": 108.63328713593032,
         "tvl": 2.9574016055653343,
-        "records_count": 43,
+        "records_count": 45,
         "first_dt": "2025-09-04T02:32:45Z",
-        "last_dt": "2025-09-07T16:00:10Z"
+        "last_dt": "2025-09-07T20:00:18Z"
       },
       {
         "platform": "LlamaLend",
@@ -43858,12 +43858,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "USDe",
         "collateral": 21028.31007653879,
         "collateral_up": 21942.119484994593,
-        "debt": 21561.918923150573,
+        "debt": 21562.260032532682,
         "price": 1.0025349339138572,
         "tvl": 43023.734937897505,
-        "records_count": 439,
+        "records_count": 440,
         "first_dt": "2025-06-26T16:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -44812,12 +44812,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WBTC",
         "collateral": 0.16213134,
         "collateral_up": 1.6213283e-11,
-        "debt": 15699.251905919566,
+        "debt": 15699.857676008092,
         "price": 112718.01423741903,
         "tvl": 18275.12269045184,
-        "records_count": 16,
+        "records_count": 17,
         "first_dt": "2025-09-05T04:00:20Z",
-        "last_dt": "2025-09-07T16:00:10Z"
+        "last_dt": "2025-09-07T20:00:18Z"
       },
       {
         "platform": "LlamaLend",
@@ -45190,12 +45190,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "SQUID",
         "collateral": 124526.64645854008,
         "collateral_up": 389123.40442539833,
-        "debt": 13758.105152273605,
+        "debt": 13759.300716624686,
         "price": 0.014635905121840723,
         "tvl": 390945.96460810653,
-        "records_count": 825,
+        "records_count": 827,
         "first_dt": "2025-06-22T19:59:13Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -45244,12 +45244,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WETH",
         "collateral": 3.936213688634778,
         "collateral_up": 3.9540575571478476,
-        "debt": 13553.74917952808,
+        "debt": 13554.824730376253,
         "price": 4601.706775363513,
         "tvl": 18117.25525782641,
-        "records_count": 78,
+        "records_count": 79,
         "first_dt": "2025-08-25T12:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -47044,12 +47044,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 12560.974323906688,
         "collateral_up": 12690.436362319177,
-        "debt": 7674.190233035948,
+        "debt": 7674.556342863442,
         "price": 0.8101831433406621,
         "tvl": 22867.126023483244,
-        "records_count": 72,
+        "records_count": 73,
         "first_dt": "2025-08-25T20:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -47062,12 +47062,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "sfrxUSD",
         "collateral": 6810.470565208874,
         "collateral_up": 6812.830532501084,
-        "debt": 7626.674299169755,
+        "debt": 7626.890816999454,
         "price": 1.1552716369433254,
         "tvl": 14680.774010724275,
-        "records_count": 65,
+        "records_count": 66,
         "first_dt": "2025-08-28T00:00:13Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -47818,12 +47818,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 10454.386846212508,
         "collateral_up": 10541.617561218138,
-        "debt": 6089.054474855617,
+        "debt": 6089.344963182814,
         "price": 0.7903168265567319,
         "tvl": 18803.895397113247,
-        "records_count": 60,
+        "records_count": 61,
         "first_dt": "2025-08-26T00:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -47926,12 +47926,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "OP",
         "collateral": 9524.779673290795,
         "collateral_up": 11252.972608838289,
-        "debt": 6007.898040056052,
+        "debt": 6007.922799986855,
         "price": 0.7206559875488804,
         "tvl": 18117.062110479168,
-        "records_count": 43,
+        "records_count": 45,
         "first_dt": "2025-09-04T00:53:33Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:07Z"
       },
       {
         "platform": "LlamaLend",
@@ -51454,12 +51454,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "SQUID",
         "collateral": 84475.30787150167,
         "collateral_up": 84503.48547713917,
-        "debt": 2031.1231043127302,
+        "debt": 2031.2996066980006,
         "price": 0.008570668800159142,
         "tvl": 85227.49536269729,
-        "records_count": 152,
+        "records_count": 154,
         "first_dt": "2025-08-26T03:59:21Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -53236,12 +53236,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "EYWA",
         "collateral": 413814.3005277253,
         "collateral_up": 507982.3742486307,
-        "debt": 1154.3721285167526,
+        "debt": 1154.395969099458,
         "price": 0.003195198656139569,
         "tvl": 509304.5931455682,
-        "records_count": 23,
+        "records_count": 24,
         "first_dt": "2025-09-04T02:32:45Z",
-        "last_dt": "2025-09-07T16:00:10Z"
+        "last_dt": "2025-09-07T20:00:18Z"
       },
       {
         "platform": "LlamaLend",
@@ -53491,9 +53491,9 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "debt": 1033.1297141847122,
         "price": 1.0025349339138572,
         "tvl": 2087.928249446588,
-        "records_count": 1499,
+        "records_count": 1500,
         "first_dt": "2025-02-11T07:57:23Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -53833,9 +53833,9 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "debt": 919.5849230563294,
         "price": 1.0025349339138572,
         "tvl": 1846.3377391134636,
-        "records_count": 1571,
+        "records_count": 1572,
         "first_dt": "2025-02-05T07:58:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -55468,12 +55468,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "SQUID",
         "collateral": 13219.065275332754,
         "collateral_up": 17172.352873421194,
-        "debt": 527.087429854202,
+        "debt": 527.1332331777021,
         "price": 0.008978976360089649,
         "tvl": 17291.04654803089,
-        "records_count": 334,
+        "records_count": 336,
         "first_dt": "2025-06-22T19:59:13Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -55774,12 +55774,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 1003.9784225376862,
         "collateral_up": 1003.9804481015548,
-        "debt": 501.3584593503476,
+        "debt": 501.3663865682245,
         "price": 0.7927796589166446,
         "tvl": 1799.9141194806525,
-        "records_count": 43,
+        "records_count": 45,
         "first_dt": "2025-09-04T00:53:33Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:07Z"
       },
       {
         "platform": "LlamaLend",
@@ -56512,12 +56512,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "EYWA",
         "collateral": 21139.90114551211,
         "collateral_up": 106766.30814640933,
-        "debt": 352.51149768621724,
+        "debt": 352.51877790314865,
         "price": 0.003195198656139569,
         "tvl": 106833.85433014038,
-        "records_count": 23,
+        "records_count": 24,
         "first_dt": "2025-09-04T02:32:45Z",
-        "last_dt": "2025-09-07T16:00:10Z"
+        "last_dt": "2025-09-07T20:00:18Z"
       },
       {
         "platform": "LlamaLend",
@@ -57124,12 +57124,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WBTC",
         "collateral": 0.00235834,
         "collateral_up": 2.54702e-13,
-        "debt": 251.4237658503899,
+        "debt": 251.43025217391923,
         "price": 113265.09647321035,
         "tvl": 267.1176076166311,
-        "records_count": 80,
+        "records_count": 81,
         "first_dt": "2025-08-25T12:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -57916,12 +57916,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WBTC",
         "collateral": 0.00106072,
         "collateral_up": 1.63244e-13,
-        "debt": 163.55648853213157,
+        "debt": 163.56117472178306,
         "price": 112693.01601254489,
         "tvl": 119.53573594482677,
-        "records_count": 23,
+        "records_count": 24,
         "first_dt": "2025-09-04T00:53:33Z",
-        "last_dt": "2025-09-07T16:00:03Z"
+        "last_dt": "2025-09-07T20:00:07Z"
       },
       {
         "platform": "LlamaLend",
@@ -58780,12 +58780,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "USDe",
         "collateral": 95.85819360251566,
         "collateral_up": 100.02382169496457,
-        "debt": 98.29066470998931,
+        "debt": 98.29221966750613,
         "price": 1.0025349339138572,
         "tvl": 196.12500948336432,
-        "records_count": 439,
+        "records_count": 440,
         "first_dt": "2025-06-26T16:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -61714,12 +61714,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "ETHFI",
         "collateral": 0.7768362663317849,
         "collateral_up": 1.0433017075735933,
-        "debt": 1.2553338605831057,
+        "debt": 1.2556460057762606,
         "price": 1.5542736068408585,
         "tvl": 2.2507178131698824,
-        "records_count": 1513,
+        "records_count": 1514,
         "first_dt": "2025-02-10T03:58:23Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -61768,12 +61768,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "wstETH",
         "collateral": 0.006975395429474543,
         "collateral_up": 0.00797181492612462,
-        "debt": 1.1876742335326307,
+        "debt": 1.1876972686329559,
         "price": 5832.279792023531,
         "tvl": 40.6904296196238,
-        "records_count": 1291,
+        "records_count": 1292,
         "first_dt": "2025-02-21T23:56:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -61840,12 +61840,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 0.000384251464572209,
         "collateral_up": 0.000501761104501183,
-        "debt": 1.0842484017120597,
+        "debt": 1.0843116051023325,
         "price": 5075.743682996987,
         "tvl": 1.950863705089232,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -62056,12 +62056,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 0.08187209342736962,
         "collateral_up": 0.4426907619723529,
-        "debt": 0.8440379460026264,
+        "debt": 0.8440782122167058,
         "price": 1.1116013250045285,
         "tvl": 0.5336998895071116,
-        "records_count": 2133,
+        "records_count": 2134,
         "first_dt": "2024-12-20T11:58:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -62146,12 +62146,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 0.8272909022100859,
         "collateral_up": 0.8369073801275831,
-        "debt": 0.5194514966528093,
+        "debt": 0.519476277938138,
         "price": 0.8346432959393885,
         "tvl": 1.5274001854488795,
-        "records_count": 81,
+        "records_count": 82,
         "first_dt": "2025-08-19T20:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -62380,12 +62380,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 0.0,
         "collateral_up": 0.07459531167783964,
-        "debt": 0.16461967404494837,
+        "debt": 0.16462752749640536,
         "price": 1.1116013250045285,
         "tvl": 0.07459531167783964,
-        "records_count": 2133,
+        "records_count": 2134,
         "first_dt": "2024-12-20T11:58:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -62506,12 +62506,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 2.314054104995e-06,
         "collateral_up": 2.446208417799e-05,
-        "debt": 0.0891146786605057,
+        "debt": 0.08911987336478704,
         "price": 5075.743682996987,
         "tvl": 0.011770007589719609,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -62722,12 +62722,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 8.73473983395e-07,
         "collateral_up": 2.902794597175e-06,
-        "debt": 0.0087573222386467,
+        "debt": 0.00875783272356355,
         "price": 5075.743682996987,
         "tvl": 0.004436432848076562,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -62812,12 +62812,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "CRV",
         "collateral": 0.001421390416077699,
         "collateral_up": 0.003540224447656961,
-        "debt": 0.00468608227336307,
+        "debt": 0.004686305830601114,
         "price": 1.1116013250045285,
         "tvl": 0.0051202439175176695,
-        "records_count": 2133,
+        "records_count": 2134,
         "first_dt": "2024-12-20T11:58:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63010,12 +63010,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 3.89901854075e-07,
         "collateral_up": 5.0913946461e-07,
-        "debt": 0.00110019215248769,
+        "debt": 0.001100256285276706,
         "price": 5075.743682996987,
         "tvl": 0.0019795510122746045,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63100,12 +63100,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 2.3975231359e-08,
         "collateral_up": 3.1307202909e-08,
-        "debt": 6.7651245257234e-05,
+        "debt": 6.7655188807485e-05,
         "price": 5075.743682996987,
         "tvl": 0.00012172343632174454,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63190,12 +63190,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 5.59242487e-10,
         "collateral_up": 5.911805085e-09,
-        "debt": 2.1536485886539e-05,
+        "debt": 2.1537741298971e-05,
         "price": 5075.743682996987,
         "tvl": 2.844483325738775e-06,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63262,12 +63262,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 2.79646142e-10,
         "collateral_up": 2.956165748e-09,
-        "debt": 1.0769175620178e-05,
+        "debt": 1.0769803380762e-05,
         "price": 5075.743682996987,
         "tvl": 1.4223683044789786e-06,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63298,12 +63298,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 9.7867187e-11,
         "collateral_up": 1.034563276e-09,
-        "debt": 3.768832325313e-06,
+        "debt": 3.769052019416e-06,
         "price": 5075.743682996987,
         "tvl": 4.977833194639348e-07,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63352,12 +63352,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 5.817381e-12,
         "collateral_up": 6.1496096e-11,
-        "debt": 2.23976195341e-07,
+        "debt": 2.2398925144e-07,
         "price": 5075.743682996987,
         "tvl": 2.95890309583367e-08,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63370,12 +63370,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 2.7978e-12,
         "collateral_up": 2.9575824e-11,
-        "debt": 1.07691549708e-07,
+        "debt": 1.07697827302e-07,
         "price": 5075.743682996987,
         "tvl": 1.4230491500288972e-08,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63406,12 +63406,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 1.762942e-12,
         "collateral_up": 1.8636229e-11,
-        "debt": 6.783890888e-08,
+        "debt": 6.784286337e-08,
         "price": 5075.743682996987,
         "tvl": 8.966877948990074e-09,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63424,12 +63424,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 2.56928e-13,
         "collateral_up": 2.716014e-12,
-        "debt": 9.842019384e-09,
+        "debt": 9.842593098e-09,
         "price": 5075.743682996987,
         "tvl": 1.30681668698505e-09,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63442,12 +63442,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 1.97064e-13,
         "collateral_up": 2.083197e-12,
-        "debt": 7.53668937e-09,
+        "debt": 7.537128701e-09,
         "price": 5075.743682996987,
         "tvl": 1.0023295501461184e-09,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63460,12 +63460,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 1.49536e-13,
         "collateral_up": 1.58077e-12,
-        "debt": 5.706352658e-09,
+        "debt": 5.706685295e-09,
         "price": 5075.743682996987,
         "tvl": 7.605871773806376e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63478,12 +63478,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 8.5231e-14,
         "collateral_up": 9.01005e-13,
-        "debt": 3.230002026e-09,
+        "debt": 3.23019031e-09,
         "price": 5075.743682996987,
         "tvl": 4.3351171484551624e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63514,12 +63514,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 3.9824e-14,
         "collateral_up": 2.11098e-13,
-        "debt": 6.66471884e-10,
+        "debt": 6.66510734e-10,
         "price": 5075.743682996987,
         "tvl": 2.0234751443167201e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63532,12 +63532,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 3.6904e-14,
         "collateral_up": 1.95621e-13,
-        "debt": 6.13779887e-10,
+        "debt": 6.13815666e-10,
         "price": 5075.743682996987,
         "tvl": 1.8751086587732082e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63550,12 +63550,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 3.3867e-14,
         "collateral_up": 1.79528e-13,
-        "debt": 5.58970597e-10,
+        "debt": 5.5900318e-10,
         "price": 5075.743682996987,
         "tvl": 1.7207973931205898e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63568,12 +63568,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 2.7019e-14,
         "collateral_up": 1.43225e-13,
-        "debt": 4.35356126e-10,
+        "debt": 4.35381504e-10,
         "price": 5075.743682996987,
         "tvl": 1.3728474357089563e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63586,12 +63586,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 3.3183e-14,
         "collateral_up": 1.10279e-13,
-        "debt": 3.01467054e-10,
+        "debt": 3.01484627e-10,
         "price": 5075.743682996987,
         "tvl": 1.6853868163288905e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63604,12 +63604,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 3.1162e-14,
         "collateral_up": 1.03566e-13,
-        "debt": 2.79932266e-10,
+        "debt": 2.79948584e-10,
         "price": 5075.743682996987,
         "tvl": 1.5827389064955215e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63622,12 +63622,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 2.9953e-14,
         "collateral_up": 9.9549e-14,
-        "debt": 2.67047992e-10,
+        "debt": 2.67063559e-10,
         "price": 5075.743682996987,
         "tvl": 1.5213329953680875e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63640,12 +63640,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 3.6327e-14,
         "collateral_up": 9.0146e-14,
-        "debt": 2.22513263e-10,
+        "debt": 2.22526234e-10,
         "price": 5075.743682996987,
         "tvl": 1.8447668677223155e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63658,12 +63658,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 4.2022e-14,
         "collateral_up": 5.4873e-14,
-        "debt": 9.4722995e-11,
+        "debt": 9.4728517e-11,
         "price": 5075.743682996987,
         "tvl": 2.1334777404689942e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63676,12 +63676,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 4.1106e-14,
         "collateral_up": 5.3677e-14,
-        "debt": 9.1516666e-11,
+        "debt": 9.1522e-11,
         "price": 5075.743682996987,
         "tvl": 2.086971968332742e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -63694,12 +63694,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "pufETH",
         "collateral": 4.06e-14,
         "collateral_up": 5.302e-14,
-        "debt": 8.9757691e-11,
+        "debt": 8.9762923e-11,
         "price": 5075.743682996987,
         "tvl": 2.0612821352967767e-10,
-        "records_count": 1597,
+        "records_count": 1598,
         "first_dt": "2025-02-03T03:57:35Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "LlamaLend",
@@ -80797,9 +80797,9 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "debt": 43466.148660700455,
         "price": 4469.613140123029,
         "tvl": 53398.316090590604,
-        "records_count": 63,
+        "records_count": 64,
         "first_dt": "2025-08-26T00:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "crvUSD",
@@ -89797,9 +89797,9 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "debt": 16497.99000032225,
         "price": 4643.843171336322,
         "tvl": 19171.76048911454,
-        "records_count": 75,
+        "records_count": 76,
         "first_dt": "2025-08-26T16:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "crvUSD",
@@ -100630,12 +100630,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WETH",
         "collateral": 0.21493049959732646,
         "collateral_up": 0.21691798591914666,
-        "debt": 818.3092192873083,
+        "debt": 818.3342486176873,
         "price": 4390.321336022148,
         "tvl": 943.8308761299612,
-        "records_count": 25,
+        "records_count": 26,
         "first_dt": "2025-09-02T00:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "crvUSD",
@@ -104986,12 +104986,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WETH",
         "collateral": 3.2661398391988e-05,
         "collateral_up": 3.2960129434221e-05,
-        "debt": 0.12288375809123686,
+        "debt": 0.12288751669263959,
         "price": 4306.552320575171,
         "tvl": 0.14069098116768028,
-        "records_count": 5,
+        "records_count": 6,
         "first_dt": "2025-09-07T00:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "crvUSD",
@@ -105004,12 +105004,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WETH",
         "collateral": 2.7420861277441e-05,
         "collateral_up": 2.9864939348047e-05,
-        "debt": 0.11878859410363586,
+        "debt": 0.11879222744772755,
         "price": 4575.520468307083,
         "tvl": 0.12549457697288846,
-        "records_count": 112,
+        "records_count": 113,
         "first_dt": "2025-08-15T16:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "crvUSD",
@@ -105238,12 +105238,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "WBTC",
         "collateral": 2.3e-07,
         "collateral_up": 2.3e-17,
-        "debt": 0.019691593487645192,
+        "debt": 0.01969220871393124,
         "price": 112784.62560337147,
         "tvl": 0.025940463888775463,
-        "records_count": 55,
+        "records_count": 56,
         "first_dt": "2025-08-29T16:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "crvUSD",
@@ -105256,12 +105256,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
         "collateral_token": "sfrxETH",
         "collateral": 8.539124508258e-06,
         "collateral_up": 1.1357791637662e-05,
-        "debt": 0.017657559209959983,
+        "debt": 0.017658443435354686,
         "price": 5456.826916562278,
         "tvl": 0.04660788225217654,
-        "records_count": 914,
+        "records_count": 915,
         "first_dt": "2025-04-08T20:00:11Z",
-        "last_dt": "2025-09-07T16:00:11Z"
+        "last_dt": "2025-09-07T20:00:11Z"
       },
       {
         "platform": "crvUSD",
@@ -105664,39 +105664,39 @@ window.SOFT_LIQUIDATIONS_DATA = {
       "ETHEREUM": {
         "positions": 2818,
         "tvl": 594510319.4487063,
-        "debt": 414617548.97240114
+        "debt": 414617568.8016592
       },
       "ARBITRUM": {
         "positions": 786,
         "tvl": 38261293.21758812,
-        "debt": 15134759.547722863
+        "debt": 15134764.659069039
       },
       "FRAXTAL": {
         "positions": 127,
         "tvl": 9566316.541419543,
-        "debt": 2384710.8432664834
+        "debt": 2384718.788174558
       },
       "OPTIMISM": {
         "positions": 36,
         "tvl": 532862.988797632,
-        "debt": 109018.77823413585
+        "debt": 109018.81560747417
       }
     },
     "token_stats": {
       "CRV": {
         "positions": 247,
         "tvl": 221415868.21703073,
-        "debt": 73720862.90082668
+        "debt": 73720865.39570235
       },
       "sfrxUSD": {
         "positions": 23,
         "tvl": 40484380.55841202,
-        "debt": 20825998.6237961
+        "debt": 20825998.84031393
       },
       "WETH": {
         "positions": 1598,
         "tvl": 155770086.6192232,
-        "debt": 151819843.31617033
+        "debt": 151819844.4167579
       },
       "sUSDe": {
         "positions": 18,
@@ -105706,12 +105706,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
       "WBTC": {
         "positions": 611,
         "tvl": 60803169.08178917,
-        "debt": 55215497.392214745
+        "debt": 55215500.33804849
       },
       "UwU": {
         "positions": 8,
         "tvl": 1746584.0435322663,
-        "debt": 1367170.6759880832
+        "debt": 1367174.2977490441
       },
       "asdCRV": {
         "positions": 34,
@@ -105721,12 +105721,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
       "wstETH": {
         "positions": 616,
         "tvl": 95140382.96431066,
-        "debt": 89057352.73384662
+        "debt": 89057352.73386964
       },
       "pufETH": {
         "positions": 75,
         "tvl": 2360366.4055579654,
-        "debt": 1731241.0503658277
+        "debt": 1731241.0504348068
       },
       "WFRAX": {
         "positions": 35,
@@ -105746,32 +105746,32 @@ window.SOFT_LIQUIDATIONS_DATA = {
       "sfrxETH": {
         "positions": 190,
         "tvl": 30041174.902738735,
-        "debt": 27200932.84265189
+        "debt": 27200932.84265277
       },
       "tBTC": {
         "positions": 27,
         "tvl": 4120930.197766833,
-        "debt": 3394848.638881098
+        "debt": 3394860.2637104434
       },
       "USDe": {
         "positions": 26,
         "tvl": 983308.8156923446,
-        "debt": 488953.4578132799
+        "debt": 488953.8004776195
       },
       "SQUID": {
         "positions": 10,
         "tvl": 5579467.362895447,
-        "debt": 142097.337472809
+        "debt": 142105.06586305404
       },
       "FXN": {
         "positions": 15,
         "tvl": 110511.05131074318,
-        "debt": 89358.41651367002
+        "debt": 89360.56207843356
       },
       "sDOLA": {
         "positions": 1,
         "tvl": 55122.153010194364,
-        "debt": 29075.275247984715
+        "debt": 29075.920823493678
       },
       "crvUSD": {
         "positions": 5,
@@ -105781,12 +105781,12 @@ window.SOFT_LIQUIDATIONS_DATA = {
       "OP": {
         "positions": 15,
         "tvl": 50527.685375721296,
-        "debt": 14500.514923384553
+        "debt": 14500.539683315355
       },
       "ETHFI": {
         "positions": 4,
         "tvl": 15658.944447534317,
-        "debt": 6726.86580503594
+        "debt": 6726.866117181133
       },
       "dlcBTC": {
         "positions": 8,
@@ -105796,7 +105796,7 @@ window.SOFT_LIQUIDATIONS_DATA = {
       "EYWA": {
         "positions": 14,
         "tvl": 1917485.925242729,
-        "debt": 7798.439299733606
+        "debt": 7798.470420533242
       },
       "USD0USD0++": {
         "positions": 1,
