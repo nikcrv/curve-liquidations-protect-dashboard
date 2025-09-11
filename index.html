@@ -1700,7 +1700,7 @@
                     positions: softData.positions.filter(pos => {
                         if (platformFilterValue && platformFilterValue !== '' && pos.platform !== platformFilterValue) return false;
                         if (networkFilterValue && networkFilterValue !== '' && pos.chain !== networkFilterValue) return false;
-                        if (tokenFilterValue && tokenFilterValue !== '' && !pos.collateral_token.toLowerCase().includes(tokenFilterValue.toLowerCase())) return false;
+                        if (tokenFilterValue && tokenFilterValue !== '' && pos.collateral_token.toLowerCase() !== tokenFilterValue.toLowerCase()) return false;
                         if (addressFilter && !pos.user.toLowerCase().includes(addressFilter)) return false;
                         return true;
                     })
@@ -1722,7 +1722,7 @@
                     events: hardData.events.filter(event => {
                         if (platformFilterValue && platformFilterValue !== '' && event.platform !== platformFilterValue) return false;
                         if (networkFilterValue && networkFilterValue !== '' && event.chain !== networkFilterValue) return false;
-                        if (tokenFilterValue && tokenFilterValue !== '' && !event.collateral_token.toLowerCase().includes(tokenFilterValue.toLowerCase())) return false;
+                        if (tokenFilterValue && tokenFilterValue !== '' && event.collateral_token.toLowerCase() !== tokenFilterValue.toLowerCase()) return false;
                         if (addressFilter && !event.user.toLowerCase().includes(addressFilter) && 
                             !event.liquidator.toLowerCase().includes(addressFilter)) return false;
                         return true;
@@ -2416,9 +2416,7 @@
             
             sortedTokens.forEach(token => {
                 const selected = window.savedFilterValues && window.savedFilterValues.token === token ? 'selected' : '';
-                const tvl = tokenTVLMap.get(token);
-                const tvlFormatted = tvl > 1000000 ? `$${(tvl/1000000).toFixed(1)}M` : `$${(tvl/1000).toFixed(0)}K`;
-                tokenOptions += `<option value="${token}" ${selected}>${token} (${tvlFormatted})</option>`;
+                tokenOptions += `<option value="${token}" ${selected}>${token}</option>`;
             });
             
             // Get saved values
