@@ -854,7 +854,7 @@
         const translations = {
             en: {
                 title: 'Curve Finance Liquidation Protection Analysis 🦙',
-                softLiquidations: 'Soft Liquidations',
+                softLiquidations: 'In Liquidation Protection Mode',
                 hardLiquidations: 'Hard Liquidations',
                 comparison: 'Comparison',
                 filters: 'Filters',
@@ -878,7 +878,7 @@
                 day: 'Day',
                 week: 'Week',
                 month: 'Month',
-                count: 'Count',
+                count: 'Positions',
                 sum: 'Size ($)',
                 start: 'Start',
                 end: 'End',
@@ -947,7 +947,7 @@
             },
             ru: {
                 title: 'Анализ защиты от ликвидаций Curve Finance 🦙',
-                softLiquidations: 'Мягкие ликвидации',
+                softLiquidations: 'В режиме защиты от ликвидации',
                 hardLiquidations: 'Жёсткие ликвидации',
                 comparison: 'Сравнение',
                 filters: 'Фильтры',
@@ -971,7 +971,7 @@
                 day: 'День',
                 week: 'Неделя',
                 month: 'Месяц',
-                count: 'Количество',
+                count: 'Позиций',
                 sum: 'Размер ($)',
                 start: 'Начало',
                 end: 'Конец',
@@ -1870,19 +1870,37 @@
                 }
             }
             
-            // Считаем софт ликвидации
+            // Считаем софт ликвидации - позиции активные в каждом периоде
             if (softDataToUse.positions) {
-                softDataToUse.positions.forEach(pos => {
-                    if (pos.first_dt) {
-                        const date = new Date(pos.first_dt);
-                        if (date >= startDate && date <= endDate) {
-                            const key = getPeriodKey(date);
-                            if (periodData[key]) {
-                                periodData[key].soft++;
-                                periodData[key].softTVL += parseFloat(pos.tvl || pos.collateral_usd || 0);
+                // Для каждого периода проверяем какие позиции были активны
+                Object.keys(periodData).forEach(periodKey => {
+                    const periodDate = new Date(periodKey);
+                    let periodEnd;
+                    
+                    // Определяем конец периода
+                    if (chartPeriod === 'day') {
+                        periodEnd = new Date(periodDate);
+                        periodEnd.setDate(periodEnd.getDate() + 1);
+                    } else if (chartPeriod === 'week') {
+                        periodEnd = new Date(periodDate);
+                        periodEnd.setDate(periodEnd.getDate() + 7);
+                    } else if (chartPeriod === 'month') {
+                        periodEnd = new Date(periodDate.getFullYear(), periodDate.getMonth() + 1, 1);
+                    }
+                    
+                    // Считаем позиции активные в этом периоде
+                    softDataToUse.positions.forEach(pos => {
+                        if (pos.first_dt) {
+                            const openDate = new Date(pos.first_dt);
+                            const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date(); // Если нет last_dt, считаем позицию открытой
+                            
+                            // Позиция активна если была открыта до конца периода И закрыта после начала периода
+                            if (openDate < periodEnd && closeDate >= periodDate) {
+                                periodData[periodKey].soft++;
+                                periodData[periodKey].softTVL += parseFloat(pos.tvl || pos.collateral_usd || 0);
                             }
                         }
-                    }
+                    });
                 });
             }
             
@@ -2046,23 +2064,40 @@
         
         function showChartTooltip(event, dateStr, soft, hard, softTVL, hardDebt) {
             const tooltip = document.getElementById('chartTooltip');
-            const date = new Date(dateStr);
+            const startDate = new Date(dateStr);
             const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
-            const formattedDate = date.toLocaleDateString(locale);
             
-            if (chartMode === 'sum') {
-                tooltip.innerHTML = `
-                    <strong>${formattedDate}</strong><br>
-                    💧 Мягких: $${formatNumber(softTVL)} (${soft} поз.)<br>
-                    🔥 Жёстких: $${formatNumber(hardDebt)} (${hard} соб.)
-                `;
+            let dateDisplay;
+            if (chartPeriod === 'week') {
+                // For week, show range from Monday to Sunday
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 6);
+                const startStr = startDate.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+                const endStr = endDate.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+                dateDisplay = `${startStr} - ${endStr}`;
+            } else if (chartPeriod === 'month') {
+                // For month, show month and year
+                const monthYear = startDate.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+                const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+                const startStr = `1`;
+                const endStr = `${lastDay} ${monthYear}`;
+                dateDisplay = `${startStr} - ${endStr}`;
             } else {
-                tooltip.innerHTML = `
-                    <strong>${formattedDate}</strong><br>
-                    💧 Мягких: ${soft} ($${formatNumber(softTVL)})<br>
-                    🔥 Жёстких: ${hard} ($${formatNumber(hardDebt)})
-                `;
+                // For day, show single date with same format as others
+                dateDisplay = startDate.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
             }
+            
+            // Calculate protected amount
+            const protectedAmount = softTVL - hardDebt;
+            const protectedPercent = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
+            const protectedLabel = currentLang === 'ru' ? 'Защищено' : 'Protected';
+            
+            tooltip.innerHTML = `
+                <strong>${dateDisplay}</strong><br>
+                💧 ${currentLang === 'ru' ? 'Мягких' : 'Soft'}: $${formatNumber(softTVL)} (${soft} ${currentLang === 'ru' ? 'поз.' : 'pos.'})<br>
+                🔥 ${currentLang === 'ru' ? 'Жёстких' : 'Hard'}: $${formatNumber(hardDebt)} (${hard} ${currentLang === 'ru' ? 'соб.' : 'events'})<br>
+                🛡️ ${protectedLabel}: $${formatNumber(Math.abs(protectedAmount))} (${protectedPercent.toFixed(1)}%) ${protectedAmount >= 0 ? '✅' : '⚠️'}
+            `;
             
             tooltip.style.display = 'block';
             tooltip.style.left = event.pageX + 10 + 'px';
@@ -2474,10 +2509,6 @@
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('debtWithoutDiscount')}:</span>
                                 <strong>$${formatNumber(totalDebt)}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">${t('liquidationsPerUser') || 'Liquidations per user'}:</span>
-                                <strong>${avgLiquidationsPerUser.toFixed(2)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('averageDiscount')}:</span>
@@ -3737,7 +3768,16 @@
             
             // Draw the selected chart - use pie chart instead of treemap
             if (window.chartData && window.chartData[type]) {
-                drawPieChartWithLabels('distributionChart', window.chartData[type]);
+                // Determine chart type based on current tab
+                let chartType;
+                if (currentTab === 'hard') {
+                    chartType = 'hard';
+                } else if (currentTab === 'comparison') {
+                    chartType = 'comparison';
+                } else {
+                    chartType = 'soft';
+                }
+                drawPieChartWithLabels('distributionChart', window.chartData[type], chartType);
             }
         }
         
@@ -4000,7 +4040,7 @@
         }
 
         // COMPLETELY REWRITTEN PIE CHART FUNCTION
-        function drawPieChartWithLabels(canvasId, data) {
+        function drawPieChartWithLabels(canvasId, data, chartType) {
             const canvas = document.getElementById(canvasId);
             if (!canvas || !data || data.length === 0) return;
             
@@ -4142,7 +4182,8 @@
                 segments: segmentAngles,
                 centerX: centerX,
                 centerY: centerY,
-                radius: radius
+                radius: radius,
+                chartType: chartType
             };
             
             // Remove old event listeners
@@ -4188,7 +4229,8 @@
                         
                         if (inSegment) {
                             canvas.style.cursor = 'pointer';
-                            showTooltip(e, segData.segment, segData.percentage);
+                            const chartType = canvas.pieData?.chartType || null;
+                            showTooltip(e, segData.segment, segData.percentage, chartType);
                             return;
                         }
                     }
@@ -4220,7 +4262,7 @@
         // Tooltip functions for pie chart
         let currentTooltip = null;
         
-        function showTooltip(event, item, percentage) {
+        function showTooltip(event, item, percentage, chartType) {
             hideTooltip(); // Remove any existing tooltip
             
             const tooltip = document.createElement('div');
@@ -4240,6 +4282,32 @@
                 backdrop-filter: blur(10px);
                 max-width: 200px;
             `;
+            
+            // Determine chart type label
+            let typeLabel = '';
+            let typeColor = '#22c55e';
+            let typeIcon = '';
+            
+            // Try to determine chart type from context
+            const canvasId = event.target?.id || '';
+            const isProtectionChart = canvasId.includes('protection');
+            const distributionType = document.querySelector('input[name="distributionType"]:checked')?.value;
+            
+            if (chartType === 'comparison' || isProtectionChart) {
+                // Remove emoji from translation if it exists
+                const protectionText = t('protectedFromLiquidation') || 'Protected from Liquidation';
+                typeLabel = protectionText.replace('🛡️', '').trim();
+                typeColor = '#3b82f6';
+                typeIcon = '🛡️';
+            } else if (chartType === 'soft' || distributionType === 'soft') {
+                typeLabel = t('softLiquidations') || 'Soft Liquidations';
+                typeColor = '#22c55e';
+                typeIcon = '💧';
+            } else if (chartType === 'hard' || distributionType === 'hard') {
+                typeLabel = t('hardLiquidations') || 'Hard Liquidations';
+                typeColor = '#ff6b6b';
+                typeIcon = '🔥';
+            }
             
             // Format both count and dollar values
             const countValue = item.count ? item.count.toLocaleString('en-US') : item.value.toLocaleString('en-US');
@@ -4273,6 +4341,7 @@
                 }
                 
                 tooltip.innerHTML = `
+                    ${typeLabel ? `<div style="font-size: 11px; font-weight: 600; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.2); color: ${typeColor};">${typeIcon} ${typeLabel}</div>` : ''}
                     <div style="font-weight: 600; margin-bottom: 6px; color: #888;">${item.label}</div>
                     <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
                     <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
@@ -4285,6 +4354,7 @@
             } else {
                 // Show regular tooltip
                 tooltip.innerHTML = `
+                    ${typeLabel ? `<div style="font-size: 11px; font-weight: 600; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.2); color: ${typeColor};">${typeIcon} ${typeLabel}</div>` : ''}
                     <div style="font-weight: 600; margin-bottom: 6px; color: #22c55e;">${item.label}</div>
                     <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
                     <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
@@ -4533,7 +4603,8 @@
                         const sliceAngle = (segment.value / total) * 2 * Math.PI;
                         
                         if (angle >= currentAngleCheck && angle <= currentAngleCheck + sliceAngle) {
-                            showTooltip(e, segment, (segment.value / total) * 100);
+                            const chartType = canvas.pieData?.chartType || null;
+                            showTooltip(e, segment, (segment.value / total) * 100, chartType);
                             canvas.style.cursor = 'pointer';
                             return;
                         }
