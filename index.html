@@ -2,13 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Curve Finance Liquidation Analysis Viewer</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-box-sizing: border-box;
         }
         
         html {
@@ -434,8 +435,128 @@
         }
         
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 0;
+                width: 100%;
+            }
+            
             .stat-card.protection {
                 grid-column: span 1;
+            }
+            
+            .controls {
+                padding: 10px;
+                overflow-x: hidden;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                width: 100%;
+            }
+            
+            .filter-grid {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            select, input[type="text"] {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .filter-buttons {
+                width: 100%;
+                flex-direction: column;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            .filter-buttons .btn {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-card.protection .stat-value {
+                font-size: 32px;
+            }
+            
+            .protection-percent {
+                font-size: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            
+            .combined-container {
+                margin: 0 -10px;
+                border-radius: 0;
+                padding: 0;
+            }
+            
+            .combined-container > div {
+                border-radius: 0;
+                padding: 10px;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+            
+            .tab {
+                flex: 1;
+                min-width: 80px;
+                text-align: center;
+                font-size: 11px;
+                padding: 5px 8px;
+            }
+            
+            .date-range-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .date-display {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .range-slider-container {
+                width: 100%;
+            }
+            
+            .language-toggle {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
             }
         }
         
