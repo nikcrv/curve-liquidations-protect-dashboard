@@ -441,6 +441,12 @@
                 -webkit-text-size-adjust: 85%;
             }
             
+            /* Stack chart and distribution on mobile */
+            .chart-distribution-grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px;
+            }
+            
             .container {
                 padding: 0;
                 width: 100%;
@@ -526,8 +532,12 @@
             }
             
             .stat-card.protection .stat-label {
-                font-size: 12px;
-                margin-bottom: 5px;
+                font-size: 16px;
+                margin-bottom: 8px;
+                font-weight: 700;
+                opacity: 1;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             
             .protection-percent {
@@ -571,6 +581,16 @@
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
                 font-size: 12px;
+            }
+            
+            .table-scroll-indicator {
+                display: block;
+                animation: slideHint 3s ease-in-out infinite;
+            }
+            
+            @keyframes slideHint {
+                0%, 100% { transform: translateX(0); }
+                50% { transform: translateX(-10px); }
             }
             
             th, td {
@@ -667,6 +687,44 @@
             border-radius: 10px;
             padding: 0 20px 20px 20px;
             overflow-x: auto;
+            position: relative;
+        }
+        
+        .table-scroll-indicator {
+            display: none;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
         
         table {
@@ -1018,7 +1076,20 @@
                                 <span id="sumLabel">Сумма ($)</span>
                             </label>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 5px; font-size: 13px;">
+                    </div>
+                </div>
+                
+                <!-- Main content area -->
+                <div class="chart-distribution-grid" style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start;">
+                    <!-- Chart area -->
+                    <div style="min-height: 250px; background: #fafafa; border-radius: 8px; padding: 15px;">
+                        <div id="liquidationChart"></div>
+                    </div>
+                    
+                    <!-- Distribution pie chart -->
+                    <div style="background: #fafafa; border-radius: 8px; padding: 10px;">
+                        <!-- Distribution type selector -->
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: white; border-radius: 5px; font-size: 13px; margin-bottom: 10px; justify-content: center;">
                             <label style="display: flex; align-items: center; cursor: pointer;">
                                 <input type="radio" name="distributionType" value="token" checked style="margin-right: 3px;">
                                 <span id="tokenBtnText2">Токены</span>
@@ -1032,19 +1103,9 @@
                                 <span id="networkBtnText2">Сети</span>
                             </label>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Main content area -->
-                <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start;">
-                    <!-- Chart area -->
-                    <div style="min-height: 250px; background: #fafafa; border-radius: 8px; padding: 15px;">
-                        <div id="liquidationChart"></div>
-                    </div>
-                    
-                    <!-- Distribution pie chart -->
-                    <div style="background: #fafafa; border-radius: 8px; padding: 10px; height: 280px; display: flex; align-items: center; justify-content: center;">
-                        <canvas id="distributionChart" width="280" height="260"></canvas>
+                        <div style="height: 260px; display: flex; align-items: center; justify-content: center;">
+                            <canvas id="distributionChart" width="280" height="260"></canvas>
+                        </div>
                     </div>
                 </div>
                 
@@ -1097,6 +1158,7 @@
                 softLiquidations: 'In Liquidation Protection Mode',
                 hardLiquidations: 'Hard Liquidations',
                 comparison: 'Comparison',
+                swipeToScroll: 'Swipe to scroll',
                 filters: 'Filters',
                 platform: 'Platform',
                 allPlatforms: 'All Platforms',
@@ -1191,6 +1253,7 @@
                 softLiquidations: 'В режиме защиты от ликвидации',
                 hardLiquidations: 'Жёсткие ликвидации',
                 comparison: 'Сравнение',
+                swipeToScroll: 'Смахните для прокрутки',
                 filters: 'Фильтры',
                 platform: 'Платформа',
                 allPlatforms: 'Все платформы',
@@ -3064,6 +3127,7 @@
                     <div class="table-header">
                         <h2 style="margin: 0;">💧 ${t('softLiquidationsInPositions')}</h2>
                     </div>
+                <div class="table-scroll-indicator" id="scrollHintSoft">← ${t('swipeToScroll')} →</div>
                 <table>
                     <thead>
                         <tr>
@@ -3144,6 +3208,19 @@
 
             html += '</tbody></table></div>';
             container.innerHTML = html;
+            
+            // Check if table needs scrolling on mobile
+            setTimeout(() => {
+                const table = container.querySelector('table');
+                const indicator = document.getElementById('scrollHintSoft');
+                if (table && indicator && window.innerWidth <= 768) {
+                    if (table.scrollWidth > table.clientWidth) {
+                        indicator.style.display = 'block';
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                }
+            }, 100);
             
             renderPagination(positions.length);
         }
@@ -3237,6 +3314,7 @@
                     <div class="table-header">
                         <h2 style="margin: 0;">🔥 ${t('hardLiquidations')}</h2>
                     </div>
+                <div class="table-scroll-indicator" id="scrollHintHard">← ${t('swipeToScroll')} →</div>
                 <table>
                     <thead>
                         <tr>
@@ -3366,6 +3444,19 @@
 
             html += '</tbody></table></div>';
             container.innerHTML = html;
+            
+            // Check if table needs scrolling on mobile
+            setTimeout(() => {
+                const table = container.querySelector('table');
+                const indicator = document.getElementById('scrollHintHard');
+                if (table && indicator && window.innerWidth <= 768) {
+                    if (table.scrollWidth > table.clientWidth) {
+                        indicator.style.display = 'block';
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                }
+            }, 100);
             
             renderPagination(events.length);
         }
@@ -3598,6 +3689,7 @@
                         <option value="chain" ${comparisonGroupBy === 'chain' ? 'selected' : ''}>${t('byNetworks')}</option>
                     </select>
                 </div>
+                <div class="table-scroll-indicator" id="scrollHintComparison">← ${t('swipeToScroll')} →</div>
                 <table>
                     <thead>
                         <tr>`;
@@ -3694,6 +3786,19 @@
 
             html += '</tbody></table>';
             container.innerHTML = html;
+            
+            // Check if table needs scrolling on mobile
+            setTimeout(() => {
+                const table = container.querySelector('table');
+                const indicator = document.getElementById('scrollHintComparison');
+                if (table && indicator && window.innerWidth <= 768) {
+                    if (table.scrollWidth > table.clientWidth) {
+                        indicator.style.display = 'block';
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                }
+            }, 100);
             
             renderPagination(statsArray.length);
         }
