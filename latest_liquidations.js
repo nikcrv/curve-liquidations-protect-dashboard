@@ -1,6 +1,6 @@
 // Auto-generated JSONP file
 // Date range: 2023-05-01 to 2025-09-12
-// Generated at: 2025-09-11T10:13:35.910274
+// Generated at: 2025-09-11T10:21:31.682448
 // Generated for use with liquidation_viewer.html
 
 window.SOFT_LIQUIDATIONS_DATA = {
