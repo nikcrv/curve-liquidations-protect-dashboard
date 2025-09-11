@@ -174,19 +174,18 @@
             margin-bottom: 20px;
         }
         
-        .chart-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 3px;
-            margin-bottom: 20px;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        /* Стили для объединенного контейнера */
+        .combined-container {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
         }
         
-        .chart-container:hover {
+        .combined-container:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 45px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 20px 45px rgba(102, 126, 234, 0.4) !important;
+        }
+        
+        .chart-container {
+            /* Стили перенесены в combined-container */
         }
         
         .chart-inner {
@@ -464,18 +463,10 @@
         }
         
         .data-table {
-            background: white;
+            background: transparent;
             border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 0 20px 20px 20px;
             overflow-x: auto;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .data-table:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
         }
         
         table {
@@ -760,8 +751,12 @@
         
         <div class="stats-grid" id="statsGrid"></div>
         
-        <div class="chart-container">
-            <div class="chart-inner">
+        <!-- Объединенный блок графика и таблиц -->
+        <div class="combined-container" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 15px; padding: 3px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;">
+            <div style="background: white; border-radius: 12px; padding: 20px;">
+                <!-- График -->
+                <div class="chart-container" style="margin-bottom: 0; box-shadow: none;">
+                    <div class="chart-inner">
                 <!-- Header with title and controls -->
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                     <div class="chart-title" id="chartTitle" style="font-size: 18px; font-weight: 600; color: #333;">📈 Ликвидации по дням</div>
@@ -829,22 +824,34 @@
                         <input type="range" id="rangeEnd" min="0" max="1000" value="30" step="1" style="position: absolute; width: 100%; height: 4px; background: transparent; pointer-events: none; -webkit-appearance: none; top: 13px;">
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; color: #666;">
-                        <span id="startLabel" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500;">Начало</span>
+                        <span id="startLabel" onclick="openDatePicker('start')" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='#fff'">Начало</span>
                         <span id="selectedPeriodLabel" style="color: #999; font-size: 11px;">Выбранный период</span>
-                        <span id="endLabel" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500;">Конец</span>
+                        <span id="endLabel" onclick="openDatePicker('end')" style="padding: 2px 6px; background: #fff; border-radius: 3px; font-weight: 500; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='#fff'">Конец</span>
                     </div>
                 </div>
+                    </div>
+                </div>
+                
+                <!-- Календарь для выбора даты -->
+                <div id="datePickerPopup" style="position: absolute; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; z-index: 1000;">
+                    <input type="date" id="datePickerInput" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <div style="margin-top: 10px; display: flex; gap: 5px;">
+                        <button id="applyDateBtn" onclick="applyDateFromPicker()" style="padding: 6px 12px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer;">Применить</button>
+                        <button id="cancelDateBtn" onclick="closeDatePicker()" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">Отмена</button>
+                    </div>
+                </div>
+                
+                <!-- Таблица -->
+                <div class="data-table" id="dataTable" style="margin-bottom: 0; box-shadow: none; padding-top: 0;">
+                    <div class="loading" id="loadingText">Loading data...</div>
+                </div>
+                
+                <div class="pagination" id="pagination" style="display: none; margin-top: 15px;"></div>
             </div>
         </div>
+        
         <div class="chart-tooltip" id="chartTooltip"></div>
-        
         <div id="chartsSection" style="display: none;"></div>
-        
-        <div class="data-table" id="dataTable">
-            <div class="loading" id="loadingText">Loading data...</div>
-        </div>
-        
-        <div class="pagination" id="pagination" style="display: none;"></div>
     </div>
 
     <script>
@@ -901,6 +908,7 @@
                 totalHardDebt: 'Total Hard Debt',
                 apply: 'Apply',
                 cancel: 'Cancel',
+                selectValidDate: 'Please select a valid date',
                 softLiquidationsInPositions: 'Positions in Liquidation Protection Mode (in soft liquidation)',
                 dateFrom: 'From',
                 dateTo: 'To',
@@ -994,6 +1002,7 @@
                 totalHardDebt: 'Общий хард долг',
                 apply: 'Применить',
                 cancel: 'Отмена',
+                selectValidDate: 'Пожалуйста, выберите корректную дату',
                 softLiquidationsInPositions: 'Позиции в режиме защиты от ликвидации (в софт ликвидации)',
                 dateFrom: 'От',
                 dateTo: 'До',
@@ -1086,10 +1095,18 @@
             }
             const chartTitle = document.querySelector('#chartTitle');
             if (chartTitle) chartTitle.textContent = `📈 ${t('chartByDays')}`;
+            
+            // Обновляем формат дат при смене языка, но не меняем сами даты
             const startLabel = document.querySelector('#startLabel');
-            if (startLabel) startLabel.textContent = t('start');
             const endLabel = document.querySelector('#endLabel');
-            if (endLabel) endLabel.textContent = t('end');
+            const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
+            
+            if (startLabel && selectedStartDate) {
+                startLabel.textContent = selectedStartDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
+            }
+            if (endLabel && selectedEndDate) {
+                endLabel.textContent = selectedEndDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
+            }
             
             // Update chart period labels
             const dayLabel = document.querySelector('#dayLabel');
@@ -1293,6 +1310,106 @@
             });
         }
 
+        // Предварительно обработанные данные для быстрого доступа
+        let preprocessedData = {
+            dailyPositions: {}, // Позиции активные в каждый день
+            weeklyPositions: {}, // Позиции активные в каждую неделю
+            monthlyPositions: {}, // Позиции активные в каждый месяц
+            dailyEvents: {}, // События по дням
+            weeklyEvents: {}, // События по неделям
+            monthlyEvents: {}, // События по месяцам
+            minDate: null,
+            maxDate: null
+        };
+        
+        // Функция предварительной обработки данных
+        function preprocessData() {
+            console.log('Preprocessing data for optimization...');
+            const startTime = performance.now();
+            
+            // Находим диапазон дат
+            let minDate = new Date('2100-01-01');
+            let maxDate = new Date('2000-01-01');
+            
+            // Обрабатываем софт ликвидации
+            if (softData && softData.positions) {
+                softData.positions.forEach(pos => {
+                    if (pos.first_dt) {
+                        const openDate = new Date(pos.first_dt);
+                        const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                        
+                        if (openDate < minDate) minDate = openDate;
+                        if (closeDate > maxDate) maxDate = closeDate;
+                        
+                        // Предварительно вычисляем TVL
+                        pos.cachedTVL = parseFloat(pos.tvl || pos.collateral_usd || 0);
+                    }
+                });
+            }
+            
+            // Обрабатываем хард ликвидации
+            if (hardData && hardData.events) {
+                hardData.events.forEach(event => {
+                    if (event.timestamp) {
+                        const date = new Date(event.timestamp);
+                        if (date < minDate) minDate = date;
+                        if (date > maxDate) maxDate = date;
+                        
+                        // Предварительно вычисляем debt
+                        event.cachedDebt = parseFloat(event.debt_with_discount || event.debt || 0);
+                    }
+                });
+            }
+            
+            preprocessedData.minDate = minDate;
+            preprocessedData.maxDate = maxDate;
+            
+            // Создаём индексы по дням
+            const currentDate = new Date(minDate);
+            while (currentDate <= maxDate) {
+                const dayKey = currentDate.toISOString().split('T')[0];
+                preprocessedData.dailyPositions[dayKey] = [];
+                preprocessedData.dailyEvents[dayKey] = [];
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            // Заполняем индексы позициями
+            if (softData && softData.positions) {
+                softData.positions.forEach((pos, index) => {
+                    if (pos.first_dt) {
+                        const openDate = new Date(pos.first_dt);
+                        const closeDate = pos.last_dt ? new Date(pos.last_dt) : maxDate;
+                        
+                        // Добавляем позицию во все дни когда она была активна
+                        let currentDate = new Date(openDate);
+                        while (currentDate <= closeDate) {
+                            const dayKey = currentDate.toISOString().split('T')[0];
+                            if (preprocessedData.dailyPositions[dayKey]) {
+                                preprocessedData.dailyPositions[dayKey].push(index);
+                            }
+                            currentDate.setDate(currentDate.getDate() + 1);
+                        }
+                    }
+                });
+            }
+            
+            // Заполняем индексы событиями
+            if (hardData && hardData.events) {
+                hardData.events.forEach((event, index) => {
+                    if (event.timestamp) {
+                        const date = new Date(event.timestamp);
+                        const dayKey = date.toISOString().split('T')[0];
+                        if (preprocessedData.dailyEvents[dayKey]) {
+                            preprocessedData.dailyEvents[dayKey].push(index);
+                        }
+                    }
+                });
+            }
+            
+            const endTime = performance.now();
+            console.log(`Data preprocessing completed in ${(endTime - startTime).toFixed(2)}ms`);
+        }
+
         function processLoadedData(data) {
             softData = data.soft_liquidations;
             hardData = data.hard_liquidations;
@@ -1300,6 +1417,9 @@
             // Initialize filtered data to be the same as original data
             filteredSoftData = softData;
             filteredHardData = hardData;
+            
+            // Предварительная обработка данных для оптимизации
+            preprocessData();
             
             // Находим полный диапазон данных
             let minDate = new Date();
@@ -1821,48 +1941,52 @@
             const periodData = {};
             
             // Функция для получения ключа периода
-            function getPeriodKey(date) {
-                if (chartPeriod === 'day') {
+            function getPeriodKey(date, period = chartPeriod) {
+                if (period === 'day') {
                     return date.toISOString().split('T')[0];
-                } else if (chartPeriod === 'week') {
+                } else if (period === 'week') {
                     // Начало недели (понедельник)
                     const weekStart = new Date(date);
                     const day = weekStart.getDay();
                     const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
                     weekStart.setDate(diff);
                     return weekStart.toISOString().split('T')[0];
-                } else if (chartPeriod === 'month') {
+                } else if (period === 'month') {
                     // Начало месяца
                     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
                 }
             }
             
             // Инициализируем периоды
-            if (chartPeriod === 'day') {
+            let actualPeriod = chartPeriod; // Локальная переменная для этого вызова
+            
+            if (actualPeriod === 'day') {
                 const totalDays = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
+                
+                // Инициализируем все дни
                 for (let i = 0; i < totalDays; i++) {
                     const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
-                    const key = getPeriodKey(date);
+                    const key = getPeriodKey(date, actualPeriod);
                     if (!periodData[key]) {
                         periodData[key] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0, date: date };
                     }
                 }
-            } else if (chartPeriod === 'week') {
+            } else if (actualPeriod === 'week') {
                 // Создаем периоды по неделям
                 let currentDate = new Date(startDate);
                 while (currentDate <= endDate) {
-                    const key = getPeriodKey(currentDate);
+                    const key = getPeriodKey(currentDate, actualPeriod);
                     if (!periodData[key]) {
                         periodData[key] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0, date: new Date(key) };
                     }
                     currentDate.setDate(currentDate.getDate() + 7);
                 }
-            } else if (chartPeriod === 'month') {
+            } else if (actualPeriod === 'month') {
                 // Создаем периоды по месяцам
                 let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
                 const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
                 while (currentDate <= endMonth) {
-                    const key = getPeriodKey(currentDate);
+                    const key = getPeriodKey(currentDate, actualPeriod);
                     if (!periodData[key]) {
                         periodData[key] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0, date: new Date(key) };
                     }
@@ -1870,50 +1994,78 @@
                 }
             }
             
-            // Считаем софт ликвидации - позиции активные в каждом периоде
-            if (softDataToUse.positions) {
-                // Для каждого периода проверяем какие позиции были активны
-                Object.keys(periodData).forEach(periodKey => {
-                    const periodDate = new Date(periodKey);
-                    let periodEnd;
-                    
-                    // Определяем конец периода
-                    if (chartPeriod === 'day') {
-                        periodEnd = new Date(periodDate);
-                        periodEnd.setDate(periodEnd.getDate() + 1);
-                    } else if (chartPeriod === 'week') {
-                        periodEnd = new Date(periodDate);
-                        periodEnd.setDate(periodEnd.getDate() + 7);
-                    } else if (chartPeriod === 'month') {
-                        periodEnd = new Date(periodDate.getFullYear(), periodDate.getMonth() + 1, 1);
-                    }
-                    
-                    // Считаем позиции активные в этом периоде
-                    softDataToUse.positions.forEach(pos => {
-                        if (pos.first_dt) {
-                            const openDate = new Date(pos.first_dt);
-                            const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date(); // Если нет last_dt, считаем позицию открытой
-                            
-                            // Позиция активна если была открыта до конца периода И закрыта после начала периода
-                            if (openDate < periodEnd && closeDate >= periodDate) {
-                                periodData[periodKey].soft++;
-                                periodData[periodKey].softTVL += parseFloat(pos.tvl || pos.collateral_usd || 0);
+            // Считаем софт ликвидации используя предварительно обработанные данные
+            if (actualPeriod === 'day' && preprocessedData.dailyPositions) {
+                // Используем предварительно обработанные индексы для дневного вида
+                Object.keys(periodData).forEach(dayKey => {
+                    const positionIndices = preprocessedData.dailyPositions[dayKey];
+                    if (positionIndices) {
+                        positionIndices.forEach(index => {
+                            const pos = softDataToUse.positions[index];
+                            if (pos) {
+                                periodData[dayKey].soft++;
+                                periodData[dayKey].softTVL += pos.cachedTVL || parseFloat(pos.tvl || pos.collateral_usd || 0);
                             }
+                        });
+                    }
+                });
+            } else if (softDataToUse.positions) {
+                // Для недель и месяцев используем старый алгоритм (меньше периодов)
+                softDataToUse.positions.forEach(pos => {
+                    if (!pos.first_dt) return;
+                    
+                    const openDate = new Date(pos.first_dt);
+                    const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                    const tvl = pos.cachedTVL || parseFloat(pos.tvl || pos.collateral_usd || 0);
+                    
+                    // Пропускаем позиции вне диапазона
+                    if (closeDate < startDate || openDate > endDate) return;
+                    
+                    Object.keys(periodData).forEach(periodKey => {
+                        const periodDate = new Date(periodKey);
+                        let periodEnd;
+                        
+                        if (actualPeriod === 'week') {
+                            periodEnd = new Date(periodDate);
+                            periodEnd.setDate(periodEnd.getDate() + 7);
+                        } else if (actualPeriod === 'month') {
+                            periodEnd = new Date(periodDate.getFullYear(), periodDate.getMonth() + 1, 1);
+                        }
+                        
+                        // Позиция активна если была открыта до конца периода И закрыта после начала периода
+                        if (openDate < periodEnd && closeDate >= periodDate) {
+                            periodData[periodKey].soft++;
+                            periodData[periodKey].softTVL += tvl;
                         }
                     });
                 });
             }
             
-            // Считаем хард ликвидации
-            if (hardDataToUse.events) {
+            // Считаем хард ликвидации используя предварительно обработанные данные
+            if (actualPeriod === 'day' && preprocessedData.dailyEvents) {
+                // Используем предварительно обработанные индексы для дневного вида
+                Object.keys(periodData).forEach(dayKey => {
+                    const eventIndices = preprocessedData.dailyEvents[dayKey];
+                    if (eventIndices) {
+                        eventIndices.forEach(index => {
+                            const event = hardDataToUse.events[index];
+                            if (event) {
+                                periodData[dayKey].hard++;
+                                periodData[dayKey].hardDebt += event.cachedDebt || parseFloat(event.debt_with_discount || event.debt || 0);
+                            }
+                        });
+                    }
+                });
+            } else if (hardDataToUse.events) {
+                // Для недель и месяцев используем стандартный алгоритм
                 hardDataToUse.events.forEach(event => {
                     if (event.timestamp) {
                         const date = new Date(event.timestamp);
                         if (date >= startDate && date <= endDate) {
-                            const key = getPeriodKey(date);
+                            const key = getPeriodKey(date, actualPeriod);
                             if (periodData[key]) {
                                 periodData[key].hard++;
-                                periodData[key].hardDebt += parseFloat(event.debt_with_discount || event.debt || 0);
+                                periodData[key].hardDebt += event.cachedDebt || parseFloat(event.debt_with_discount || event.debt || 0);
                             }
                         }
                     }
@@ -1978,7 +2130,7 @@
             html += '<div style="position: absolute; left: 50px; right: 0; top: 0; bottom: 30px;">';
             
             const dates = Object.keys(periodData).sort();
-            const barWidth = Math.min(100 / dates.length, chartPeriod === 'month' ? 8 : chartPeriod === 'week' ? 4 : 2);
+            const barWidth = Math.min(100 / dates.length, actualPeriod === 'month' ? 8 : actualPeriod === 'week' ? 4 : 2);
             
             dates.forEach((dateStr, index) => {
                 const period = periodData[dateStr];
@@ -2028,9 +2180,9 @@
             
             // Определяем интервал меток в зависимости от периода
             let labelInterval;
-            if (chartPeriod === 'month') {
+            if (actualPeriod === 'month') {
                 labelInterval = Math.max(1, Math.floor(dates.length / 12));
-            } else if (chartPeriod === 'week') {
+            } else if (actualPeriod === 'week') {
                 labelInterval = Math.max(1, Math.floor(dates.length / 8));
             } else {
                 labelInterval = Math.max(1, Math.floor(dates.length / 6));
@@ -2041,12 +2193,12 @@
                     const date = new Date(dates[i]);
                     let label;
                     
-                    if (chartPeriod === 'month') {
+                    if (actualPeriod === 'month') {
                         // Для месяцев показываем "MM/YY"
                         const month = (date.getMonth() + 1).toString().padStart(2, '0');
                         const year = date.getFullYear().toString().slice(-2);
                         label = `${month}/${year}`;
-                    } else if (chartPeriod === 'week') {
+                    } else if (actualPeriod === 'week') {
                         // Для недель показываем "DD.MM" (начало недели)
                         label = `${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
                     } else {
@@ -2598,16 +2750,18 @@
         function renderSoftLiquidations(container) {
             // Add tab buttons at the top
             let html = `
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
-                    <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
-                        💧 ${t('softLiquidations')}
-                    </button>
-                    <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
-                        🔥 ${t('hardLiquidations')}
-                    </button>
-                    <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
-                        📊 ${t('comparison')}
-                    </button>
+                <div style="display: flex; gap: 0; margin-bottom: 20px; align-items: center; justify-content: flex-end;">
+                    <div style="display: inline-flex; gap: 2px; background: #f8f9fa; padding: 4px; border-radius: 6px;">
+                        <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
+                            💧 ${t('softLiquidations')}
+                        </button>
+                        <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
+                            🔥 ${t('hardLiquidations')}
+                        </button>
+                        <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
+                            📊 ${t('comparison')}
+                        </button>
+                    </div>
                 </div>
             `;
             
@@ -2764,16 +2918,18 @@
         function renderHardLiquidations(container) {
             // Add tab buttons at the top
             let html = `
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
-                    <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
-                        💧 ${t('softLiquidations')}
-                    </button>
-                    <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
-                        🔥 ${t('hardLiquidations')}
-                    </button>
-                    <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
-                        📊 ${t('comparison')}
-                    </button>
+                <div style="display: flex; gap: 0; margin-bottom: 20px; align-items: center; justify-content: flex-end;">
+                    <div style="display: inline-flex; gap: 2px; background: #f8f9fa; padding: 4px; border-radius: 6px;">
+                        <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
+                            💧 ${t('softLiquidations')}
+                        </button>
+                        <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
+                            🔥 ${t('hardLiquidations')}
+                        </button>
+                        <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
+                            📊 ${t('comparison')}
+                        </button>
+                    </div>
                 </div>
             `;
             
@@ -2993,24 +3149,18 @@
         function renderComparison(container) {
             // Add tab buttons with comparison selector
             let html = `
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
-                    <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
-                        💧 ${t('softLiquidations')}
-                    </button>
-                    <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
-                        🔥 ${t('hardLiquidations')}
-                    </button>
-                    <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
-                        📊 ${t('comparison')}
-                    </button>
-                    
-                    <!-- Comparison group selector (shown when Comparison is active) -->
-                    <select id="comparisonGroup" onchange="changeComparisonGroup()" style="padding: 8px 12px; border-radius: 5px; border: 1px solid #ddd; background: white;">
-                        <option value="market" ${comparisonGroupBy === 'market' ? 'selected' : ''}>${t('byMarkets')}</option>
-                        <option value="platform" ${comparisonGroupBy === 'platform' ? 'selected' : ''}>${t('byPlatforms')}</option>
-                        <option value="token" ${comparisonGroupBy === 'token' ? 'selected' : ''}>${t('byTokens')}</option>
-                        <option value="chain" ${comparisonGroupBy === 'chain' ? 'selected' : ''}>${t('byNetworks')}</option>
-                    </select>
+                <div style="display: flex; gap: 0; margin-bottom: 20px; align-items: center; justify-content: flex-end;">
+                    <div style="display: inline-flex; gap: 2px; background: #f8f9fa; padding: 4px; border-radius: 6px;">
+                        <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
+                            💧 ${t('softLiquidations')}
+                        </button>
+                        <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
+                            🔥 ${t('hardLiquidations')}
+                        </button>
+                        <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
+                            📊 ${t('comparison')}
+                        </button>
+                    </div>
                 </div>
             `;
             
@@ -3025,7 +3175,19 @@
             
             // Софт ликвидации
             if (filteredSoftData.positions) {
-                filteredSoftData.positions.forEach(pos => {
+                // Фильтруем по датам если указаны
+                let positions = filteredSoftData.positions;
+                if (tableDateStart || tableDateEnd) {
+                    positions = positions.filter(pos => {
+                        if (!pos.first_dt) return false;
+                        const date = new Date(pos.first_dt);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                }
+                
+                positions.forEach(pos => {
                     let key, label;
                     
                     switch(comparisonGroupBy) {
@@ -3069,7 +3231,19 @@
             
             // Хард ликвидации
             if (filteredHardData.events) {
-                filteredHardData.events.forEach(event => {
+                // Фильтруем по датам если указаны
+                let events = filteredHardData.events;
+                if (tableDateStart || tableDateEnd) {
+                    events = events.filter(event => {
+                        if (!event.timestamp) return false;
+                        const date = new Date(event.timestamp);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                }
+                
+                events.forEach(event => {
                     let key, label;
                     
                     switch(comparisonGroupBy) {
@@ -3111,6 +3285,13 @@
             }
             
             let statsArray = Object.values(stats);
+            
+            // Проверяем, есть ли данные после фильтрации
+            if (statsArray.length === 0) {
+                container.innerHTML = html + `<div class="no-data">${currentLang === 'en' ? 'No data in the selected date range' : 'Нет данных в выбранном диапазоне дат'}</div>`;
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
             
             // Сортировка сравнения
             statsArray.sort((a, b) => {
@@ -3173,10 +3354,16 @@
             // Сохраняем текущее значение выбора
             const currentValue = comparisonGroupBy;
             
-            // Append to existing HTML (which already has tabs and selector)
+            // Append to existing HTML (which already has tabs)
             html += `
-                <div style="margin-bottom: 15px;">
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
                     <h2 style="margin: 0;">📊 ${t('comparison')}</h2>
+                    <select id="comparisonGroup" onchange="changeComparisonGroup()" style="padding: 8px 12px; border-radius: 5px; border: 1px solid #ddd; background: white;">
+                        <option value="market" ${comparisonGroupBy === 'market' ? 'selected' : ''}>${t('byMarkets')}</option>
+                        <option value="platform" ${comparisonGroupBy === 'platform' ? 'selected' : ''}>${t('byPlatforms')}</option>
+                        <option value="token" ${comparisonGroupBy === 'token' ? 'selected' : ''}>${t('byTokens')}</option>
+                        <option value="chain" ${comparisonGroupBy === 'chain' ? 'selected' : ''}>${t('byNetworks')}</option>
+                    </select>
                 </div>
                 <table>
                     <thead>
@@ -3500,6 +3687,71 @@
             dataTable.innerHTML = `<div class="error">${message}</div>`;
         }
 
+        // Функции для работы с календарем
+        let currentDatePickerType = null; // 'start' или 'end'
+        
+        window.openDatePicker = function(type) {
+            currentDatePickerType = type;
+            const datePickerPopup = document.getElementById('datePickerPopup');
+            const datePickerInput = document.getElementById('datePickerInput');
+            const label = document.getElementById(type + 'Label');
+            
+            // Обновляем текст кнопок в зависимости от языка
+            document.getElementById('applyDateBtn').textContent = t('apply');
+            document.getElementById('cancelDateBtn').textContent = t('cancel');
+            
+            // Устанавливаем текущую дату в input
+            const currentDate = type === 'start' ? selectedStartDate : selectedEndDate;
+            if (currentDate) {
+                datePickerInput.value = currentDate.toISOString().split('T')[0];
+            }
+            
+            // Позиционируем календарь под лейблом
+            const rect = label.getBoundingClientRect();
+            const container = label.closest('.combined-container');
+            const containerRect = container.getBoundingClientRect();
+            
+            datePickerPopup.style.position = 'absolute';
+            datePickerPopup.style.left = (rect.left - containerRect.left) + 'px';
+            datePickerPopup.style.top = (rect.bottom - containerRect.top + 5) + 'px';
+            datePickerPopup.style.display = 'block';
+        }
+        
+        window.closeDatePicker = function() {
+            document.getElementById('datePickerPopup').style.display = 'none';
+            currentDatePickerType = null;
+        }
+        
+        window.applyDateFromPicker = function() {
+            const datePickerInput = document.getElementById('datePickerInput');
+            const selectedDate = new Date(datePickerInput.value);
+            
+            if (!selectedDate || isNaN(selectedDate.getTime())) {
+                alert(t('selectValidDate'));
+                return;
+            }
+            
+            // Обновляем соответствующую дату
+            if (currentDatePickerType === 'start') {
+                selectedStartDate = selectedDate;
+                tableDateStart = selectedDate;
+            } else if (currentDatePickerType === 'end') {
+                selectedEndDate = selectedDate;
+                tableDateEnd = selectedDate;
+            }
+            
+            // Обновляем слайдер в соответствии с выбранными датами
+            updateSliderFromDates();
+            
+            // Закрываем календарь
+            closeDatePicker();
+            
+            // Применяем фильтры
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            }
+        }
+        
         // Автозагрузка при открытии страницы
         window.addEventListener('DOMContentLoaded', async () => {
             // Добавляем обработчики для двустороннего слайдера
