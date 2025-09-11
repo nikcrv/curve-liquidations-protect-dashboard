@@ -180,6 +180,13 @@
             padding: 3px;
             margin-bottom: 20px;
             box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(102, 126, 234, 0.4);
         }
         
         .chart-inner {
@@ -345,11 +352,32 @@
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+        
+        /* Modern select and input styles */
+        .modern-select:hover,
+        .modern-select:focus {
+            border-color: rgba(255,255,255,0.6) !important;
+            background: white !important;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+        
+        select.modern-select option {
+            padding: 10px;
+            background: white;
+            color: #333;
+        }
+        
+        select.modern-select option:hover {
+            background: #f0f0f0;
         }
         
         .stat-card.protection {
@@ -395,6 +423,7 @@
             font-size: 24px;
             font-weight: bold;
             color: #333;
+            margin-bottom: 6px;
         }
         
         @media (max-width: 768px) {
@@ -440,6 +469,13 @@
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow-x: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .data-table:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
         }
         
         table {
@@ -870,6 +906,7 @@
                 dateTo: 'To',
                 loadingData: 'Loading data...',
                 averageSize: 'Average size',
+                liquidationsPerUser: 'Liquidations per user',
                 averageDiscount: 'Average discount',
                 softPositionsCount: 'Soft positions',
                 totalTVL: 'Total TVL',
@@ -962,6 +999,7 @@
                 dateTo: 'До',
                 loadingData: 'Загрузка данных...',
                 averageSize: 'Средний размер',
+                liquidationsPerUser: 'Ликвидаций на юзера',
                 averageDiscount: 'Средний дисконт',
                 softPositionsCount: 'Софт позиций',
                 totalTVL: 'Общий TVL',
@@ -1147,7 +1185,7 @@
         let hardData = null;
         let filteredSoftData = null;
         let filteredHardData = null;
-        let currentTab = 'soft';
+        let currentTab = 'comparison';
         let currentPage = 1;
         const itemsPerPage = 50;
         let availableNetworks = new Set();
@@ -2150,14 +2188,18 @@
             // Get current filtered available options based on platform filter
             const currentPlatform = window.savedFilterValues ? window.savedFilterValues.platform : '';
             let filteredNetworks = new Set();
-            let filteredTokens = new Set();
+            let tokenTVLMap = new Map(); // Map to store token -> TVL
             
-            // Collect available networks and tokens based on platform filter
+            // Collect available networks and calculate TVL for each token based on platform filter
             if (softData && softData.positions) {
                 softData.positions.forEach(pos => {
                     if (!currentPlatform || pos.platform === currentPlatform) {
                         if (pos.chain) filteredNetworks.add(pos.chain);
-                        if (pos.collateral_token) filteredTokens.add(pos.collateral_token);
+                        if (pos.collateral_token) {
+                            const tvl = parseFloat(pos.tvl || pos.collateral_usd || 0);
+                            const currentTVL = tokenTVLMap.get(pos.collateral_token) || 0;
+                            tokenTVLMap.set(pos.collateral_token, currentTVL + tvl);
+                        }
                     }
                 });
             }
@@ -2165,7 +2207,11 @@
                 hardData.events.forEach(event => {
                     if (!currentPlatform || event.platform === currentPlatform) {
                         if (event.chain) filteredNetworks.add(event.chain);
-                        if (event.collateral_token) filteredTokens.add(event.collateral_token);
+                        if (event.collateral_token) {
+                            const tvl = parseFloat(event.collateral_usd || 0);
+                            const currentTVL = tokenTVLMap.get(event.collateral_token) || 0;
+                            tokenTVLMap.set(event.collateral_token, currentTVL + tvl);
+                        }
                     }
                 });
             }
@@ -2176,50 +2222,64 @@
                 networkOptions += `<option value="${network}" ${selected}>${network}</option>`;
             });
             
-            // Build token options
-            Array.from(filteredTokens).sort().forEach(token => {
+            // Sort tokens by TVL (descending) and build options
+            const sortedTokens = Array.from(tokenTVLMap.entries())
+                .sort((a, b) => b[1] - a[1]) // Sort by TVL descending
+                .map(([token, tvl]) => token);
+            
+            sortedTokens.forEach(token => {
                 const selected = window.savedFilterValues && window.savedFilterValues.token === token ? 'selected' : '';
-                tokenOptions += `<option value="${token}" ${selected}>${token}</option>`;
+                const tvl = tokenTVLMap.get(token);
+                const tvlFormatted = tvl > 1000000 ? `$${(tvl/1000000).toFixed(1)}M` : `$${(tvl/1000).toFixed(0)}K`;
+                tokenOptions += `<option value="${token}" ${selected}>${token} (${tvlFormatted})</option>`;
             });
             
             // Get saved values
             const savedPlatform = window.savedFilterValues ? window.savedFilterValues.platform : '';
             const savedAddress = window.savedFilterValues ? window.savedFilterValues.address : '';
             
-            // Add filters as 2nd card with orange gradient background
+            // Add filters as 2nd card with modern gradient background
             html += `
-                <div class="stat-card" style="display: flex; flex-direction: column; gap: 10px; background: linear-gradient(135deg, #ff6b35 0%, #f4511e 100%); padding: 20px;">
+                <div class="stat-card" style="display: flex; flex-direction: column; gap: 7px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 14px; position: relative; overflow: hidden;">
+                    <!-- Decorative background pattern -->
+                    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+                    <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+                    
                     <!-- Filter header -->
-                    <div style="margin-bottom: 10px;">
-                        <div class="stat-label" style="color: rgba(255,255,255,0.9);">🔍 ${t('filters')}</div>
+                    <div style="margin-bottom: 4px; position: relative; z-index: 1;">
+                        <div style="font-size: 13px; font-weight: 600; color: white; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 6px;">
+                            <span style="background: rgba(255,255,255,0.2); padding: 3px 5px; border-radius: 5px; font-size: 11px;">🔍</span>
+                            <span>${t('filters')}</span>
+                        </div>
                     </div>
+                    
                     <!-- Platform filter -->
-                    <select id="platformFilter" onchange="applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                    <select id="platformFilter" onchange="applyFilters()" class="modern-select" style="width: 100%; padding: 7px 9px; font-size: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; background: rgba(255,255,255,0.95); color: #333; font-weight: 500; transition: all 0.3s; cursor: pointer; position: relative; z-index: 1;">
                         <option value="" ${savedPlatform === '' ? 'selected' : ''}>${t('allPlatforms')}</option>
                         <option value="LlamaLend" ${savedPlatform === 'LlamaLend' ? 'selected' : ''}>🦙 LlamaLend</option>
                         <option value="crvUSD" ${savedPlatform === 'crvUSD' ? 'selected' : ''}>💱 crvUSD</option>
                     </select>
                     
                     <!-- Network filter -->
-                    <select id="networkFilter" onchange="applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                    <select id="networkFilter" onchange="applyFilters()" class="modern-select" style="width: 100%; padding: 7px 9px; font-size: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; background: rgba(255,255,255,0.95); color: #333; font-weight: 500; transition: all 0.3s; cursor: pointer; position: relative; z-index: 1;">
                         ${networkOptions}
                     </select>
                     
                     <!-- Token filter -->
-                    <select id="tokenFilter" onchange="applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                    <select id="tokenFilter" onchange="applyFilters()" class="modern-select" style="width: 100%; padding: 7px 9px; font-size: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; background: rgba(255,255,255,0.95); color: #333; font-weight: 500; transition: all 0.3s; cursor: pointer; position: relative; z-index: 1;">
                         ${tokenOptions}
                     </select>
                     
                     <!-- Address filter -->
-                    <input type="text" id="addressFilter" placeholder="${t('addressPlaceholder')}" value="${savedAddress}" onkeyup="if(event.key === 'Enter') applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                    <input type="text" id="addressFilter" placeholder="${t('addressPlaceholder')}" value="${savedAddress}" onkeyup="if(event.key === 'Enter') applyFilters()" style="width: 100%; padding: 7px 9px; font-size: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; background: rgba(255,255,255,0.95); color: #333; font-weight: 500; transition: all 0.3s; position: relative; z-index: 1;" onfocus="this.style.borderColor='rgba(255,255,255,0.6)'; this.style.background='white';" onblur="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.background='rgba(255,255,255,0.95)';">
                     
                     <!-- Buttons -->
-                    <div style="display: flex; gap: 5px;">
-                        <button onclick="applyFilters()" style="flex: 1; padding: 6px; font-size: 12px; background: rgba(255,255,255,0.95); color: #4caf50; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
-                            ${t('apply')}
+                    <div style="display: flex; gap: 7px; margin-top: 3px; position: relative; z-index: 1;">
+                        <button onclick="applyFilters()" style="flex: 1; padding: 7px; font-size: 12px; background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; border-radius: 7px; cursor: pointer; font-weight: 600; transition: all 0.3s; box-shadow: 0 3px 12px rgba(76, 175, 80, 0.3); text-transform: uppercase; letter-spacing: 0.5px;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(76, 175, 80, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(76, 175, 80, 0.3)';">
+                            ✓ ${t('apply')}
                         </button>
-                        <button onclick="resetFilters()" style="flex: 1; padding: 6px; font-size: 12px; background: rgba(255,255,255,0.95); color: #f44336; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
-                            ${t('resetFilters').replace('Filters', '')}
+                        <button onclick="resetFilters()" style="flex: 1; padding: 7px; font-size: 12px; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; cursor: pointer; font-weight: 600; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.5px;" onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(0)';">
+                            ↺ ${t('resetFilters').replace('Filters', '')}
                         </button>
                     </div>
                 </div>
@@ -2301,7 +2361,7 @@
                     <div class="stat-card">
                         <div class="stat-label">${t('softLiquidationsLabel')}</div>
                         <div class="stat-value">$${formatNumber(totalTVL)}</div>
-                        <div style="font-size: 14px; margin-top: 12px;">
+                        <div style="font-size: 14px; margin-top: 8px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('positionsLabel')}:</span>
                                 <strong>${totalPositions}</strong>
@@ -2377,6 +2437,26 @@
                     }
                 }
                 
+                // Подсчет уникальных пользователей для хард ликвидаций
+                const uniqueHardUsers = new Set();
+                if (hardToUse?.events) {
+                    let events = hardToUse.events;
+                    if (tableDateStart || tableDateEnd) {
+                        events = events.filter(event => {
+                            if (!event.timestamp) return false;
+                            const date = new Date(event.timestamp);
+                            if (tableDateStart && date < tableDateStart) return false;
+                            if (tableDateEnd && date > tableDateEnd) return false;
+                            return true;
+                        });
+                    }
+                    events.forEach(event => {
+                        if (event.user) uniqueHardUsers.add(event.user);
+                    });
+                }
+                
+                const uniqueHardUsersCount = uniqueHardUsers.size;
+                const avgLiquidationsPerUser = uniqueHardUsersCount > 0 ? (totalCount / uniqueHardUsersCount) : 0;
                 const avgDiscount = totalDebt > 0 ? 
                     ((totalDebt - totalDebtWithDiscount) / totalDebt * 100) : 0;
                 const avgLiquidationSize = totalCount > 0 ? 
@@ -2386,7 +2466,7 @@
                     <div class="stat-card">
                         <div class="stat-label">${t('hardLiquidationsLabel')}</div>
                         <div class="stat-value">$${formatNumber(totalDebtWithDiscount)}</div>
-                        <div style="font-size: 14px; margin-top: 12px;">
+                        <div style="font-size: 14px; margin-top: 8px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('events')}:</span>
                                 <strong>${totalCount}</strong>
@@ -2394,6 +2474,10 @@
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('debtWithoutDiscount')}:</span>
                                 <strong>$${formatNumber(totalDebt)}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #666;">${t('liquidationsPerUser') || 'Liquidations per user'}:</span>
+                                <strong>${avgLiquidationsPerUser.toFixed(2)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('averageDiscount')}:</span>
@@ -3609,7 +3693,7 @@
             // Draw background circle (track)
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.lineWidth = 20;
             ctx.stroke();
             
@@ -4018,11 +4102,6 @@
                 // Remove shadow for border
                 ctx.shadowColor = 'transparent';
                 ctx.shadowBlur = 0;
-                
-                // White border
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
                 
                 ctx.restore();
                 
