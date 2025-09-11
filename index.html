@@ -249,7 +249,7 @@
         .chart-axis {
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 40px;
             right: 0;
             height: 30px;
             border-top: 2px solid #e0e0e0;
@@ -260,6 +260,28 @@
             color: #666;
             padding: 5px 10px;
             background: rgba(255,255,255,0.8);
+        }
+        
+        .chart-y-axis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 30px;
+            width: 50px;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 10px 8px 10px 5px;
+            font-size: 10px;
+            color: #666;
+            border-right: 2px solid #e0e0e0;
+            background: rgba(255,255,255,0.8);
+        }
+        
+        .chart-y-label {
+            text-align: right;
+            width: 100%;
         }
         
         input[type="range"]::-webkit-slider-thumb {
@@ -382,27 +404,34 @@
         }
         
         .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: white;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: inline-flex;
+            gap: 5px;
+            margin-bottom: 0;
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
         }
         
         .tab {
-            padding: 10px 20px;
-            background: #f0f0f0;
-            border: none;
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
             border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .tab:hover {
+            background: #e8e8e8;
         }
         
         .tab.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border-color: transparent;
         }
         
         .data-table {
@@ -547,6 +576,13 @@
             font-size: 16px;
         }
         
+        @media (max-width: 968px) {
+            /* Переход на вертикальную компоновку для планшетов */
+            .chart-inner > div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -554,6 +590,23 @@
             
             .filter-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            /* Вертикальная компоновка для мобильных */
+            .chart-inner > div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+            
+            /* Адаптация контролов */
+            .chart-inner > div:first-child {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .chart-inner > div:first-child > div:last-child {
+                width: 100%;
+                justify-content: center !important;
             }
         }
         
@@ -673,30 +726,65 @@
         
         <div class="chart-container">
             <div class="chart-inner">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <!-- Header with title and controls -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                     <div class="chart-title" id="chartTitle" style="font-size: 18px; font-weight: 600; color: #333;">📈 Ликвидации по дням</div>
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="radio" name="chartMode" value="count" style="margin-right: 5px;">
-                            Количество
-                        </label>
-                        <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="radio" name="chartMode" value="sum" checked style="margin-right: 5px;">
-                            Сумма ($)
-                        </label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;">
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 5px; font-size: 13px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartPeriod" value="day" style="margin-right: 3px;">
+                                <span id="dayLabel">День</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartPeriod" value="week" style="margin-right: 3px;">
+                                <span id="weekLabel">Неделя</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartPeriod" value="month" checked style="margin-right: 3px;">
+                                <span id="monthLabel">Месяц</span>
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 5px; font-size: 13px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartMode" value="count" style="margin-right: 3px;">
+                                <span id="countLabel">Количество</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartMode" value="sum" checked style="margin-right: 3px;">
+                                <span id="sumLabel">Сумма ($)</span>
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 5px; font-size: 13px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="distributionType" value="token" checked style="margin-right: 3px;">
+                                <span id="tokenBtnText2">Токены</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="distributionType" value="platform" style="margin-right: 3px;">
+                                <span id="platformBtnText2">Платформы</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="distributionType" value="network" style="margin-right: 3px;">
+                                <span id="networkBtnText2">Сети</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div id="liquidationChart"></div>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: rgba(76, 175, 80, 0.8);"></div>
-                        <span>Мягкие ликвидации</span>
+                
+                <!-- Main content area -->
+                <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start;">
+                    <!-- Chart area -->
+                    <div style="min-height: 250px; background: #fafafa; border-radius: 8px; padding: 15px;">
+                        <div id="liquidationChart"></div>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: rgba(255, 107, 107, 0.9);"></div>
-                        <span>Жёсткие ликвидации</span>
+                    
+                    <!-- Distribution pie chart -->
+                    <div style="background: #fafafa; border-radius: 8px; padding: 10px; height: 280px; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="distributionChart" width="280" height="260"></canvas>
                     </div>
                 </div>
+                
+                <!-- Range slider -->
                 <div class="chart-controls" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
                     <div style="position: relative; width: 100%; height: 30px; margin: 10px 0;">
                         <div style="position: absolute; width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; top: 13px;"></div>
@@ -714,38 +802,7 @@
         </div>
         <div class="chart-tooltip" id="chartTooltip"></div>
         
-        <div class="controls">
-            <div class="filter-section">
-                <span class="filter-title" id="filterTitle">🔍 Фильтры:</span>
-                <div class="filter-grid">
-                    <select id="platformFilter" style="padding: 5px 10px; font-size: 13px;">
-                        <option value="all" id="allPlatformsOption">All platforms</option>
-                        <option value="LlamaLend">LlamaLend</option>
-                        <option value="crvUSD">crvUSD</option>
-                    </select>
-                    
-                    <select id="networkFilter" style="padding: 5px 10px; font-size: 13px;">
-                        <option value="all">Все сети</option>
-                    </select>
-                    
-                    <select id="tokenFilter" style="padding: 5px 10px; font-size: 13px;">
-                        <option value="all">Все токены</option>
-                    </select>
-                    
-                    <input type="text" id="addressFilter" placeholder="Address (0x...)" style="padding: 5px 10px; font-size: 13px; width: 150px;">
-                    
-                    <button class="btn btn-primary" onclick="applyFilters()" style="padding: 5px 12px; font-size: 13px;" id="applyFiltersBtn">Apply</button>
-                    <button class="btn btn-secondary" onclick="resetFilters()" style="padding: 5px 12px; font-size: 13px;" id="resetFiltersBtn">Reset</button>
-                </div>
-            </div>
-            <div class="filter-stats" id="filterStats"></div>
-        </div>
-        
-        <div class="tabs">
-            <button class="tab active" data-tab="soft">💧 Soft Liquidations</button>
-            <button class="tab" data-tab="hard">🔥 Hard Liquidations</button>
-            <button class="tab" data-tab="comparison">📊 Comparison</button>
-        </div>
+        <div id="chartsSection" style="display: none;"></div>
         
         <div class="data-table" id="dataTable">
             <div class="loading" id="loadingText">Loading data...</div>
@@ -782,6 +839,9 @@
                 applyFilters: 'Apply Filters',
                 resetFilters: 'Reset',
                 chartByDays: 'Liquidations by Days',
+                day: 'Day',
+                week: 'Week',
+                month: 'Month',
                 count: 'Count',
                 sum: 'Size ($)',
                 start: 'Start',
@@ -817,14 +877,19 @@
                 debtWithDiscount: 'Debt with discount',
                 events: 'Events',
                 hardLiquidationsLabel: '🔥 HARD LIQUIDATIONS',
-                platformBreakdown: '🏦 Platform Breakdown',
+                quickFilters: '⚡ Quick Filters',
                 positions: 'positions',
                 protectedFromLiquidation: '🛡️ PROTECTED FROM LIQUIDATION',
+                protectionStatus: 'Protection Status',
+                platformDistribution: 'Platform Distribution',
+                networkDistribution: 'Network Distribution', 
+                tokenDistribution: 'Token Distribution',
                 ofTVLInSoft: 'of TVL in liquidation protection<br>(soft liquidation)',
                 softLiquidationsLabel: '💧 SOFT LIQUIDATIONS',
                 positionsLabel: 'Positions',
                 totalDebt: 'Total debt',
                 averageLTV: 'Average LTV',
+                positionsPerUser: 'Positions per user',
                 averagePosition: 'Average position',
                 protected: 'Protected',
                 chain: 'Chain',
@@ -833,7 +898,15 @@
                 pageText: 'Page',
                 ofPages: 'of',
                 records: 'records',
-                selectedPeriod: 'Selected period'
+                selectedPeriod: 'Selected period',
+                others: 'Others',
+                tokens: 'Tokens',
+                platforms: 'Platforms',
+                networks: 'Networks',
+                value: 'Value',
+                share: 'Share',
+                includes: 'Includes',
+                andMore: 'and {count} more'
             },
             ru: {
                 title: 'Анализ защиты от ликвидаций Curve Finance 🦙',
@@ -858,6 +931,9 @@
                 applyFilters: 'Применить фильтры',
                 resetFilters: 'Сбросить',
                 chartByDays: 'Ликвидации по дням',
+                day: 'День',
+                week: 'Неделя',
+                month: 'Месяц',
                 count: 'Количество',
                 sum: 'Размер ($)',
                 start: 'Начало',
@@ -893,14 +969,19 @@
                 debtWithDiscount: 'Долг с дисконтом',
                 events: 'Событий',
                 hardLiquidationsLabel: '🔥 ХАРД ЛИКВИДАЦИИ',
-                platformBreakdown: '🏦 Разбивка по платформам',
+                quickFilters: '⚡ Быстрые фильтры',
                 positions: 'позиций',
                 protectedFromLiquidation: '🛡️ ЗАЩИЩЕНО ОТ ЛИКВИДАЦИИ',
+                protectionStatus: 'Статус защиты',
+                platformDistribution: 'Распределение по платформам',
+                networkDistribution: 'Распределение по сетям',
+                tokenDistribution: 'Распределение по токенам',
                 ofTVLInSoft: 'от TVL в диапазоне защиты<br>(в софт ликвидации)',
                 softLiquidationsLabel: '💧 СОФТ ЛИКВИДАЦИИ',
                 positionsLabel: 'Позиций',
                 totalDebt: 'Общий долг',
                 averageLTV: 'Средний LTV',
+                positionsPerUser: 'Позиций на юзера',
                 averagePosition: 'Средняя позиция',
                 protected: 'Защищено',
                 chain: 'Сеть',
@@ -909,7 +990,15 @@
                 pageText: 'Страница',
                 ofPages: 'из',
                 records: 'записей',
-                selectedPeriod: 'Выбранный период'
+                selectedPeriod: 'Выбранный период',
+                others: 'Остальные',
+                tokens: 'Токены',
+                platforms: 'Платформы',
+                networks: 'Сети',
+                value: 'Сумма',
+                share: 'Доля',
+                includes: 'Включает',
+                andMore: 'и еще {count}'
             }
         };
         
@@ -937,7 +1026,9 @@
             }
             
             updateUILanguage();
-            renderStats();  // Add this to update stats when language changes
+            renderStats();
+            // Update the inline protection chart after stats are rendered
+            setTimeout(() => updateProtectionChartInline(), 100);  // Add this to update stats when language changes
             renderData();
             renderChart();  // Fixed: was updateChart, should be renderChart
             updateFilters();
@@ -961,6 +1052,14 @@
             if (startLabel) startLabel.textContent = t('start');
             const endLabel = document.querySelector('#endLabel');
             if (endLabel) endLabel.textContent = t('end');
+            
+            // Update chart period labels
+            const dayLabel = document.querySelector('#dayLabel');
+            if (dayLabel) dayLabel.textContent = t('day');
+            const weekLabel = document.querySelector('#weekLabel');
+            if (weekLabel) weekLabel.textContent = t('week');
+            const monthLabel = document.querySelector('#monthLabel');
+            if (monthLabel) monthLabel.textContent = t('month');
             
             // Update filter texts
             const filterTitle = document.querySelector('#filterTitle');
@@ -986,6 +1085,35 @@
             const selectedPeriodLabel = document.querySelector('#selectedPeriodLabel');
             if (selectedPeriodLabel) selectedPeriodLabel.textContent = t('selectedPeriod');
             
+            // Update distribution chart buttons
+            // Update both sets of buttons
+            const tokenBtnText = document.querySelector('#tokenBtnText');
+            if (tokenBtnText) tokenBtnText.textContent = t('tokens');
+            const tokenBtnText2 = document.querySelector('#tokenBtnText2');
+            if (tokenBtnText2) tokenBtnText2.textContent = t('tokens');
+            
+            const platformBtnText = document.querySelector('#platformBtnText');
+            if (platformBtnText) platformBtnText.textContent = t('platforms');
+            const platformBtnText2 = document.querySelector('#platformBtnText2');
+            if (platformBtnText2) platformBtnText2.textContent = t('platforms');
+            
+            const networkBtnText = document.querySelector('#networkBtnText');
+            if (networkBtnText) networkBtnText.textContent = t('networks');
+            const networkBtnText2 = document.querySelector('#networkBtnText2');
+            if (networkBtnText2) networkBtnText2.textContent = t('networks');
+            
+            // Update main date filter
+            const mainDateFilterBtn = document.querySelector('#mainDateFilterBtn');
+            if (mainDateFilterBtn) mainDateFilterBtn.innerHTML = `📅 ${t('dateFilter')}`;
+            const mainDateFromLabel = document.querySelector('#mainDateFromLabel');
+            if (mainDateFromLabel) mainDateFromLabel.textContent = `${t('dateFrom')}:`;
+            const mainDateToLabel = document.querySelector('#mainDateToLabel');
+            if (mainDateToLabel) mainDateToLabel.textContent = `${t('dateTo')}:`;
+            const mainApplyBtn = document.querySelector('#mainApplyBtn');
+            if (mainApplyBtn) mainApplyBtn.textContent = t('apply');
+            const mainCancelBtn = document.querySelector('#mainCancelBtn');
+            if (mainCancelBtn) mainCancelBtn.textContent = t('cancel');
+            
             // Update tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 const tabType = tab.dataset.tab;
@@ -999,16 +1127,11 @@
             if (legendItems[0]) legendItems[0].textContent = t('softLiquidations');
             if (legendItems[1]) legendItems[1].textContent = t('hardLiquidations');
             
-            // Update radio buttons
-            const radioLabels = document.querySelectorAll('input[name="chartMode"]');
-            radioLabels.forEach(radio => {
-                const label = radio.parentElement;
-                if (radio.value === 'count') {
-                    label.childNodes[2].textContent = t('count');
-                } else if (radio.value === 'sum') {
-                    label.childNodes[2].textContent = t('sum');
-                }
-            });
+            // Update radio buttons for chart mode
+            const countLabel = document.getElementById('countLabel');
+            const sumLabel = document.getElementById('sumLabel');
+            if (countLabel) countLabel.textContent = t('count');
+            if (sumLabel) sumLabel.textContent = t('sum');
             
             // Update loading text
             const loadingEl = document.querySelector('#loadingText');
@@ -1042,6 +1165,7 @@
         let globalMinDate = null;
         let globalMaxDate = null;
         let chartMode = 'sum'; // 'count' или 'sum'
+        let chartPeriod = 'month'; // 'day', 'week', 'month'
         let comparisonGroupBy = 'market'; // 'market', 'platform', 'token', 'chain'
         let tableDateStart = null; // Начальная дата для фильтрации таблиц
         let tableDateEnd = null; // Конечная дата для фильтрации таблиц
@@ -1061,13 +1185,29 @@
         
         // Обработка переключения режима графика
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize language on page load
-            setLanguage(currentLang);
+            // Don't initialize language here - wait until data is loaded
             
             document.querySelectorAll('input[name="chartMode"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     chartMode = e.target.value;
                     renderChart();
+                    // Also update distribution chart
+                    updateDistributionCharts();
+                });
+            });
+            
+            // Обработчик для периода графика
+            document.querySelectorAll('input[name="chartPeriod"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    chartPeriod = e.target.value;
+                    renderChart();
+                });
+            });
+
+            // Обработчик для типа диаграммы распределения
+            document.querySelectorAll('input[name="distributionType"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    switchDistributionChart(e.target.value);
                 });
             });
             
@@ -1119,6 +1259,10 @@
             softData = data.soft_liquidations;
             hardData = data.hard_liquidations;
             
+            // Initialize filtered data to be the same as original data
+            filteredSoftData = softData;
+            filteredHardData = hardData;
+            
             // Находим полный диапазон данных
             let minDate = new Date();
             let maxDate = new Date(0);
@@ -1158,7 +1302,7 @@
             globalMaxDate = maxDate;
             
             // Устанавливаем диапазон ползунков на весь период данных
-            const totalDays = Math.ceil((maxDate - minDate) / (24 * 60 * 60 * 1000)) + 1;
+            const totalDays = Math.ceil((maxDate - minDate) / (24 * 60 * 60 * 1000));
             const rangeStart = document.getElementById('rangeStart');
             const rangeEnd = document.getElementById('rangeEnd');
             const sliderRange = document.getElementById('sliderRange');
@@ -1166,75 +1310,251 @@
             // Устанавливаем максимум на полный диапазон данных
             rangeStart.max = totalDays;
             rangeEnd.max = totalDays;
-            rangeStart.value = Math.max(0, totalDays - 30); // Начало за 30 дней до конца
+            rangeStart.value = 0; // Начало с первого дня
             rangeEnd.value = totalDays; // Конец на последней дате
             
             // Обновляем визуальный диапазон
-            const startPercent = (rangeStart.value / rangeEnd.max) * 100;
-            const endPercent = (rangeEnd.value / rangeEnd.max) * 100;
+            const startPercent = 0;
+            const endPercent = 100;
             sliderRange.style.left = startPercent + '%';
-            sliderRange.style.width = (endPercent - startPercent) + '%';
+            sliderRange.style.width = endPercent + '%';
             
-            // Устанавливаем начальные выбранные даты
-            selectedStartDate = new Date(minDate.getTime() + parseInt(rangeStart.value) * 24 * 60 * 60 * 1000);
-            selectedEndDate = new Date(minDate.getTime() + parseInt(rangeEnd.value) * 24 * 60 * 60 * 1000);
+            // Устанавливаем начальные выбранные даты на весь диапазон
+            selectedStartDate = minDate;
+            selectedEndDate = maxDate;
             
             // Обновляем метки
             const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
             document.getElementById('startLabel').textContent = selectedStartDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
             document.getElementById('endLabel').textContent = selectedEndDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
             
-            // Обновляем фильтры
-            updateFilterOptions();
+            // Обрабатываем и отображаем данные (this will create the filter elements in the stats grid)
+            processData();
             
-            // Применяем фильтры по умолчанию
-            applyFilters();
+            // Initialize language UI and update filter options after elements are created
+            setTimeout(() => {
+                updateUILanguage();
+                updateFilterOptions();
+                
+                // Force update dropdowns again after a delay to ensure they're populated
+                setTimeout(() => {
+                    updateFilterOptions();
+                }, 100);
+            }, 20);
             
-            // Force update filter stats with current language
-            setTimeout(() => updateFilterStats(), 100);
+            // Применяем фильтры после того как элементы созданы
+            setTimeout(() => {
+                applyFilters();
+            }, 150);
+            
+            // Force update filter stats with current language and date range
+            setTimeout(() => {
+                updateFilterStats();
+                updateProtectionChart();
+            }, 100);
+            
+            // Final attempt to populate dropdowns after everything is ready
+            setTimeout(() => {
+                updateFilterOptions();
+            }, 500);
         }
 
         function updateFilterOptions() {
-            // Обновляем сети
-            const networkFilter = document.getElementById('networkFilter');
-            networkFilter.innerHTML = `<option value="all">${t('allNetworks')}</option>`;
-            Array.from(availableNetworks).sort().forEach(network => {
-                const option = document.createElement('option');
-                option.value = network;
-                option.textContent = network;
-                networkFilter.appendChild(option);
+            // Function to try updating filters with retries
+            let retryCount = 0;
+            const maxRetries = 10;
+            
+            function tryUpdate() {
+                // Обновляем сети
+                const networkFilter = document.getElementById('networkFilter');
+                const tokenFilter = document.getElementById('tokenFilter');
+                
+                let networkUpdated = false;
+                let tokenUpdated = false;
+                
+                if (networkFilter && availableNetworks.size > 0) {
+                    // Check if already populated
+                    if (networkFilter.options.length <= 1) {
+                        networkFilter.innerHTML = `<option value="">${t('allNetworks')}</option>`;
+                        Array.from(availableNetworks).sort().forEach(network => {
+                            const option = document.createElement('option');
+                            option.value = network;
+                            option.textContent = network;
+                            networkFilter.appendChild(option);
+                        });
+                        console.log('Networks populated:', availableNetworks.size);
+                    }
+                    networkUpdated = true;
+                }
+                
+                // Обновляем токены
+                if (tokenFilter && availableTokens.size > 0) {
+                    // Check if already populated
+                    if (tokenFilter.options.length <= 1) {
+                        tokenFilter.innerHTML = `<option value="">${t('allTokens')}</option>`;
+                        Array.from(availableTokens).sort().forEach(token => {
+                            const option = document.createElement('option');
+                            option.value = token;
+                            option.textContent = token;
+                            tokenFilter.appendChild(option);
+                        });
+                        console.log('Tokens populated:', availableTokens.size);
+                    }
+                    tokenUpdated = true;
+                }
+                
+                // Retry if not successful and under retry limit
+                if ((!networkUpdated || !tokenUpdated) && retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(tryUpdate, 200);
+                }
+            }
+            
+            tryUpdate();
+        }
+        
+        // Helper functions for calculating summaries
+        function calculateSoftSummary(positions) {
+            if (!positions || positions.length === 0) {
+                return {
+                    total_positions: 0,
+                    total_tvl: 0,
+                    total_debt: 0,
+                    llamalend_positions: 0,
+                    llamalend_tvl: 0,
+                    llamalend_debt: 0,
+                    crvusd_positions: 0,
+                    crvusd_tvl: 0,
+                    crvusd_debt: 0
+                };
+            }
+            
+            const summary = {
+                total_positions: positions.length,
+                total_tvl: 0,
+                total_debt: 0,
+                llamalend_positions: 0,
+                llamalend_tvl: 0,
+                llamalend_debt: 0,
+                crvusd_positions: 0,
+                crvusd_tvl: 0,
+                crvusd_debt: 0
+            };
+            
+            positions.forEach(pos => {
+                const tvl = parseFloat(pos.tvl || pos.collateral_usd || 0);
+                const debt = parseFloat(pos.debt || 0);
+                
+                summary.total_tvl += tvl;
+                summary.total_debt += debt;
+                
+                if (pos.platform === 'LlamaLend') {
+                    summary.llamalend_positions++;
+                    summary.llamalend_tvl += tvl;
+                    summary.llamalend_debt += debt;
+                } else if (pos.platform === 'crvUSD') {
+                    summary.crvusd_positions++;
+                    summary.crvusd_tvl += tvl;
+                    summary.crvusd_debt += debt;
+                }
             });
             
-            // Обновляем токены
-            const tokenFilter = document.getElementById('tokenFilter');
-            tokenFilter.innerHTML = `<option value="all">${t('allTokens')}</option>`;
-            Array.from(availableTokens).sort().forEach(token => {
-                const option = document.createElement('option');
-                option.value = token;
-                option.textContent = token;
-                tokenFilter.appendChild(option);
+            return summary;
+        }
+        
+        function calculateHardTotal(events) {
+            if (!events || events.length === 0) {
+                return {
+                    count: 0,
+                    debt: 0,
+                    debt_with_discount: 0
+                };
+            }
+            
+            const total = {
+                count: events.length,
+                debt: 0,
+                debt_with_discount: 0
+            };
+            
+            events.forEach(event => {
+                const debt = parseFloat(event.debt || 0);
+                total.debt += debt;
+                // Используем готовое значение debt_with_discount из JSON
+                total.debt_with_discount += parseFloat(event.debt_with_discount || event.debt || 0);
             });
+            
+            return total;
         }
 
-        function applyFilters() {
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            
+            // Update main tabs
+            const tabs = document.querySelectorAll('.tabs .tab');
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                if (t.dataset.tab === tab) {
+                    t.classList.add('active');
+                }
+            });
+            
+            // Update tab content
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tab}Tab`) {
+                    content.classList.add('active');
+                }
+            });
+            
+            // Update stats and re-render data
+            renderStats();
+            renderData();
+        }
+        
+        window.applyFilters = function() {
             const typeFilter = 'all'; // Убрали фильтр по типу
-            const platformFilter = document.getElementById('platformFilter').value;
-            const networkFilter = document.getElementById('networkFilter').value;
-            const tokenFilter = document.getElementById('tokenFilter').value;
-            const addressFilter = document.getElementById('addressFilter').value.toLowerCase();
+            
+            const platformFilter = document.getElementById('platformFilter');
+            const networkFilter = document.getElementById('networkFilter');
+            const tokenFilter = document.getElementById('tokenFilter');
+            const addressFilterEl = document.getElementById('addressFilter');
+            
+            // Сохраняем текущие значения фильтров перед пересозданием
+            const platformFilterValue = platformFilter ? platformFilter.value : '';
+            const networkFilterValue = networkFilter ? networkFilter.value : '';
+            const tokenFilterValue = tokenFilter ? tokenFilter.value : '';
+            const addressFilter = addressFilterEl ? addressFilterEl.value.toLowerCase() : '';
+            
+            // Сохраняем значения глобально для восстановления после renderStats
+            window.savedFilterValues = {
+                platform: platformFilterValue,
+                network: networkFilterValue,
+                token: tokenFilterValue,
+                address: addressFilterEl ? addressFilterEl.value : ''
+            };
             
             // Фильтруем софт ликвидации
             if (softData && softData.positions) {
                 filteredSoftData = {
                     ...softData,
                     positions: softData.positions.filter(pos => {
-                        if (platformFilter !== 'all' && pos.platform !== platformFilter) return false;
-                        if (networkFilter !== 'all' && pos.chain !== networkFilter) return false;
-                        if (tokenFilter !== 'all' && pos.collateral_token !== tokenFilter) return false;
+                        if (platformFilterValue && platformFilterValue !== '' && pos.platform !== platformFilterValue) return false;
+                        if (networkFilterValue && networkFilterValue !== '' && pos.chain !== networkFilterValue) return false;
+                        if (tokenFilterValue && tokenFilterValue !== '' && !pos.collateral_token.toLowerCase().includes(tokenFilterValue.toLowerCase())) return false;
                         if (addressFilter && !pos.user.toLowerCase().includes(addressFilter)) return false;
                         return true;
                     })
                 };
+                
+                // Recalculate summary for filtered data
+                filteredSoftData.summary = calculateSoftSummary(filteredSoftData.positions);
+                
+                // Keep original summary if it exists and we haven't calculated a new one
+                if (!filteredSoftData.summary.total_positions && softData.summary) {
+                    filteredSoftData.summary = softData.summary;
+                }
             }
             
             // Фильтруем хард ликвидации
@@ -1242,15 +1562,26 @@
                 filteredHardData = {
                     ...hardData,
                     events: hardData.events.filter(event => {
-                        if (platformFilter !== 'all' && event.platform !== platformFilter) return false;
-                        if (networkFilter !== 'all' && event.chain !== networkFilter) return false;
-                        if (tokenFilter !== 'all' && event.collateral_token !== tokenFilter) return false;
+                        if (platformFilterValue && platformFilterValue !== '' && event.platform !== platformFilterValue) return false;
+                        if (networkFilterValue && networkFilterValue !== '' && event.chain !== networkFilterValue) return false;
+                        if (tokenFilterValue && tokenFilterValue !== '' && !event.collateral_token.toLowerCase().includes(tokenFilterValue.toLowerCase())) return false;
                         if (addressFilter && !event.user.toLowerCase().includes(addressFilter) && 
                             !event.liquidator.toLowerCase().includes(addressFilter)) return false;
                         return true;
                     })
                 };
+                
+                // Recalculate total for filtered data
+                filteredHardData.total = calculateHardTotal(filteredHardData.events);
+                
+                // Keep original total if it exists and we haven't calculated a new one
+                if (!filteredHardData.total.count && hardData.total) {
+                    filteredHardData.total = hardData.total;
+                }
             }
+            
+            // Update inline protection chart
+            setTimeout(() => updateProtectionChartInline(), 100);
             
             // Обновляем статистику фильтров
             setTimeout(() => updateFilterStats(), 0);  // Defer to ensure DOM is ready
@@ -1271,6 +1602,8 @@
             
             // Обновляем статистику, диаграмму и данные
             renderStats();
+            // Update the inline protection chart after stats are rendered
+            setTimeout(() => updateProtectionChartInline(), 100);
             
             // Обновляем диапазон слайдера при фильтрации, но сохраняем выбранные даты
             if (filteredSoftData && filteredHardData) {
@@ -1347,41 +1680,36 @@
         }
 
         function updateFilterStats() {
-            const stats = document.getElementById('filterStats');
-            if (!stats) {
-                console.warn('filterStats element not found');
-                return;
-            }
-            
-            // Determine what data to show
-            const softCount = filteredSoftData?.positions?.length || softData?.positions?.length || 0;
-            const hardCount = filteredHardData?.events?.length || hardData?.events?.length || 0;
-            const originalSoftCount = softData?.positions?.length || 0;
-            const originalHardCount = hardData?.events?.length || 0;
-            
-            // Force language update by recreating the entire text
-            const showingText = t('showing');
-            const ofText = t('of');
-            const softText = t('softLiquidationsCount');
-            const hardText = t('hardLiquidationsCount');
-            
-            // Always update the text using current language
-            stats.innerHTML = `${showingText}: <strong>${softCount}</strong> ${ofText} ${originalSoftCount} ${softText}, <strong>${hardCount}</strong> ${ofText} ${originalHardCount} ${hardText}`;
+            // This function is no longer needed as we removed the filter stats display
+            // Keeping it as empty function to avoid breaking existing calls
         }
 
         function resetFilters() {
-            document.getElementById('platformFilter').value = 'all';
-            document.getElementById('networkFilter').value = 'all';
-            document.getElementById('tokenFilter').value = 'all';
+            // Clear saved filter values
+            window.savedFilterValues = {
+                platform: '',
+                network: '',
+                token: '',
+                address: ''
+            };
+            
+            // Clear filter elements
+            document.getElementById('platformFilter').value = '';
+            document.getElementById('networkFilter').value = '';
+            document.getElementById('tokenFilter').value = '';
             document.getElementById('addressFilter').value = '';
+            
             applyFilters();
         }
 
         function processData() {
             renderStats();
+            // Update the inline protection chart after stats are rendered
+            setTimeout(() => updateProtectionChartInline(), 100);
             renderChart();
             renderData();
             updateFilterStats();  // Ensure filter stats are updated after data loads
+            updateProtectionChart();  // Update protection chart
         }
         
         function renderChart() {
@@ -1451,43 +1779,85 @@
             const dateRange = `${startStr} - ${endStr}`;
             title.textContent = `📈 ${t('chartByDays')} (${dateRange})`;
             
-            // Подготавливаем данные по дням
-            const dailyData = {};
-            const totalDays = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
+            // Подготавливаем данные по периодам
+            const periodData = {};
             
-            // Инициализируем все дни
-            for (let i = 0; i < totalDays; i++) {
-                const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
-                const dateStr = date.toISOString().split('T')[0];
-                dailyData[dateStr] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0 };
+            // Функция для получения ключа периода
+            function getPeriodKey(date) {
+                if (chartPeriod === 'day') {
+                    return date.toISOString().split('T')[0];
+                } else if (chartPeriod === 'week') {
+                    // Начало недели (понедельник)
+                    const weekStart = new Date(date);
+                    const day = weekStart.getDay();
+                    const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+                    weekStart.setDate(diff);
+                    return weekStart.toISOString().split('T')[0];
+                } else if (chartPeriod === 'month') {
+                    // Начало месяца
+                    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+                }
             }
             
-            // Считаем софт ликвидации (используем те же отфильтрованные данные)
+            // Инициализируем периоды
+            if (chartPeriod === 'day') {
+                const totalDays = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
+                for (let i = 0; i < totalDays; i++) {
+                    const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+                    const key = getPeriodKey(date);
+                    if (!periodData[key]) {
+                        periodData[key] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0, date: date };
+                    }
+                }
+            } else if (chartPeriod === 'week') {
+                // Создаем периоды по неделям
+                let currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    const key = getPeriodKey(currentDate);
+                    if (!periodData[key]) {
+                        periodData[key] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0, date: new Date(key) };
+                    }
+                    currentDate.setDate(currentDate.getDate() + 7);
+                }
+            } else if (chartPeriod === 'month') {
+                // Создаем периоды по месяцам
+                let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+                const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+                while (currentDate <= endMonth) {
+                    const key = getPeriodKey(currentDate);
+                    if (!periodData[key]) {
+                        periodData[key] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0, date: new Date(key) };
+                    }
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                }
+            }
+            
+            // Считаем софт ликвидации
             if (softDataToUse.positions) {
                 softDataToUse.positions.forEach(pos => {
                     if (pos.first_dt) {
                         const date = new Date(pos.first_dt);
                         if (date >= startDate && date <= endDate) {
-                            const dateStr = date.toISOString().split('T')[0];
-                            if (dailyData[dateStr]) {
-                                dailyData[dateStr].soft++;
-                                dailyData[dateStr].softTVL += pos.tvl || 0;
+                            const key = getPeriodKey(date);
+                            if (periodData[key]) {
+                                periodData[key].soft++;
+                                periodData[key].softTVL += parseFloat(pos.tvl || pos.collateral_usd || 0);
                             }
                         }
                     }
                 });
             }
             
-            // Считаем хард ликвидации (используем те же отфильтрованные данные)
+            // Считаем хард ликвидации
             if (hardDataToUse.events) {
                 hardDataToUse.events.forEach(event => {
                     if (event.timestamp) {
                         const date = new Date(event.timestamp);
                         if (date >= startDate && date <= endDate) {
-                            const dateStr = date.toISOString().split('T')[0];
-                            if (dailyData[dateStr]) {
-                                dailyData[dateStr].hard++;
-                                dailyData[dateStr].hardDebt += event.debt || 0;
+                            const key = getPeriodKey(date);
+                            if (periodData[key]) {
+                                periodData[key].hard++;
+                                periodData[key].hardDebt += parseFloat(event.debt_with_discount || event.debt || 0);
                             }
                         }
                     }
@@ -1497,32 +1867,73 @@
             // Находим максимальные значения в зависимости от режима
             let maxSoft = 0;
             let maxHard = 0;
-            Object.values(dailyData).forEach(day => {
+            Object.values(periodData).forEach(period => {
                 if (chartMode === 'sum') {
-                    maxSoft = Math.max(maxSoft, day.softTVL);
-                    maxHard = Math.max(maxHard, day.hardDebt);
+                    maxSoft = Math.max(maxSoft, period.softTVL);
+                    maxHard = Math.max(maxHard, period.hardDebt);
                 } else {
-                    maxSoft = Math.max(maxSoft, day.soft);
-                    maxHard = Math.max(maxHard, day.hard);
+                    maxSoft = Math.max(maxSoft, period.soft);
+                    maxHard = Math.max(maxHard, period.hard);
                 }
             });
             const maxValue = Math.max(maxSoft, maxHard);
             
             // Рисуем диаграмму
             let html = '';
-            const dates = Object.keys(dailyData).sort();
-            const barWidth = 100 / dates.length;
+            
+            // Добавляем легенду в верхний левый угол графика
+            html += `
+                <div style="position: absolute; top: 10px; left: 60px; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; font-size: 12px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                        <div style="width: 12px; height: 12px; background: rgba(76, 175, 80, 0.8); border-radius: 2px; margin-right: 6px;"></div>
+                        <span>${t('softLiquidations')}</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 12px; height: 12px; background: rgba(255, 107, 107, 0.9); border-radius: 2px; margin-right: 6px;"></div>
+                        <span>${t('hardLiquidations')}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Добавляем Y-ось (вертикальную шкалу)
+            html += '<div class="chart-y-axis">';
+            const ySteps = 5; // Количество делений на Y-оси
+            for (let i = 0; i <= ySteps; i++) {
+                const value = (maxValue * i) / ySteps;
+                let label;
+                if (chartMode === 'sum') {
+                    // Форматируем сумму в доллары
+                    if (value >= 1000000) {
+                        label = `$${(value / 1000000).toFixed(1)}M`;
+                    } else if (value >= 1000) {
+                        label = `$${(value / 1000).toFixed(0)}K`;
+                    } else {
+                        label = `$${value.toFixed(0)}`;
+                    }
+                } else {
+                    // Для количества просто число
+                    label = value.toFixed(0);
+                }
+                html += `<div class="chart-y-label">${label}</div>`;
+            }
+            html += '</div>';
+            
+            // Добавляем контейнер для баров с отступом слева для Y-оси
+            html += '<div style="position: absolute; left: 50px; right: 0; top: 0; bottom: 30px;">';
+            
+            const dates = Object.keys(periodData).sort();
+            const barWidth = Math.min(100 / dates.length, chartPeriod === 'month' ? 8 : chartPeriod === 'week' ? 4 : 2);
             
             dates.forEach((dateStr, index) => {
-                const day = dailyData[dateStr];
+                const period = periodData[dateStr];
                 let softValue, hardValue;
                 
                 if (chartMode === 'sum') {
-                    softValue = day.softTVL;
-                    hardValue = day.hardDebt;
+                    softValue = period.softTVL;
+                    hardValue = period.hardDebt;
                 } else {
-                    softValue = day.soft;
-                    hardValue = day.hard;
+                    softValue = period.soft;
+                    hardValue = period.hard;
                 }
                 
                 const softHeight = maxValue > 0 ? (softValue / maxValue * 200) : 0;
@@ -1546,20 +1957,48 @@
                 
                 html += `
                     <div class="chart-bar" style="left: ${index * barWidth}%; width: ${barWidth}%;" 
-                         onmouseover="showChartTooltip(event, '${dateStr}', ${day.soft}, ${day.hard}, ${day.softTVL}, ${day.hardDebt})"
+                         onmouseover="showChartTooltip(event, '${dateStr}', ${period.soft}, ${period.hard}, ${period.softTVL}, ${period.hardDebt})"
                          onmouseout="hideChartTooltip()">
                         ${barsHtml}
                     </div>
                 `;
             });
             
-            // Добавляем ось X
+            // Закрываем контейнер для баров
+            html += '</div>';
+            
+            // Добавляем ось X с правильными метками для разных периодов
             html += '<div class="chart-axis">';
-            const labelInterval = Math.max(1, Math.floor(dates.length / 6));
+            
+            // Определяем интервал меток в зависимости от периода
+            let labelInterval;
+            if (chartPeriod === 'month') {
+                labelInterval = Math.max(1, Math.floor(dates.length / 12));
+            } else if (chartPeriod === 'week') {
+                labelInterval = Math.max(1, Math.floor(dates.length / 8));
+            } else {
+                labelInterval = Math.max(1, Math.floor(dates.length / 6));
+            }
+            
             for (let i = 0; i < dates.length; i += labelInterval) {
                 if (dates[i]) {
                     const date = new Date(dates[i]);
-                    html += `<span>${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}</span>`;
+                    let label;
+                    
+                    if (chartPeriod === 'month') {
+                        // Для месяцев показываем "MM/YY"
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        const year = date.getFullYear().toString().slice(-2);
+                        label = `${month}/${year}`;
+                    } else if (chartPeriod === 'week') {
+                        // Для недель показываем "DD.MM" (начало недели)
+                        label = `${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                    } else {
+                        // Для дней показываем "DD.MM"
+                        label = `${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                    }
+                    
+                    html += `<span>${label}</span>`;
                 }
             }
             html += '</div>';
@@ -1606,55 +2045,274 @@
 
             let html = '';
             
-            // Расчет защищенных депозитов
-            const softTVL = softData?.summary?.total_tvl || 0;
-            const hardDebtWithDiscount = hardData?.total?.debt_with_discount || 0;
+            // Используем отфильтрованные данные если они есть, иначе оригинальные
+            const softToUse = filteredSoftData || softData;
+            const hardToUse = filteredHardData || hardData;
+            
+            // Определяем, нужно ли пересчитывать или использовать готовые суммы
+            let softTVL = 0;
+            let hardDebtWithDiscount = 0;
+            
+            // Проверяем, применены ли фильтры
+            const hasFilters = (tableDateStart || tableDateEnd || 
+                               (filteredSoftData && filteredSoftData.positions?.length !== softData?.positions?.length) ||
+                               (filteredHardData && filteredHardData.events?.length !== hardData?.events?.length));
+            
+            console.log('Filter check:', {
+                tableDateStart,
+                tableDateEnd,
+                filteredSoftLength: filteredSoftData?.positions?.length,
+                softLength: softData?.positions?.length,
+                filteredHardLength: filteredHardData?.events?.length,
+                hardLength: hardData?.events?.length,
+                hasFilters
+            });
+            
+            if (hasFilters) {
+                // Пересчитываем TVL для soft с учетом всех фильтров
+                if (softToUse?.positions) {
+                    let positions = softToUse.positions;
+                    if (tableDateStart || tableDateEnd) {
+                        positions = positions.filter(pos => {
+                            if (!pos.first_dt) return false;
+                            const date = new Date(pos.first_dt);
+                            if (tableDateStart && date < tableDateStart) return false;
+                            if (tableDateEnd && date > tableDateEnd) return false;
+                            return true;
+                        });
+                    }
+                    softTVL = positions.reduce((sum, pos) => sum + parseFloat(pos.tvl || pos.collateral_usd || 0), 0);
+                }
+                
+                // Пересчитываем debt для hard с учетом всех фильтров
+                if (hardToUse?.events) {
+                    let events = hardToUse.events;
+                    if (tableDateStart || tableDateEnd) {
+                        events = events.filter(event => {
+                            if (!event.timestamp) return false;
+                            const date = new Date(event.timestamp);
+                            if (tableDateStart && date < tableDateStart) return false;
+                            if (tableDateEnd && date > tableDateEnd) return false;
+                            return true;
+                        });
+                    }
+                    events.forEach(event => {
+                        // Используем готовое значение debt_with_discount из JSON
+                        hardDebtWithDiscount += parseFloat(event.debt_with_discount || event.debt || 0);
+                    });
+                }
+            } else {
+                // Используем готовые суммы из summary/total когда нет фильтров
+                softTVL = softData?.summary?.total_tvl || 0;
+                hardDebtWithDiscount = hardData?.total?.debt_with_discount || 0;
+                
+                // Отладочный вывод
+                console.log('Using pre-calculated totals (no filters):');
+                console.log('  Soft TVL from summary:', softTVL);
+                console.log('  Hard debt_with_discount from total:', hardDebtWithDiscount);
+                console.log('  Has filters:', hasFilters);
+            }
+            
             const protectedAmount = softTVL - hardDebtWithDiscount;
             const protectionPercent = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
+            console.log('Protected amount:', protectedAmount, 'Percent:', protectionPercent.toFixed(1) + '%');
             
-            // ГЛАВНЫЙ БЛОК - Защищено депозитов (занимает 2 колонки)
+            // ГЛАВНЫЙ БЛОК - Защищено депозитов с диаграммой (занимает 2 колонки)
             if (softData && hardData) {
                 const isPositive = protectedAmount > 0;
                 html += `
                     <div class="stat-card protection ${!isPositive ? 'negative' : ''}">
-                        <div class="stat-label">${t('protectedFromLiquidation')}</div>
-                        <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
-                        <div class="protection-percent">
-                            <span>${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% ${t('ofTVLInSoft').split('<br>')[0]}</span>
-                            <span style="display: block; font-size: 0.9em; opacity: 0.8;">${t('ofTVLInSoft').split('<br>')[1] || ''}</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                            <div style="flex: 1; text-align: left;">
+                                <div class="stat-label">${t('protectedFromLiquidation')}</div>
+                                <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
+                                <div class="protection-percent">
+                                    <span>${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% ${t('ofTVLInSoft').split('<br>')[0]}</span>
+                                    <span style="display: block; font-size: 0.9em; opacity: 0.8;">${t('ofTVLInSoft').split('<br>')[1] || ''}</span>
+                                </div>
+                            </div>
+                            <div style="position: relative; width: 180px; height: 180px;">
+                                <canvas id="protectionChartInline" width="180" height="180" style="display: block;"></canvas>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                    <div style="font-size: 28px; font-weight: 600; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${protectionPercent.toFixed(0)}%</div>
+                                    <div style="font-size: 12px; color: rgba(255,255,255,0.9); text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${t('protected')}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
+            // Prepare network and token options based on current filter state
+            let networkOptions = `<option value="">${t('allNetworks')}</option>`;
+            let tokenOptions = `<option value="">${t('allTokens')}</option>`;
+            
+            // Get current filtered available options based on platform filter
+            const currentPlatform = window.savedFilterValues ? window.savedFilterValues.platform : '';
+            let filteredNetworks = new Set();
+            let filteredTokens = new Set();
+            
+            // Collect available networks and tokens based on platform filter
+            if (softData && softData.positions) {
+                softData.positions.forEach(pos => {
+                    if (!currentPlatform || pos.platform === currentPlatform) {
+                        if (pos.chain) filteredNetworks.add(pos.chain);
+                        if (pos.collateral_token) filteredTokens.add(pos.collateral_token);
+                    }
+                });
+            }
+            if (hardData && hardData.events) {
+                hardData.events.forEach(event => {
+                    if (!currentPlatform || event.platform === currentPlatform) {
+                        if (event.chain) filteredNetworks.add(event.chain);
+                        if (event.collateral_token) filteredTokens.add(event.collateral_token);
+                    }
+                });
+            }
+            
+            // Build network options
+            Array.from(filteredNetworks).sort().forEach(network => {
+                const selected = window.savedFilterValues && window.savedFilterValues.network === network ? 'selected' : '';
+                networkOptions += `<option value="${network}" ${selected}>${network}</option>`;
+            });
+            
+            // Build token options
+            Array.from(filteredTokens).sort().forEach(token => {
+                const selected = window.savedFilterValues && window.savedFilterValues.token === token ? 'selected' : '';
+                tokenOptions += `<option value="${token}" ${selected}>${token}</option>`;
+            });
+            
+            // Get saved values
+            const savedPlatform = window.savedFilterValues ? window.savedFilterValues.platform : '';
+            const savedAddress = window.savedFilterValues ? window.savedFilterValues.address : '';
+            
+            // Add filters as 2nd card with orange gradient background
+            html += `
+                <div class="stat-card" style="display: flex; flex-direction: column; gap: 10px; background: linear-gradient(135deg, #ff6b35 0%, #f4511e 100%); padding: 20px;">
+                    <!-- Filter header -->
+                    <div style="margin-bottom: 10px;">
+                        <div class="stat-label" style="color: rgba(255,255,255,0.9);">🔍 ${t('filters')}</div>
+                    </div>
+                    <!-- Platform filter -->
+                    <select id="platformFilter" onchange="applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                        <option value="" ${savedPlatform === '' ? 'selected' : ''}>${t('allPlatforms')}</option>
+                        <option value="LlamaLend" ${savedPlatform === 'LlamaLend' ? 'selected' : ''}>🦙 LlamaLend</option>
+                        <option value="crvUSD" ${savedPlatform === 'crvUSD' ? 'selected' : ''}>💱 crvUSD</option>
+                    </select>
+                    
+                    <!-- Network filter -->
+                    <select id="networkFilter" onchange="applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                        ${networkOptions}
+                    </select>
+                    
+                    <!-- Token filter -->
+                    <select id="tokenFilter" onchange="applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                        ${tokenOptions}
+                    </select>
+                    
+                    <!-- Address filter -->
+                    <input type="text" id="addressFilter" placeholder="${t('addressPlaceholder')}" value="${savedAddress}" onkeyup="if(event.key === 'Enter') applyFilters()" style="width: 100%; padding: 6px; font-size: 12px; border: none; border-radius: 4px; background: rgba(255,255,255,0.95); color: #333;">
+                    
+                    <!-- Buttons -->
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="applyFilters()" style="flex: 1; padding: 6px; font-size: 12px; background: rgba(255,255,255,0.95); color: #4caf50; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                            ${t('apply')}
+                        </button>
+                        <button onclick="resetFilters()" style="flex: 1; padding: 6px; font-size: 12px; background: rgba(255,255,255,0.95); color: #f44336; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                            ${t('resetFilters').replace('Filters', '')}
+                        </button>
+                    </div>
+                </div>
+            `;
+
             // Софт ликвидации - расширенная информация
-            if (softData) {
-                const summary = softData.summary || {};
-                const avgPositionSize = summary.total_positions > 0 ? (summary.total_tvl / summary.total_positions) : 0;
+            if (softToUse) {
+                let totalPositions = 0;
+                let totalTVL = 0;
+                let totalDebt = 0;
+                let llamaLendCount = 0;
+                let crvusdCount = 0;
                 
-                // Count positions by platform
-                let llamaLendCount = summary.llamalend_positions || 0;
-                let crvusdCount = summary.crvusd_positions || 0;
+                if (hasFilters) {
+                    // Пересчитываем статистику для отфильтрованных данных
+                    if (softToUse.positions) {
+                        // Фильтруем по датам если нужно
+                        let positions = softToUse.positions;
+                        if (tableDateStart || tableDateEnd) {
+                            positions = positions.filter(pos => {
+                                if (!pos.first_dt) return false;
+                                const date = new Date(pos.first_dt);
+                                if (tableDateStart && date < tableDateStart) return false;
+                                if (tableDateEnd && date > tableDateEnd) return false;
+                                return true;
+                            });
+                        }
+                        
+                        // Считаем статистику
+                        positions.forEach(pos => {
+                            totalPositions++;
+                            totalTVL += parseFloat(pos.tvl || pos.collateral_usd || 0);
+                            totalDebt += parseFloat(pos.debt || 0);
+                            
+                            if (pos.platform === 'LlamaLend') {
+                                llamaLendCount++;
+                            } else if (pos.platform === 'crvUSD') {
+                                crvusdCount++;
+                            }
+                        });
+                    }
+                } else {
+                    // Используем готовые данные из summary когда нет фильтров
+                    const summary = softData?.summary || {};
+                    totalPositions = summary.total_positions || 0;
+                    totalTVL = summary.total_tvl || 0;
+                    totalDebt = summary.total_debt || 0;
+                    llamaLendCount = summary.llamalend_positions || 0;
+                    crvusdCount = summary.crvusd_positions || 0;
+                }
+                
+                // Подсчет позиций по пользователям (учитывая все рынки)
+                const userPositionsCount = new Map();
+                if (softToUse?.positions) {
+                    let positions = softToUse.positions;
+                    if (tableDateStart || tableDateEnd) {
+                        positions = positions.filter(pos => {
+                            if (!pos.first_dt) return false;
+                            const date = new Date(pos.first_dt);
+                            if (tableDateStart && date < tableDateStart) return false;
+                            if (tableDateEnd && date > tableDateEnd) return false;
+                            return true;
+                        });
+                    }
+                    positions.forEach(pos => {
+                        if (pos.user) {
+                            // Каждая запись в positions - это отдельная позиция/сегмент
+                            const currentCount = userPositionsCount.get(pos.user) || 0;
+                            userPositionsCount.set(pos.user, currentCount + 1);
+                        }
+                    });
+                }
+                
+                const uniqueUsersCount = userPositionsCount.size;
+                const avgPositionSize = totalPositions > 0 ? (totalTVL / totalPositions) : 0;
+                const avgPositionsPerUser = uniqueUsersCount > 0 ? (totalPositions / uniqueUsersCount) : 0;
                 
                 html += `
                     <div class="stat-card">
                         <div class="stat-label">${t('softLiquidationsLabel')}</div>
-                        <div class="stat-value">$${formatNumber(summary.total_tvl || 0)}</div>
+                        <div class="stat-value">$${formatNumber(totalTVL)}</div>
                         <div style="font-size: 14px; margin-top: 12px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('positionsLabel')}:</span>
-                                <strong>${summary.total_positions || 0}</strong>
+                                <strong>${totalPositions}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('totalDebt')}:</span>
-                                <strong>$${formatNumber(summary.total_debt || 0)}</strong>
+                                <strong>$${formatNumber(totalDebt)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="color: #666;">${t('byPlatforms')}:</span>
-                                <strong>
-                                    <span style="color: #667eea;">${llamaLendCount}</span> / 
-                                    <span style="color: #764ba2;">${crvusdCount}</span>
-                                </strong>
+                                <span style="color: #666;">${t('positionsPerUser') || 'Positions per user'}:</span>
+                                <strong>${avgPositionsPerUser.toFixed(2)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="color: #666;">${t('averagePosition')}:</span>
@@ -1666,49 +2324,84 @@
             }
 
             // Хард ликвидации - расширенная информация  
-            if (hardData) {
-                const totalHard = hardData.total || {};
-                const avgDiscount = totalHard.debt > 0 ? 
-                    ((totalHard.debt_with_discount - totalHard.debt) / totalHard.debt * 100) : 0;
-                const avgLiquidationSize = totalHard.count > 0 ? 
-                    (totalHard.debt / totalHard.count) : 0;
+            if (hardToUse) {
+                let totalCount = 0;
+                let totalDebt = 0;
+                let totalDebtWithDiscount = 0;
+                let lendingCount = 0;
+                let crvusdCount = 0;
                 
-                // Подсчет по платформам
-                let lendingCount = 0, crvusdCount = 0;
-                if (hardData.events) {
-                    hardData.events.forEach(e => {
-                        if (e.platform === 'LlamaLend') lendingCount++;
-                        else if (e.platform === 'crvUSD') crvusdCount++;
-                    });
+                if (hasFilters) {
+                    // Пересчитываем статистику для отфильтрованных данных
+                    if (hardToUse.events) {
+                        // Фильтруем по датам если нужно
+                        let events = hardToUse.events;
+                        if (tableDateStart || tableDateEnd) {
+                            events = events.filter(event => {
+                                if (!event.timestamp) return false;
+                                const date = new Date(event.timestamp);
+                                if (tableDateStart && date < tableDateStart) return false;
+                                if (tableDateEnd && date > tableDateEnd) return false;
+                                return true;
+                            });
+                        }
+                        
+                        // Считаем статистику
+                        events.forEach(event => {
+                            totalCount++;
+                            const debt = parseFloat(event.debt || 0);
+                            totalDebt += debt;
+                            // Используем готовое значение debt_with_discount из JSON
+                            totalDebtWithDiscount += parseFloat(event.debt_with_discount || event.debt || 0);
+                            
+                            if (event.platform === 'LlamaLend') {
+                                lendingCount++;
+                            } else if (event.platform === 'crvUSD') {
+                                crvusdCount++;
+                            }
+                        });
+                    }
+                } else {
+                    // Используем готовые данные из total когда нет фильтров
+                    const total = hardData?.total || {};
+                    totalCount = total.count || 0;
+                    totalDebt = total.debt || 0;
+                    totalDebtWithDiscount = total.debt_with_discount || 0;
+                    
+                    // Подсчет по платформам
+                    if (hardData?.events) {
+                        hardData.events.forEach(e => {
+                            if (e.platform === 'LlamaLend') lendingCount++;
+                            else if (e.platform === 'crvUSD') crvusdCount++;
+                        });
+                    }
                 }
+                
+                const avgDiscount = totalDebt > 0 ? 
+                    ((totalDebt - totalDebtWithDiscount) / totalDebt * 100) : 0;
+                const avgLiquidationSize = totalCount > 0 ? 
+                    (totalDebt / totalCount) : 0;
                 
                 html += `
                     <div class="stat-card">
                         <div class="stat-label">${t('hardLiquidationsLabel')}</div>
-                        <div class="stat-value">$${formatNumber(totalHard.debt_with_discount || totalHard.debt || 0)}</div>
+                        <div class="stat-value">$${formatNumber(totalDebtWithDiscount)}</div>
                         <div style="font-size: 14px; margin-top: 12px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('events')}:</span>
-                                <strong>${totalHard.count || 0}</strong>
+                                <strong>${totalCount}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('debtWithoutDiscount')}:</span>
-                                <strong>$${formatNumber(totalHard.debt || 0)}</strong>
+                                <strong>$${formatNumber(totalDebt)}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #666;">${t('averageDiscount')}:</span>
                                 <strong style="color: #f44336">${avgDiscount.toFixed(1)}%</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between;">
                                 <span style="color: #666;">${t('averageSize')}:</span>
                                 <strong>$${formatNumber(avgLiquidationSize)}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: #666;">${t('byPlatforms')}:</span>
-                                <strong>
-                                    <span style="color: #667eea;">${lendingCount}</span> / 
-                                    <span style="color: #764ba2;">${crvusdCount}</span>
-                                </strong>
                             </div>
                         </div>
                     </div>
@@ -1716,28 +2409,55 @@
             }
             
             // Статистика по платформам - объединенная
-            if (softData?.summary) {
-                html += `
-                    <div class="stat-card">
-                        <div class="stat-label">${t('platformBreakdown')}</div>
-                        <div style="font-size: 16px; margin-top: 15px;">
-                            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
-                                <strong style="color: #667eea;">🦙 LlamaLend</strong><br>
-                                <span style="font-size: 20px; font-weight: bold;">$${formatNumber(softData.summary.llamalend_tvl || 0)}</span><br>
-                                <span style="font-size: 14px; color: #666;">
-                                    ${softData.summary.llamalend_positions || 0} ${t('positions')} • ${t('debt')}: $${formatNumber(softData.summary.llamalend_debt || 0)}
-                                </span>
-                            </div>
-                            <div>
-                                <strong style="color: #764ba2;">💱 crvUSD</strong><br>
-                                <span style="font-size: 20px; font-weight: bold;">$${formatNumber(softData.summary.crvusd_tvl || 0)}</span><br>
-                                <span style="font-size: 14px; color: #666;">
-                                    ${softData.summary.crvusd_positions || 0} ${t('positions')} • ${t('debt')}: $${formatNumber(softData.summary.crvusd_debt || 0)}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            if (softToUse) {
+                let llamalendPositions = 0;
+                let llamalendTVL = 0;
+                let llamalendDebt = 0;
+                let crvusdPositions = 0;
+                let crvusdTVL = 0;
+                let crvusdDebt = 0;
+                
+                if (hasFilters) {
+                    // Пересчитываем статистику по платформам для отфильтрованных данных
+                    if (softToUse.positions) {
+                        // Фильтруем по датам если нужно
+                        let positions = softToUse.positions;
+                        if (tableDateStart || tableDateEnd) {
+                            positions = positions.filter(pos => {
+                                if (!pos.first_dt) return false;
+                                const date = new Date(pos.first_dt);
+                                if (tableDateStart && date < tableDateStart) return false;
+                                if (tableDateEnd && date > tableDateEnd) return false;
+                                return true;
+                            });
+                        }
+                        
+                        // Считаем статистику по платформам
+                        positions.forEach(pos => {
+                            const tvl = parseFloat(pos.tvl || pos.collateral_usd || 0);
+                            const debt = parseFloat(pos.debt || 0);
+                            
+                            if (pos.platform === 'LlamaLend') {
+                                llamalendPositions++;
+                                llamalendTVL += tvl;
+                                llamalendDebt += debt;
+                            } else if (pos.platform === 'crvUSD') {
+                                crvusdPositions++;
+                                crvusdTVL += tvl;
+                                crvusdDebt += debt;
+                            }
+                        });
+                    }
+                } else {
+                    // Используем готовые данные из summary когда нет фильтров
+                    const summary = softData?.summary || {};
+                    llamalendPositions = summary.llamalend_positions || 0;
+                    llamalendTVL = summary.llamalend_tvl || 0;
+                    llamalendDebt = summary.llamalend_debt || 0;
+                    crvusdPositions = summary.crvusd_positions || 0;
+                    crvusdTVL = summary.crvusd_tvl || 0;
+                    crvusdDebt = summary.crvusd_debt || 0;
+                }
             }
 
             statsGrid.innerHTML = html;
@@ -1745,6 +2465,11 @@
 
         function renderData() {
             const dataTable = document.getElementById('dataTable');
+            
+            // Update distribution charts only if we have data
+            if (filteredSoftData || filteredHardData || softData || hardData) {
+                updateDistributionCharts();
+            }
             
             if (currentTab === 'soft') {
                 renderSoftLiquidations(dataTable);
@@ -1756,8 +2481,23 @@
         }
 
         function renderSoftLiquidations(container) {
+            // Add tab buttons at the top
+            let html = `
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+                    <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
+                        💧 ${t('softLiquidations')}
+                    </button>
+                    <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
+                        🔥 ${t('hardLiquidations')}
+                    </button>
+                    <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
+                        📊 ${t('comparison')}
+                    </button>
+                </div>
+            `;
+            
             if (!filteredSoftData || !filteredSoftData.positions) {
-                container.innerHTML = `<div class="no-data">${t('noData')}</div>`;
+                container.innerHTML = html + `<div class="no-data">${t('noData')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1775,7 +2515,7 @@
                 });
             }
             if (positions.length === 0) {
-                container.innerHTML = `<div class="no-data">${t('noPositionsMatchingFilters')}</div>`;
+                container.innerHTML = html + `<div class="no-data">${t('noPositionsMatchingFilters')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1817,28 +2557,11 @@
             const end = start + itemsPerPage;
             const pageData = positions.slice(start, end);
 
-            let html = `
+            html += `
                 <div class="table-wrapper">
                     <div class="table-header">
                         <h2 style="margin: 0;">💧 ${t('softLiquidationsInPositions')}</h2>
-                        <span class="calendar-icon" onclick="toggleDatePicker('soft')">
-                            📅 ${t('dateFilter')}
-                        </span>
                     </div>
-                    <div id="softDatePicker" class="date-range-picker">
-                    <div class="date-input-group">
-                        <label>${t('dateFrom')}:</label>
-                        <input type="date" id="softDateStart" value="${tableDateStart ? tableDateStart.toISOString().split('T')[0] : ''}">
-                    </div>
-                    <div class="date-input-group">
-                        <label>${t('dateTo')}:</label>
-                        <input type="date" id="softDateEnd" value="${tableDateEnd ? tableDateEnd.toISOString().split('T')[0] : ''}">
-                    </div>
-                    <div class="date-range-buttons">
-                        <button class="btn-apply" onclick="applyDateRange('soft')">${t('apply')}</button>
-                        <button class="btn-cancel" onclick="clearDateRange('soft')">${t('cancel')}</button>
-                    </div>
-                </div>
                 <table>
                     <thead>
                         <tr>
@@ -1924,8 +2647,23 @@
         }
 
         function renderHardLiquidations(container) {
+            // Add tab buttons at the top
+            let html = `
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+                    <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
+                        💧 ${t('softLiquidations')}
+                    </button>
+                    <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
+                        🔥 ${t('hardLiquidations')}
+                    </button>
+                    <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
+                        📊 ${t('comparison')}
+                    </button>
+                </div>
+            `;
+            
             if (!filteredHardData || !filteredHardData.events) {
-                container.innerHTML = `<div class="no-data">${t('noData')}</div>`;
+                container.innerHTML = html + `<div class="no-data">${t('noData')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1943,7 +2681,7 @@
                 });
             }
             if (events.length === 0) {
-                container.innerHTML = `<div class="no-data">${t('noEventsMatchingFilters')}</div>`;
+                container.innerHTML = html + `<div class="no-data">${t('noEventsMatchingFilters')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -1990,28 +2728,11 @@
             const end = start + itemsPerPage;
             const pageData = events.slice(start, end);
 
-            let html = `
+            html += `
                 <div class="table-wrapper">
                     <div class="table-header">
                         <h2 style="margin: 0;">🔥 ${t('hardLiquidations')}</h2>
-                        <span class="calendar-icon" onclick="toggleDatePicker('hard')">
-                            📅 ${t('dateFilter')}
-                        </span>
                     </div>
-                    <div id="hardDatePicker" class="date-range-picker">
-                    <div class="date-input-group">
-                        <label>${t('dateFrom')}:</label>
-                        <input type="date" id="hardDateStart" value="${tableDateStart ? tableDateStart.toISOString().split('T')[0] : ''}">
-                    </div>
-                    <div class="date-input-group">
-                        <label>${t('dateTo')}:</label>
-                        <input type="date" id="hardDateEnd" value="${tableDateEnd ? tableDateEnd.toISOString().split('T')[0] : ''}">
-                    </div>
-                    <div class="date-range-buttons">
-                        <button class="btn-apply" onclick="applyDateRange('hard')">${t('apply')}</button>
-                        <button class="btn-cancel" onclick="clearDateRange('hard')">${t('cancel')}</button>
-                    </div>
-                </div>
                 <table>
                     <thead>
                         <tr>
@@ -2155,8 +2876,31 @@
         }
         
         function renderComparison(container) {
+            // Add tab buttons with comparison selector
+            let html = `
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+                    <button class="tab ${currentTab === 'soft' ? 'active' : ''}" onclick="window.switchTab('soft')" style="padding: 8px 16px;">
+                        💧 ${t('softLiquidations')}
+                    </button>
+                    <button class="tab ${currentTab === 'hard' ? 'active' : ''}" onclick="window.switchTab('hard')" style="padding: 8px 16px;">
+                        🔥 ${t('hardLiquidations')}
+                    </button>
+                    <button class="tab ${currentTab === 'comparison' ? 'active' : ''}" onclick="window.switchTab('comparison')" style="padding: 8px 16px;">
+                        📊 ${t('comparison')}
+                    </button>
+                    
+                    <!-- Comparison group selector (shown when Comparison is active) -->
+                    <select id="comparisonGroup" onchange="changeComparisonGroup()" style="padding: 8px 12px; border-radius: 5px; border: 1px solid #ddd; background: white;">
+                        <option value="market" ${comparisonGroupBy === 'market' ? 'selected' : ''}>${t('byMarkets')}</option>
+                        <option value="platform" ${comparisonGroupBy === 'platform' ? 'selected' : ''}>${t('byPlatforms')}</option>
+                        <option value="token" ${comparisonGroupBy === 'token' ? 'selected' : ''}>${t('byTokens')}</option>
+                        <option value="chain" ${comparisonGroupBy === 'chain' ? 'selected' : ''}>${t('byNetworks')}</option>
+                    </select>
+                </div>
+            `;
+            
             if (!filteredSoftData || !filteredHardData) {
-                container.innerHTML = `<div class="no-data">${currentLang === 'en' ? 'Insufficient data for comparison' : 'Недостаточно данных для сравнения'}</div>`;
+                container.innerHTML = html + `<div class="no-data">${currentLang === 'en' ? 'Insufficient data for comparison' : 'Недостаточно данных для сравнения'}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -2302,7 +3046,7 @@
             });
             
             if (statsArray.length === 0) {
-                container.innerHTML = `<div class="no-data">${t('noData')}</div>`;
+                container.innerHTML = html + `<div class="no-data">${t('noData')}</div>`;
                 document.getElementById('pagination').style.display = 'none';
                 return;
             }
@@ -2314,15 +3058,10 @@
             // Сохраняем текущее значение выбора
             const currentValue = comparisonGroupBy;
             
-            let html = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            // Append to existing HTML (which already has tabs and selector)
+            html += `
+                <div style="margin-bottom: 15px;">
                     <h2 style="margin: 0;">📊 ${t('comparison')}</h2>
-                    <select id="comparisonGroup" onchange="changeComparisonGroup()" style="padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd;">
-                        <option value="market" ${currentValue === 'market' ? 'selected' : ''}>${t('byMarkets')}</option>
-                        <option value="platform" ${currentValue === 'platform' ? 'selected' : ''}>${t('byPlatforms')}</option>
-                        <option value="token" ${currentValue === 'token' ? 'selected' : ''}>${t('byTokens')}</option>
-                        <option value="chain" ${currentValue === 'chain' ? 'selected' : ''}>${t('byNetworks')}</option>
-                    </select>
                 </div>
                 <table>
                     <thead>
@@ -2524,8 +3263,67 @@
             renderData();
         }
         
+        window.applyMainDateFilter = function() {
+            const startInput = document.getElementById('mainDateStart');
+            const endInput = document.getElementById('mainDateEnd');
+            
+            if (startInput.value) {
+                tableDateStart = new Date(startInput.value);
+                selectedStartDate = tableDateStart;
+            }
+            if (endInput.value) {
+                tableDateEnd = new Date(endInput.value);
+                selectedEndDate = tableDateEnd;
+            }
+            
+            // Обновляем слайдер чтобы он соответствовал выбранным датам
+            updateSliderFromDates();
+            
+            // Применяем фильтр ко всем вкладкам
+            applyFilters();
+            renderChart();
+            document.getElementById('mainDatePicker').classList.remove('active');
+        }
+        
+        window.resetMainDateFilter = function() {
+            document.getElementById('mainDateStart').value = '';
+            document.getElementById('mainDateEnd').value = '';
+            tableDateStart = null;
+            tableDateEnd = null;
+            
+            // Сбрасываем слайдер на полный период
+            const totalDays = parseInt(rangeEnd.max);
+            rangeStart.value = 0;
+            rangeEnd.value = totalDays;
+            
+            // Обновляем визуальный диапазон
+            const startPercent = (rangeStart.value / totalDays) * 100;
+            const endPercent = (rangeEnd.value / totalDays) * 100;
+            sliderRange.style.left = startPercent + '%';
+            sliderRange.style.width = (endPercent - startPercent) + '%';
+            
+            // Обновляем selectedStartDate и selectedEndDate
+            const minDate = globalMinDate || new Date();
+            const maxDate = globalMaxDate || new Date();
+            const dayRange = (maxDate - minDate) / (24 * 60 * 60 * 1000);
+            const max = parseInt(rangeStart.max);
+            selectedStartDate = new Date(minDate.getTime() + (parseInt(rangeStart.value) / max) * dayRange * 24 * 60 * 60 * 1000);
+            selectedEndDate = new Date(minDate.getTime() + (parseInt(rangeEnd.value) / max) * dayRange * 24 * 60 * 60 * 1000);
+            
+            applyFilters();
+            renderChart();
+            document.getElementById('mainDatePicker').classList.remove('active');
+        }
+        
         window.toggleDatePicker = function(type) {
-            const pickerId = type === 'soft' ? 'softDatePicker' : 'hardDatePicker';
+            let pickerId;
+            if (type === 'main') {
+                pickerId = 'mainDatePicker';
+            } else if (type === 'soft') {
+                pickerId = 'softDatePicker';
+            } else {
+                pickerId = 'hardDatePicker';
+            }
             const picker = document.getElementById(pickerId);
             if (picker) {
                 picker.classList.toggle('active');
@@ -2536,58 +3334,6 @@
                     otherPicker.classList.remove('active');
                 }
             }
-        }
-        
-        window.applyDateRange = function(type) {
-            const startInput = document.getElementById(type + 'DateStart');
-            const endInput = document.getElementById(type + 'DateEnd');
-            
-            if (startInput && startInput.value) {
-                tableDateStart = new Date(startInput.value);
-            } else {
-                tableDateStart = null;
-            }
-            
-            if (endInput && endInput.value) {
-                tableDateEnd = new Date(endInput.value);
-                // Устанавливаем время на конец дня
-                tableDateEnd.setHours(23, 59, 59, 999);
-            } else {
-                tableDateEnd = null;
-            }
-            
-            // Закрываем календарь
-            const pickerId = type === 'soft' ? 'softDatePicker' : 'hardDatePicker';
-            const picker = document.getElementById(pickerId);
-            if (picker) {
-                picker.classList.remove('active');
-            }
-            
-            // Перерисовываем данные
-            currentPage = 1;
-            renderData();
-        }
-        
-        window.clearDateRange = function(type) {
-            tableDateStart = null;
-            tableDateEnd = null;
-            
-            // Очищаем поля ввода
-            const startInput = document.getElementById(type + 'DateStart');
-            const endInput = document.getElementById(type + 'DateEnd');
-            if (startInput) startInput.value = '';
-            if (endInput) endInput.value = '';
-            
-            // Закрываем календарь
-            const pickerId = type === 'soft' ? 'softDatePicker' : 'hardDatePicker';
-            const picker = document.getElementById(pickerId);
-            if (picker) {
-                picker.classList.remove('active');
-            }
-            
-            // Перерисовываем данные
-            currentPage = 1;
-            renderData();
         }
         
         function getCompareSortArrow(column) {
@@ -2704,16 +3450,62 @@
                 }
                 
                 // Вычисляем и сохраняем выбранные даты
-                selectedStartDate = new Date(minDate.getTime() + start * 24 * 60 * 60 * 1000);
-                selectedEndDate = new Date(minDate.getTime() + end * 24 * 60 * 60 * 1000);
+                const dayRange = (maxDate - minDate) / (24 * 60 * 60 * 1000);
+                selectedStartDate = new Date(minDate.getTime() + (start / max) * dayRange * 24 * 60 * 60 * 1000);
+                selectedEndDate = new Date(minDate.getTime() + (end / max) * dayRange * 24 * 60 * 60 * 1000);
+                
+                // Обновляем глобальные переменные для фильтрации таблицы
+                tableDateStart = selectedStartDate;
+                tableDateEnd = selectedEndDate;
+                
+                // Обновляем Date Filter чтобы он соответствовал слайдеру
+                const mainDateStart = document.getElementById('mainDateStart');
+                const mainDateEnd = document.getElementById('mainDateEnd');
+                if (mainDateStart) {
+                    mainDateStart.value = selectedStartDate.toISOString().split('T')[0];
+                }
+                if (mainDateEnd) {
+                    mainDateEnd.value = selectedEndDate.toISOString().split('T')[0];
+                }
                 
                 const locale = currentLang === 'en' ? 'en-US' : 'ru-RU';
                 startLabel.textContent = selectedStartDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
                 endLabel.textContent = selectedEndDate.toLocaleDateString(locale, {day: 'numeric', month: 'short', year: '2-digit'});
                 
-                // Перерисовываем график
+                // Перерисовываем график и данные таблицы
+                renderStats();
+            // Update the inline protection chart after stats are rendered
+            setTimeout(() => updateProtectionChartInline(), 100);  // Обновляем блоки статистики
                 renderChart();
+                renderData();  // Обновляем таблицу и диаграммы с учетом нового диапазона дат
+                updateFilterStats();  // Обновляем счетчик отфильтрованных данных
+                updateProtectionChart();  // Обновляем диаграмму защиты
             }
+            
+            // Функция для обновления слайдера на основе выбранных дат
+            function updateSliderFromDates() {
+                if (!selectedStartDate || !selectedEndDate) return;
+                
+                // Находим минимальную и максимальную даты в данных
+                let minDate = globalMinDate || new Date();
+                let maxDate = globalMaxDate || new Date();
+                
+                // Вычисляем позиции слайдера
+                const totalDays = Math.ceil((maxDate - minDate) / (24 * 60 * 60 * 1000)) + 1;
+                const startDay = Math.max(0, Math.floor((selectedStartDate - minDate) / (24 * 60 * 60 * 1000)));
+                const endDay = Math.min(totalDays, Math.ceil((selectedEndDate - minDate) / (24 * 60 * 60 * 1000)));
+                
+                // Обновляем слайдер
+                rangeStart.value = startDay;
+                rangeEnd.value = endDay;
+                
+                // Обновляем визуальный диапазон
+                const startPercent = (startDay / totalDays) * 100;
+                const endPercent = (endDay / totalDays) * 100;
+                sliderRange.style.left = startPercent + '%';
+                sliderRange.style.width = (endPercent - startPercent) + '%';
+            }
+            window.updateSliderFromDates = updateSliderFromDates;
             
             rangeStart.addEventListener('input', updateSliderRange);
             rangeEnd.addEventListener('input', updateSliderRange);
@@ -2735,6 +3527,1274 @@
                 console.error('Error loading data:', error);
             }
         });
+        
+        // Helper function to setup canvas for high DPI displays (moved here to be available for all functions)
+        function setupHighDPICanvas(canvas, width, height) {
+            const dpr = window.devicePixelRatio || 1;
+            
+            // Set the actual dimensions
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            
+            // Scale the canvas back down using CSS
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            
+            // Scale the drawing context so everything draws at the correct size
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            
+            return ctx;
+        }
+        
+        // Function to update the protection chart
+        function updateProtectionChartInline() {
+            const canvas = document.getElementById('protectionChartInline');
+            if (!canvas) return;
+            
+            // Set canvas size with high DPI support
+            const width = 180;
+            const height = 180;
+            const ctx = setupHighDPICanvas(canvas, width, height);
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 15;
+            
+            // Calculate protection percentage based on filtered data
+            const softToUse = filteredSoftData || softData;
+            const hardToUse = filteredHardData || hardData;
+            
+            let softTVL = 0;
+            let hardDebtWithDiscount = 0;
+            
+            // If date filter is applied, recalculate sums
+            if (tableDateStart || tableDateEnd) {
+                // Recalculate TVL for soft with date filter
+                if (softToUse?.positions) {
+                    const filteredPositions = softToUse.positions.filter(pos => {
+                        if (!pos.first_dt) return false;
+                        const date = new Date(pos.first_dt);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                    softTVL = filteredPositions.reduce((sum, pos) => sum + parseFloat(pos.tvl || pos.collateral_usd || 0), 0);
+                }
+                
+                // Recalculate debt for hard with date filter
+                if (hardToUse?.events) {
+                    const filteredEvents = hardToUse.events.filter(event => {
+                        if (!event.timestamp) return false;
+                        const date = new Date(event.timestamp);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                    filteredEvents.forEach(event => {
+                        hardDebtWithDiscount += parseFloat(event.debt_with_discount || event.debt || 0);
+                    });
+                }
+            } else {
+                // Use ready sums from summary/total
+                softTVL = softToUse?.summary?.total_tvl || 0;
+                hardDebtWithDiscount = hardToUse?.total?.debt_with_discount || 0;
+            }
+            
+            const protectedAmount = softTVL - hardDebtWithDiscount;
+            const protectionPercent = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw background circle (track)
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 20;
+            ctx.stroke();
+            
+            // Draw protection arc
+            const startAngle = -Math.PI / 2;
+            const endAngle = startAngle + (2 * Math.PI * protectionPercent / 100);
+            
+            // Create gradient for the arc - use white/light colors for better contrast on green background
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            if (protectedAmount >= 0) {
+                // White to light gray for positive protection
+                gradient.addColorStop(0, '#ffffff');
+                gradient.addColorStop(1, '#f0f0f0');
+            } else {
+                // Red tones for negative protection
+                gradient.addColorStop(0, '#ff6b6b');
+                gradient.addColorStop(1, '#ff4444');
+            }
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 20;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            
+        }
+        
+        // Compatibility wrapper for old function name
+        function updateProtectionChart() {
+            updateProtectionChartInline();
+        }
+        
+        // Function to switch distribution chart type
+        function switchDistributionChart(type) {
+            // Update radio button
+            const radio = document.querySelector(`input[name="distributionType"][value="${type}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+            
+            // Draw the selected chart - use pie chart instead of treemap
+            if (window.chartData && window.chartData[type]) {
+                drawPieChartWithLabels('distributionChart', window.chartData[type]);
+            }
+        }
+        
+        // Function to draw treemap chart for distributions (like stock market apps)
+        function drawRectChart(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (!container || !data || data.length === 0) return;
+            
+            // Clear container
+            container.innerHTML = '';
+            
+            // Calculate total and percentages
+            const total = data.reduce((sum, item) => sum + item.value, 0);
+            if (total === 0) return;
+            
+            // Sort data by value (descending)
+            const sortedData = [...data].sort((a, b) => b.value - a.value);
+            
+            // Take top 10 items for better layout
+            const displayData = sortedData.slice(0, 10);
+            
+            // Colors palette - green for largest, distinct colors for others
+            const colors = [
+                '#22c55e', // GREEN for #1 largest sector
+                '#3b82f6', // blue
+                '#f97316', // orange
+                '#8b5cf6', // purple
+                '#ef4444', // red
+                '#fbbf24', // yellow
+                '#06b6d4', // cyan
+                '#ec4899', // pink
+                '#84cc16', // lime
+                '#f59e0b', // amber
+                '#6366f1', // indigo
+                '#14b8a6', // teal
+                '#f472b6', // rose
+                '#a78bfa', // violet
+                '#fb7185', // light red
+                '#34d399'  // emerald
+            ];
+            
+            // Container dimensions
+            const containerWidth = 290;
+            const containerHeight = 280;
+            
+            // Create treemap container
+            const treemapContainer = document.createElement('div');
+            treemapContainer.style.cssText = `
+                width: ${containerWidth}px;
+                height: ${containerHeight}px;
+                position: relative;
+                background: rgba(255,255,255,0.05);
+                border-radius: 6px;
+            `;
+            
+            // Simple treemap algorithm - squarified layout
+            function squarify(data, x, y, width, height) {
+                if (data.length === 0) return;
+                
+                if (data.length === 1) {
+                    const item = data[0];
+                    const percentage = (item.value / total) * 100;
+                    const rect = createRect(item, colors[item.index % colors.length], x, y, width, height, percentage);
+                    treemapContainer.appendChild(rect);
+                    return;
+                }
+                
+                // Split into two groups
+                const totalValue = data.reduce((sum, item) => sum + item.value, 0);
+                const mid = Math.floor(data.length / 2);
+                
+                let sum1 = 0;
+                for (let i = 0; i < mid; i++) {
+                    sum1 += data[i].value;
+                }
+                
+                const ratio1 = sum1 / totalValue;
+                
+                if (width > height) {
+                    // Split vertically
+                    const w1 = width * ratio1;
+                    squarify(data.slice(0, mid), x, y, w1, height);
+                    squarify(data.slice(mid), x + w1, y, width - w1, height);
+                } else {
+                    // Split horizontally  
+                    const h1 = height * ratio1;
+                    squarify(data.slice(0, mid), x, y, width, h1);
+                    squarify(data.slice(mid), x, y + h1, width, height - h1);
+                }
+            }
+            
+            function createRect(item, color, x, y, width, height, percentage) {
+                const rect = document.createElement('div');
+                
+                rect.style.cssText = `
+                    position: absolute;
+                    left: ${x}px;
+                    top: ${y}px;
+                    width: ${width}px;
+                    height: ${height}px;
+                    background: ${color};
+                    border: 1px solid rgba(255,255,255,0.1);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    color: white;
+                    font-size: ${Math.min(Math.max(width / 12, 8), 12)}px;
+                    font-weight: 600;
+                    text-align: center;
+                    padding: 4px;
+                    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+                    transition: all 0.2s ease;
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+                    box-sizing: border-box;
+                `;
+                
+                // Add hover effect with tooltip
+                rect.addEventListener('mouseenter', (e) => {
+                    rect.style.transform = 'scale(1.05)';
+                    rect.style.zIndex = '10';
+                    rect.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.3)';
+                    
+                    // Create tooltip
+                    const tooltip = document.createElement('div');
+                    tooltip.id = 'treemap-tooltip';
+                    tooltip.style.cssText = `
+                        position: fixed;
+                        background: rgba(0,0,0,0.9);
+                        color: white;
+                        padding: 12px;
+                        border-radius: 8px;
+                        font-size: 12px;
+                        line-height: 1.4;
+                        max-width: 200px;
+                        z-index: 1000;
+                        pointer-events: none;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                        border: 1px solid rgba(255,255,255,0.1);
+                        backdrop-filter: blur(10px);
+                    `;
+                    
+                    // Format both count and dollar values
+                    const countValue = item.count ? item.count.toLocaleString('en-US') : item.value.toLocaleString('en-US');
+                    const dollarValue = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(item.dollars || item.value);
+                    
+                    // Show both count and dollars
+                    tooltip.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 6px; color: ${color};">${item.label}</div>
+                        <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
+                        <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
+                        <div style="margin-bottom: 3px;">${t('share')}: <strong>${percentage.toFixed(2)}%</strong></div>
+                        <div style="font-size: 11px; opacity: 0.8;">Rank: #${item.index + 1}</div>
+                    `;
+                    
+                    document.body.appendChild(tooltip);
+                    
+                    // Position tooltip
+                    const updateTooltipPosition = (event) => {
+                        const rect = tooltip.getBoundingClientRect();
+                        const x = event.clientX + 10;
+                        const y = event.clientY - rect.height - 10;
+                        
+                        // Keep tooltip within viewport
+                        const finalX = Math.min(x, window.innerWidth - rect.width - 10);
+                        const finalY = Math.max(y, 10);
+                        
+                        tooltip.style.left = finalX + 'px';
+                        tooltip.style.top = finalY + 'px';
+                    };
+                    
+                    updateTooltipPosition(e);
+                    
+                    // Update position on mouse move
+                    rect._mouseMoveHandler = updateTooltipPosition;
+                    rect.addEventListener('mousemove', rect._mouseMoveHandler);
+                });
+                
+                rect.addEventListener('mouseleave', () => {
+                    rect.style.transform = 'scale(1)';
+                    rect.style.zIndex = '1';
+                    rect.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.1)';
+                    
+                    // Remove tooltip
+                    const tooltip = document.getElementById('treemap-tooltip');
+                    if (tooltip) {
+                        tooltip.remove();
+                    }
+                    
+                    // Remove mouse move handler
+                    if (rect._mouseMoveHandler) {
+                        rect.removeEventListener('mousemove', rect._mouseMoveHandler);
+                        rect._mouseMoveHandler = null;
+                    }
+                });
+                
+                // Only show text if rectangle is big enough
+                if (width > 40 && height > 25) {
+                    // Create label
+                    const label = document.createElement('div');
+                    let displayName = item.label;
+                    if (width < 80 && displayName.length > 6) {
+                        displayName = displayName.substring(0, 6) + '...';
+                    } else if (displayName.length > 10) {
+                        displayName = displayName.substring(0, 10) + '...';
+                    }
+                    label.textContent = displayName;
+                    label.style.cssText = `
+                        font-size: ${Math.min(Math.max(width / 15, 8), 11)}px;
+                        line-height: 1.1;
+                        margin-bottom: 2px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 100%;
+                    `;
+                    
+                    // Create percentage - only if there's space
+                    if (height > 40) {
+                        const percent = document.createElement('div');
+                        percent.textContent = `${percentage.toFixed(1)}%`;
+                        percent.style.cssText = `
+                            font-size: ${Math.min(Math.max(width / 18, 7), 10)}px;
+                            font-weight: 700;
+                            opacity: 0.9;
+                        `;
+                        rect.appendChild(label);
+                        rect.appendChild(percent);
+                    } else {
+                        rect.appendChild(label);
+                    }
+                } else if (width > 25 && height > 15) {
+                    // Very small - just percentage
+                    const percent = document.createElement('div');
+                    percent.textContent = `${percentage.toFixed(0)}%`;
+                    percent.style.cssText = `
+                        font-size: 8px;
+                        font-weight: 700;
+                    `;
+                    rect.appendChild(percent);
+                }
+                
+                return rect;
+            }
+            
+            // Add indexes to data for color consistency
+            const indexedData = displayData.map((item, index) => ({ ...item, index }));
+            
+            // Start recursive layout
+            squarify(indexedData, 0, 0, containerWidth, containerHeight);
+            
+            container.appendChild(treemapContainer);
+        }
+
+        // COMPLETELY REWRITTEN PIE CHART FUNCTION
+        function drawPieChartWithLabels(canvasId, data) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || !data || data.length === 0) return;
+            
+            // Configuration
+            const width = 280;
+            const height = 260;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 20;
+            
+            // Setup high DPI canvas
+            const ctx = setupHighDPICanvas(canvas, width, height);
+            ctx.clearRect(0, 0, width, height);
+            
+            // Prepare data: sort and create segments
+            const sortedData = [...data]
+                .filter(item => item.value > 0)
+                .sort((a, b) => b.value - a.value);
+            
+            // Create segments array with top 8 + others
+            const segments = [];
+            const topItems = sortedData.slice(0, 8);
+            const remainingItems = sortedData.slice(8);
+            
+            // Add top items
+            topItems.forEach(item => segments.push({...item}));
+            
+            // Add "Others" segment if needed
+            if (remainingItems.length > 0) {
+                const othersValue = remainingItems.reduce((sum, item) => sum + item.value, 0);
+                const othersCount = remainingItems.reduce((sum, item) => sum + (item.count || 1), 0);
+                const othersDollars = remainingItems.reduce((sum, item) => sum + (item.dollars || item.value), 0);
+                
+                segments.push({
+                    label: t('others') || 'Others',
+                    value: othersValue,
+                    count: othersCount,
+                    dollars: othersDollars,
+                    items: remainingItems,
+                    isOthers: true
+                });
+            }
+            
+            // Calculate total from segments (ensures consistency)
+            const total = segments.reduce((sum, seg) => sum + seg.value, 0);
+            if (total === 0) return;
+            
+            // Color palette
+            const colors = [
+                '#22c55e', // green
+                '#3b82f6', // blue
+                '#f97316', // orange
+                '#8b5cf6', // purple
+                '#ef4444', // red
+                '#fbbf24', // yellow
+                '#06b6d4', // cyan
+                '#ec4899', // pink
+            ];
+            
+            // Store segment angles for hover detection
+            const segmentAngles = [];
+            let startAngle = -Math.PI / 2; // Start from top
+            
+            // Draw all segments
+            segments.forEach((segment, index) => {
+                const segmentValue = segment.value;
+                const angle = (segmentValue / total) * 2 * Math.PI;
+                const endAngle = startAngle + angle;
+                
+                // Store angles for hover detection
+                segmentAngles.push({
+                    startAngle: startAngle,
+                    endAngle: endAngle,
+                    segment: segment,
+                    color: segment.isOthers ? '#555' : colors[index % colors.length],
+                    percentage: (segmentValue / total) * 100
+                });
+                
+                // Draw segment with shadow
+                ctx.save();
+                
+                // Add shadow for depth (like bar chart)
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 4;
+                
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                
+                // Fill with color
+                const segmentColor = segment.isOthers ? '#555' : colors[index % colors.length];
+                ctx.fillStyle = segmentColor;
+                ctx.fill();
+                
+                // Remove shadow for border
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                
+                // White border
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.restore();
+                
+                // Draw label for segments > 5%
+                const percentage = (segmentValue / total) * 100;
+                if (percentage > 5) {
+                    const labelAngle = startAngle + angle / 2;
+                    const labelRadius = radius * 0.7;
+                    const labelX = centerX + Math.cos(labelAngle) * labelRadius;
+                    const labelY = centerY + Math.sin(labelAngle) * labelRadius;
+                    
+                    // Draw text with shadow
+                    ctx.save();
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 11px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                    ctx.shadowBlur = 3;
+                    
+                    // Label text
+                    const labelText = segment.label.length > 10 ? 
+                        segment.label.substring(0, 10) + '...' : 
+                        segment.label;
+                    ctx.fillText(labelText, labelX, labelY - 6);
+                    
+                    // Percentage
+                    ctx.font = '10px Arial';
+                    ctx.fillText(`${percentage.toFixed(1)}%`, labelX, labelY + 6);
+                    ctx.restore();
+                }
+                
+                startAngle = endAngle;
+            });
+            
+            // Store data for hover detection
+            canvas.pieData = {
+                segments: segmentAngles,
+                centerX: centerX,
+                centerY: centerY,
+                radius: radius
+            };
+            
+            // Remove old event listeners
+            canvas.onmousemove = null;
+            canvas.onmouseleave = null;
+            
+            // Add new hover handler
+            canvas.addEventListener('mousemove', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (width / rect.width);
+                const y = (e.clientY - rect.top) * (height / rect.height);
+                
+                // Check if mouse is over pie
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= radius && canvas.pieData) {
+                    // Calculate angle
+                    let mouseAngle = Math.atan2(dy, dx);
+                    // Normalize to 0-2π range starting from top
+                    mouseAngle = mouseAngle + Math.PI / 2;
+                    if (mouseAngle < 0) mouseAngle += 2 * Math.PI;
+                    if (mouseAngle > 2 * Math.PI) mouseAngle -= 2 * Math.PI;
+                    
+                    // Find which segment
+                    for (let segData of canvas.pieData.segments) {
+                        let start = segData.startAngle + Math.PI / 2;
+                        let end = segData.endAngle + Math.PI / 2;
+                        
+                        // Normalize angles
+                        if (start < 0) start += 2 * Math.PI;
+                        if (end < 0) end += 2 * Math.PI;
+                        
+                        // Check if mouse angle is within segment
+                        let inSegment = false;
+                        if (start <= end) {
+                            inSegment = mouseAngle >= start && mouseAngle <= end;
+                        } else {
+                            // Segment crosses 0
+                            inSegment = mouseAngle >= start || mouseAngle <= end;
+                        }
+                        
+                        if (inSegment) {
+                            canvas.style.cursor = 'pointer';
+                            showTooltip(e, segData.segment, segData.percentage);
+                            return;
+                        }
+                    }
+                }
+                
+                // Not hovering over pie
+                canvas.style.cursor = 'default';
+                hideTooltip();
+            });
+            
+            canvas.addEventListener('mouseleave', function() {
+                canvas.style.cursor = 'default';
+                hideTooltip();
+            });
+        }
+        
+        // Helper function to adjust color brightness
+        function adjustColorBrightness(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+        
+        // Tooltip functions for pie chart
+        let currentTooltip = null;
+        
+        function showTooltip(event, item, percentage) {
+            hideTooltip(); // Remove any existing tooltip
+            
+            const tooltip = document.createElement('div');
+            tooltip.id = 'pie-tooltip';
+            tooltip.style.cssText = `
+                position: fixed;
+                background: rgba(0,0,0,0.9);
+                color: white;
+                padding: 12px;
+                border-radius: 8px;
+                font-size: 12px;
+                line-height: 1.4;
+                z-index: 1000;
+                pointer-events: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.1);
+                backdrop-filter: blur(10px);
+                max-width: 200px;
+            `;
+            
+            // Format both count and dollar values
+            const countValue = item.count ? item.count.toLocaleString('en-US') : item.value.toLocaleString('en-US');
+            const dollarValue = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(item.dollars || item.value);
+            
+            // Check if this is the "Others" item
+            if (item.isOthers && item.items) {
+                // Show detailed info for Others
+                let detailsHtml = '';
+                const topItems = item.items.slice(0, 5); // Show top 5 items
+                topItems.forEach(subItem => {
+                    const subPercent = ((subItem.value / item.value) * 100).toFixed(1);
+                    detailsHtml += `
+                        <div style="margin-left: 10px; font-size: 10px; opacity: 0.8;">
+                            • ${subItem.label}: ${subPercent}%
+                        </div>
+                    `;
+                });
+                if (item.items.length > 5) {
+                    const moreText = t('andMore').replace('{count}', item.items.length - 5);
+                    detailsHtml += `
+                        <div style="margin-left: 10px; font-size: 10px; opacity: 0.6;">
+                            ... ${moreText}
+                        </div>
+                    `;
+                }
+                
+                tooltip.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 6px; color: #888;">${item.label}</div>
+                    <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
+                    <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
+                    <div style="margin-bottom: 3px;">${t('share')}: <strong>${percentage.toFixed(2)}%</strong></div>
+                    <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <div style="font-size: 11px; margin-bottom: 4px; opacity: 0.9;">${t('includes')}:</div>
+                        ${detailsHtml}
+                    </div>
+                `;
+            } else {
+                // Show regular tooltip
+                tooltip.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 6px; color: #22c55e;">${item.label}</div>
+                    <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
+                    <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
+                    <div>${t('share')}: <strong>${percentage.toFixed(2)}%</strong></div>
+                `;
+            }
+            
+            document.body.appendChild(tooltip);
+            currentTooltip = tooltip;
+            
+            // Position tooltip
+            const rect = tooltip.getBoundingClientRect();
+            const x = event.clientX + 10;
+            const y = event.clientY - rect.height - 10;
+            
+            const finalX = Math.min(x, window.innerWidth - rect.width - 10);
+            const finalY = Math.max(y, 10);
+            
+            tooltip.style.left = finalX + 'px';
+            tooltip.style.top = finalY + 'px';
+        }
+        
+        function hideTooltip() {
+            if (currentTooltip) {
+                currentTooltip.remove();
+                currentTooltip = null;
+            }
+        }
+        
+        // Function to draw pie charts for distributions - SIMPLIFIED VERSION
+        function drawPieChart(canvasId, data, legendId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.error('Canvas not found:', canvasId);
+                return;
+            }
+            
+            // Set canvas size
+            const width = 300;
+            const height = 300;
+            
+            // Setup high DPI canvas
+            const ctx = setupHighDPICanvas(canvas, width, height);
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 60;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            if (!data || data.length === 0) {
+                ctx.fillStyle = '#ccc';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(t('noData'), centerX, centerY);
+                return;
+            }
+            
+            // Sort data by value (descending) and filter out invalid values
+            const sortedData = [...data]
+                .filter(item => item.value > 0)
+                .sort((a, b) => b.value - a.value);
+            
+            // Prepare segments (top 8 + others if needed)
+            const segments = [];
+            const colors = [
+                '#667eea', '#764ba2', '#4caf50', '#ff9800', '#f44336',
+                '#2196f3', '#9c27b0', '#00bcd4', '#cddc39', '#ff5722'
+            ];
+            
+            // Add top 8 segments
+            for (let i = 0; i < Math.min(8, sortedData.length); i++) {
+                segments.push({
+                    ...sortedData[i],
+                    color: colors[i % colors.length],
+                    isOthers: false
+                });
+            }
+            
+            // Add "Others" segment if there are more than 8 items
+            if (sortedData.length > 8) {
+                let othersValue = 0;
+                let othersCount = 0;
+                let othersDollars = 0;
+                const othersItems = [];
+                
+                for (let i = 8; i < sortedData.length; i++) {
+                    othersValue += sortedData[i].value;
+                    othersCount += sortedData[i].count || 0;
+                    othersDollars += sortedData[i].dollars || 0;
+                    othersItems.push(sortedData[i]);
+                }
+                
+                if (othersValue > 0) {
+                    segments.push({
+                        label: t('others') || 'Others',
+                        value: othersValue,
+                        count: othersCount,
+                        dollars: othersDollars,
+                        items: othersItems,
+                        color: '#555',
+                        isOthers: true
+                    });
+                }
+            }
+            
+            // Calculate total from SEGMENTS (not original data) to ensure consistency
+            const total = segments.reduce((sum, item) => sum + item.value, 0);
+            if (total === 0) return;
+            
+            // SIMPLIFIED DRAWING - Draw segments covering the red circle
+            let currentAngle = -Math.PI / 2; // Start from top
+            const labels = [];
+            
+            console.log(`[PIE CHART] Drawing ${segments.length} segments`);
+            
+            // Draw each segment
+            for (let i = 0; i < segments.length; i++) {
+                const segment = segments[i];
+                let sliceAngle;
+                
+                // For the last segment, make sure it closes the circle exactly
+                if (i === segments.length - 1) {
+                    sliceAngle = (Math.PI * 2 - Math.PI / 2) - currentAngle;
+                    console.log(`LAST Segment ${i}: ${segment.label}, forcing closure angle: ${(sliceAngle * 180 / Math.PI).toFixed(1)}°`);
+                } else {
+                    sliceAngle = (segment.value / total) * 2 * Math.PI;
+                }
+                
+                const percent = (segment.value / total * 100);
+                
+                console.log(`Segment ${i}: ${segment.label}, ${percent.toFixed(1)}%, angle: ${(sliceAngle * 180 / Math.PI).toFixed(1)}°`);
+                
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.lineTo(centerX, centerY);
+                ctx.fillStyle = segment.color;
+                ctx.fill();
+                
+                // Store label info for segments >= 3%
+                if (percent >= 3) {
+                    const labelAngle = currentAngle + sliceAngle / 2;
+                    labels.push({
+                        text: segment.label || 'Unknown',
+                        percent: `${percent.toFixed(1)}%`,
+                        angle: labelAngle,
+                        color: segment.color
+                    });
+                }
+                
+                currentAngle += sliceAngle;
+            }
+            
+            // Verify we drew a complete circle
+            const finalAngle = currentAngle + Math.PI / 2; // Adjust back
+            console.log(`[PIE CHART] Final angle: ${(finalAngle * 180 / Math.PI).toFixed(1)}° (should be 360°)`);
+            
+            // Store segments data for hover interactions
+            canvas.pieChartData = {
+                segments: segments,
+                total: total,
+                centerX: centerX,
+                centerY: centerY,
+                radius: radius
+            };
+            
+            // Second pass: draw labels with leader lines
+            labels.forEach(label => {
+                // Draw leader line
+                ctx.beginPath();
+                ctx.moveTo(label.lineStartX, label.lineStartY);
+                ctx.lineTo(label.lineEndX, label.lineEndY);
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Determine text alignment based on angle
+                let textAlign = 'center';
+                let xOffset = 0;
+                if (Math.cos(label.angle) > 0.1) {
+                    textAlign = 'left';
+                    xOffset = 3;
+                } else if (Math.cos(label.angle) < -0.1) {
+                    textAlign = 'right';
+                    xOffset = -3;
+                }
+                
+                // Draw text
+                ctx.font = '11px Arial';
+                ctx.fillStyle = '#333';
+                ctx.textAlign = textAlign;
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(label.text, label.textX + xOffset, label.textY - 2);
+                
+                // Draw percentage
+                ctx.font = 'bold 12px Arial';
+                ctx.textBaseline = 'top';
+                ctx.fillText(label.percent, label.textX + xOffset, label.textY + 2);
+            });
+            
+            // Update legend using segments array
+            const legendElement = document.getElementById(legendId);
+            if (legendElement) {
+                let legendHtml = '';
+                
+                // Show all segments in legend
+                segments.forEach((segment, index) => {
+                    const percent = ((segment.value / total) * 100).toFixed(1);
+                    legendHtml += `
+                        <div style="display: flex; align-items: center; min-width: 120px;">
+                            <div style="width: 12px; height: 12px; background: ${segment.color}; margin-right: 6px; border-radius: 2px; flex-shrink: 0;"></div>
+                            <span style="flex: 1; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;" title="${segment.label}">${segment.label}</span>
+                            <span style="font-weight: bold; font-size: 11px; margin-left: 4px;">${percent}%</span>
+                        </div>
+                    `;
+                });
+                
+                legendElement.innerHTML = legendHtml;
+            }
+            
+            // Add mouse hover handler
+            canvas.onmousemove = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Convert to canvas coordinates (accounting for CSS scaling)
+                const canvasX = (x * width) / rect.width;
+                const canvasY = (y * height) / rect.height;
+                
+                // Check if mouse is over pie
+                const dx = canvasX - centerX;
+                const dy = canvasY - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= radius) {
+                    // Calculate angle
+                    let angle = Math.atan2(dy, dx) + Math.PI / 2; // Adjust for starting position
+                    if (angle < 0) angle += 2 * Math.PI;
+                    
+                    // Find which segment we're hovering over
+                    let currentAngleCheck = 0;
+                    for (let segment of segments) {
+                        const sliceAngle = (segment.value / total) * 2 * Math.PI;
+                        
+                        if (angle >= currentAngleCheck && angle <= currentAngleCheck + sliceAngle) {
+                            showTooltip(e, segment, (segment.value / total) * 100);
+                            canvas.style.cursor = 'pointer';
+                            return;
+                        }
+                        currentAngleCheck += sliceAngle;
+                    }
+                }
+                
+                // Not hovering over any segment
+                hideTooltip();
+                canvas.style.cursor = 'default';
+            };
+            
+            canvas.onmouseleave = function() {
+                hideTooltip();
+                canvas.style.cursor = 'default';
+            };
+        }
+        
+        // Function to update distribution charts
+        function updateDistributionCharts() {
+            // Get current chart mode (count or sum)
+            const chartMode = document.querySelector('input[name="chartMode"]:checked')?.value || 'sum';
+            
+            const chartsSection = document.getElementById('chartsSection');
+            if (!chartsSection) return;
+            
+            // Only show charts section if we have data
+            if (!filteredSoftData && !filteredHardData && !softData && !hardData) {
+                chartsSection.style.display = 'none';
+                return;
+            }
+            
+            // Show charts section
+            chartsSection.style.display = 'block';
+            
+            // Update titles
+            const protectionTitle = document.getElementById('protectionTitle');
+            if (protectionTitle) protectionTitle.textContent = t('protectionStatus');
+            
+            // Get current data based on tab
+            let dataToAnalyze = [];
+            
+            if (currentTab === 'soft') {
+                // Use filtered data if available, otherwise use original data
+                let dataSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
+                                   (softData?.positions || []);
+                
+                // Apply date filter
+                if (tableDateStart || tableDateEnd) {
+                    dataSource = dataSource.filter(p => {
+                        if (!p.first_dt) return false;
+                        const date = new Date(p.first_dt);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                }
+                
+                dataToAnalyze = dataSource.map(p => ({
+                    platform: p.platform,
+                    network: p.chain,
+                    token: p.collateral_token,
+                    value: chartMode === 'count' ? 1 : parseFloat(p.tvl || p.collateral_usd || 0)
+                }));
+            } else if (currentTab === 'hard') {
+                // Use filtered data if available, otherwise use original data
+                let dataSource = (filteredHardData?.events?.length > 0) ? filteredHardData.events : 
+                                   (hardData?.events || []);
+                
+                // Apply date filter
+                if (tableDateStart || tableDateEnd) {
+                    dataSource = dataSource.filter(e => {
+                        if (!e.timestamp) return false;
+                        const date = new Date(e.timestamp);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                }
+                
+                dataToAnalyze = dataSource.map(e => ({
+                    platform: e.platform,
+                    network: e.chain,
+                    token: e.collateral_token,
+                    value: chartMode === 'count' ? 1 : parseFloat(e.debt || 0)
+                }));
+            } else if (currentTab === 'comparison') {
+                // For comparison tab, show the DIFFERENCE between soft and hard
+                // Store both count and dollar differences
+                
+                let softSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
+                                   (softData?.positions || []);
+                let hardSource = (filteredHardData?.events?.length > 0) ? filteredHardData.events : 
+                                   (hardData?.events || []);
+                
+                // Apply date filter to soft data
+                if (tableDateStart || tableDateEnd) {
+                    softSource = softSource.filter(p => {
+                        if (!p.first_dt) return false;
+                        const date = new Date(p.first_dt);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                    
+                    hardSource = hardSource.filter(e => {
+                        if (!e.timestamp) return false;
+                        const date = new Date(e.timestamp);
+                        if (tableDateStart && date < tableDateStart) return false;
+                        if (tableDateEnd && date > tableDateEnd) return false;
+                        return true;
+                    });
+                }
+                
+                // Aggregate soft data by platform, network, and token
+                const softAgg = { platform: {}, network: {}, token: {} };
+                softSource.forEach(p => {
+                    // Platform
+                    if (p.platform) {
+                        if (!softAgg.platform[p.platform]) {
+                            softAgg.platform[p.platform] = { count: 0, dollars: 0 };
+                        }
+                        softAgg.platform[p.platform].count += 1;
+                        softAgg.platform[p.platform].dollars += parseFloat(p.tvl || p.collateral_usd || 0);
+                    }
+                    // Network
+                    if (p.chain) {
+                        if (!softAgg.network[p.chain]) {
+                            softAgg.network[p.chain] = { count: 0, dollars: 0 };
+                        }
+                        softAgg.network[p.chain].count += 1;
+                        softAgg.network[p.chain].dollars += parseFloat(p.tvl || p.collateral_usd || 0);
+                    }
+                    // Token
+                    if (p.collateral_token) {
+                        if (!softAgg.token[p.collateral_token]) {
+                            softAgg.token[p.collateral_token] = { count: 0, dollars: 0 };
+                        }
+                        softAgg.token[p.collateral_token].count += 1;
+                        softAgg.token[p.collateral_token].dollars += parseFloat(p.tvl || p.collateral_usd || 0);
+                    }
+                });
+                
+                // Aggregate hard data by platform, network, and token
+                const hardAgg = { platform: {}, network: {}, token: {} };
+                hardSource.forEach(e => {
+                    // Platform
+                    if (e.platform) {
+                        if (!hardAgg.platform[e.platform]) {
+                            hardAgg.platform[e.platform] = { count: 0, dollars: 0 };
+                        }
+                        hardAgg.platform[e.platform].count += 1;
+                        hardAgg.platform[e.platform].dollars += parseFloat(e.debt_with_discount || e.debt || 0);
+                    }
+                    // Network
+                    if (e.chain) {
+                        if (!hardAgg.network[e.chain]) {
+                            hardAgg.network[e.chain] = { count: 0, dollars: 0 };
+                        }
+                        hardAgg.network[e.chain].count += 1;
+                        hardAgg.network[e.chain].dollars += parseFloat(e.debt_with_discount || e.debt || 0);
+                    }
+                    // Token
+                    if (e.collateral_token) {
+                        if (!hardAgg.token[e.collateral_token]) {
+                            hardAgg.token[e.collateral_token] = { count: 0, dollars: 0 };
+                        }
+                        hardAgg.token[e.collateral_token].count += 1;
+                        hardAgg.token[e.collateral_token].dollars += parseFloat(e.debt_with_discount || e.debt || 0);
+                    }
+                });
+                
+                // Store aggregated data for comparison
+                window.comparisonAggData = { softAgg, hardAgg };
+            }
+            
+            // Aggregate by platform - store both count and dollar values
+            const platformData = {};
+            const networkData = {};
+            const tokenData = {};
+            
+            if (currentTab === 'comparison') {
+                // For comparison, calculate differences using stored data
+                const { softAgg, hardAgg } = window.comparisonAggData || { softAgg: { platform: {}, network: {}, token: {} }, hardAgg: { platform: {}, network: {}, token: {} } };
+                
+                // We already aggregated above, now calculate differences
+                const allPlatforms = new Set([...Object.keys(softAgg.platform), ...Object.keys(hardAgg.platform)]);
+                allPlatforms.forEach(platform => {
+                    const soft = softAgg.platform[platform] || { count: 0, dollars: 0 };
+                    const hard = hardAgg.platform[platform] || { count: 0, dollars: 0 };
+                    const diffCount = soft.count - hard.count;
+                    const diffDollars = soft.dollars - hard.dollars;
+                    
+                    if (diffCount > 0 || diffDollars > 0) {
+                        platformData[platform] = {
+                            count: Math.max(0, diffCount),
+                            dollars: Math.max(0, diffDollars)
+                        };
+                    }
+                });
+                
+                const allNetworks = new Set([...Object.keys(softAgg.network), ...Object.keys(hardAgg.network)]);
+                allNetworks.forEach(network => {
+                    const soft = softAgg.network[network] || { count: 0, dollars: 0 };
+                    const hard = hardAgg.network[network] || { count: 0, dollars: 0 };
+                    const diffCount = soft.count - hard.count;
+                    const diffDollars = soft.dollars - hard.dollars;
+                    
+                    if (diffCount > 0 || diffDollars > 0) {
+                        networkData[network] = {
+                            count: Math.max(0, diffCount),
+                            dollars: Math.max(0, diffDollars)
+                        };
+                    }
+                });
+                
+                const allTokens = new Set([...Object.keys(softAgg.token), ...Object.keys(hardAgg.token)]);
+                allTokens.forEach(token => {
+                    const soft = softAgg.token[token] || { count: 0, dollars: 0 };
+                    const hard = hardAgg.token[token] || { count: 0, dollars: 0 };
+                    const diffCount = soft.count - hard.count;
+                    const diffDollars = soft.dollars - hard.dollars;
+                    
+                    if (diffCount > 0 || diffDollars > 0) {
+                        tokenData[token] = {
+                            count: Math.max(0, diffCount),
+                            dollars: Math.max(0, diffDollars)
+                        };
+                    }
+                });
+            } else {
+                // First, get the original data to calculate both count and dollar values
+                let originalDataForCounting = [];
+                if (currentTab === 'soft') {
+                    let dataSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
+                                       (softData?.positions || []);
+                    if (tableDateStart || tableDateEnd) {
+                        dataSource = dataSource.filter(p => {
+                            if (!p.first_dt) return false;
+                            const date = new Date(p.first_dt);
+                            if (tableDateStart && date < tableDateStart) return false;
+                            if (tableDateEnd && date > tableDateEnd) return false;
+                            return true;
+                        });
+                    }
+                    originalDataForCounting = dataSource;
+                } else if (currentTab === 'hard') {
+                    let dataSource = (filteredHardData?.events?.length > 0) ? filteredHardData.events : 
+                                       (hardData?.events || []);
+                    if (tableDateStart || tableDateEnd) {
+                        dataSource = dataSource.filter(e => {
+                            if (!e.timestamp) return false;
+                            const date = new Date(e.timestamp);
+                            if (tableDateStart && date < tableDateStart) return false;
+                            if (tableDateEnd && date > tableDateEnd) return false;
+                            return true;
+                        });
+                    }
+                    originalDataForCounting = dataSource;
+                }
+                
+                // Aggregate both count and dollar values
+                originalDataForCounting.forEach(item => {
+                    const platform = item.platform;
+                    const network = item.chain;
+                    const token = item.collateral_token;
+                    const dollarValue = currentTab === 'soft' ? 
+                        parseFloat(item.tvl || item.collateral_usd || 0) :
+                        parseFloat(item.debt || 0);
+                    
+                    if (platform) {
+                        if (!platformData[platform]) {
+                            platformData[platform] = { count: 0, dollars: 0 };
+                        }
+                        platformData[platform].count += 1;
+                        platformData[platform].dollars += dollarValue;
+                    }
+                    if (network) {
+                        if (!networkData[network]) {
+                            networkData[network] = { count: 0, dollars: 0 };
+                        }
+                        networkData[network].count += 1;
+                        networkData[network].dollars += dollarValue;
+                    }
+                    if (token) {
+                        if (!tokenData[token]) {
+                            tokenData[token] = { count: 0, dollars: 0 };
+                        }
+                        tokenData[token].count += 1;
+                        tokenData[token].dollars += dollarValue;
+                    }
+                });
+            }
+            
+            // Convert to array format and sort based on current chart mode
+            const platformArray = Object.entries(platformData)
+                .map(([label, data]) => ({
+                    label, 
+                    value: chartMode === 'count' ? data.count : data.dollars,
+                    count: data.count,
+                    dollars: data.dollars
+                }))
+                .sort((a, b) => b.value - a.value);
+            
+            const networkArray = Object.entries(networkData)
+                .map(([label, data]) => ({
+                    label, 
+                    value: chartMode === 'count' ? data.count : data.dollars,
+                    count: data.count,
+                    dollars: data.dollars
+                }))
+                .sort((a, b) => b.value - a.value);
+            
+            const tokenArray = Object.entries(tokenData)
+                .map(([label, data]) => ({
+                    label, 
+                    value: chartMode === 'count' ? data.count : data.dollars,
+                    count: data.count,
+                    dollars: data.dollars
+                }))
+                .sort((a, b) => b.value - a.value);
+            
+            // Store data globally for chart switching
+            window.chartData = {
+                platform: platformArray,
+                network: networkArray,
+                token: tokenArray
+            };
+            
+            // Get current distribution type selection
+            const currentDistributionType = document.querySelector('input[name="distributionType"]:checked')?.value || 'token';
+            
+            // Draw chart with current selection (not always defaulting to 'token')
+            setTimeout(() => {
+                switchDistributionChart(currentDistributionType);
+                
+                // Update protection chart
+                updateProtectionChart();
+            }, 100);
+        }
     </script>
 </body>
 </html>
