@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Curve Finance Liquidation Analysis Viewer</title>
     <style>
         * {
@@ -11,11 +11,19 @@
             box-sizing: border-box;
         }
         
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
         }
         
         .container {
@@ -635,6 +643,39 @@
                 width: 100%;
                 justify-content: center !important;
             }
+            
+            /* Предотвращение переполнения таблиц */
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .data-table {
+                padding: 10px;
+                overflow-x: auto;
+            }
+            
+            /* Убираем фиксированные ширины */
+            .container {
+                width: 100%;
+                padding: 0 10px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            /* Адаптация элементов управления */
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            /* Сокращаем padding для карточек */
+            .stat-card {
+                padding: 10px;
+            }
         }
         
         .date-range-picker {
@@ -752,8 +793,8 @@
         <div class="stats-grid" id="statsGrid"></div>
         
         <!-- Объединенный блок графика и таблиц -->
-        <div class="combined-container" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 15px; padding: 3px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;">
-            <div style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="combined-container" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 15px; padding: 3px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; width: 100%; max-width: 100%; overflow: hidden;">
+            <div style="background: white; border-radius: 12px; padding: 20px; width: 100%; overflow-x: auto;">
                 <!-- График -->
                 <div class="chart-container" style="margin-bottom: 0; box-shadow: none;">
                     <div class="chart-inner">
