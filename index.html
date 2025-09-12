@@ -3516,6 +3516,9 @@
             // Собираем статистику в зависимости от типа группировки
             const stats = {};
             
+            // First create a map of soft positions for duplicate detection
+            const softPositionsMap = new Map();
+            
             // Софт ликвидации
             if (filteredSoftData.positions) {
                 // Фильтруем по датам если указаны
@@ -3533,6 +3536,24 @@
                         return openDate <= rangeEnd && closeDate >= rangeStart;
                     });
                 }
+                
+                // Build soft positions map for duplicate detection
+                console.log('Building soft positions map from', positions.length, 'positions');
+                if (positions.length > 0) {
+                    console.log('Sample soft position:', positions[0]);
+                }
+                positions.forEach(pos => {
+                    if (pos.user && pos.market_id) {
+                        const key = `${pos.user}_${pos.market_id}`;
+                        if (!softPositionsMap.has(key)) {
+                            softPositionsMap.set(key, []);
+                        }
+                        softPositionsMap.get(key).push({
+                            first_dt: pos.first_dt ? new Date(pos.first_dt) : null,
+                            last_dt: pos.last_dt ? new Date(pos.last_dt) : new Date('2100-01-01')
+                        });
+                    }
+                });
                 
                 positions.forEach(pos => {
                     let key, label;
@@ -3567,7 +3588,8 @@
                             softTVL: 0,
                             softDebt: 0,
                             hardCount: 0,
-                            hardDebt: 0
+                            hardDebt: 0,
+                            hardDuplicates: 0  // Track duplicate hard liquidations
                         };
                     }
                     stats[key].softCount++;
@@ -3590,7 +3612,38 @@
                     });
                 }
                 
-                events.forEach(event => {
+                console.log('Processing', events.length, 'hard events. SoftPositionsMap size:', softPositionsMap.size);
+                if (events.length > 0) {
+                    console.log('Sample hard event:', events[0]);
+                }
+                events.forEach((event, idx) => {
+                    // Check if this hard liquidation is a duplicate of a soft position
+                    let isDuplicate = false;
+                    if (idx === 0) {
+                        console.log('Hard event fields - user:', event.user, 'market_id:', event.market_id, 'timestamp:', event.timestamp);
+                    }
+                    if (event.user && event.market_id && event.timestamp) {
+                        const posKey = `${event.user}_${event.market_id}`;
+                        const eventTime = new Date(event.timestamp);
+                        const positions = softPositionsMap.get(posKey);
+                        
+                        if (positions) {
+                            isDuplicate = positions.some(pos => {
+                                const match = pos.first_dt && eventTime >= pos.first_dt && eventTime <= pos.last_dt;
+                                if (match) {
+                                    console.log('Duplicate found:', {
+                                        user: event.user,
+                                        market: event.market_id,
+                                        hardTime: eventTime,
+                                        softStart: pos.first_dt,
+                                        softEnd: pos.last_dt
+                                    });
+                                }
+                                return match;
+                            });
+                        }
+                    }
+                    
                     let key, label;
                     
                     switch(comparisonGroupBy) {
@@ -3623,12 +3676,21 @@
                             softTVL: 0,
                             softDebt: 0,
                             hardCount: 0,
-                            hardDebt: 0
+                            hardDebt: 0,
+                            hardDuplicates: 0
                         };
                     }
                     stats[key].hardCount++;
                     stats[key].hardDebt += event.debt_with_discount || event.debt || 0;
+                    if (isDuplicate) {
+                        stats[key].hardDuplicates++;
+                    }
                 });
+                
+                // Log duplicate summary
+                let totalDuplicates = 0;
+                Object.values(stats).forEach(s => totalDuplicates += s.hardDuplicates || 0);
+                console.log('Total duplicates found:', totalDuplicates, 'out of', events.length, 'hard events');
             }
             
             let statsArray = Object.values(stats);
@@ -3664,6 +3726,10 @@
                     case 'hardCount':
                         aVal = a.hardCount;
                         bVal = b.hardCount;
+                        break;
+                    case 'protectedPositions':
+                        aVal = Math.max(0, a.softCount - a.hardCount + (a.hardDuplicates || 0));
+                        bVal = Math.max(0, b.softCount - b.hardCount + (b.hardDuplicates || 0));
                         break;
                     case 'protected':
                         aVal = a.softTVL - a.hardDebt;
@@ -3764,6 +3830,9 @@
                             <th class="sortable" onclick="sortCompareTable('hardDebt')">
                                 ${t('totalHardDebt')} ${getCompareSortArrow('hardDebt')}
                             </th>
+                            <th class="sortable" onclick="sortCompareTable('protectedPositions')" title="${currentLang === 'en' ? 'Positions protected from hard liquidation' : 'Позиции защищенные от хард ликвидации'}">
+                                ${currentLang === 'en' ? 'Protected Pos.' : 'Защищено поз.'} ${getCompareSortArrow('protectedPositions')}
+                            </th>
                             <th class="sortable" onclick="sortCompareTable('protected')">
                                 ${t('protected')} ${getCompareSortArrow('protected')}
                             </th>
@@ -3799,6 +3868,7 @@
                         <td>$${formatNumber(stat.softDebt)}</td>
                         <td>${stat.hardCount}</td>
                         <td>$${formatNumber(stat.hardDebt)}</td>
+                        <td style="color: green">${Math.max(0, stat.softCount - stat.hardCount + (stat.hardDuplicates || 0))}</td>
                         <td style="color: ${protectedColor}">
                             $${formatNumber(Math.abs(protected))} 
                             (${protectedPercent.toFixed(1)}%)
@@ -4571,7 +4641,7 @@
                     tooltip.innerHTML = `
                         <div style="font-weight: 600; margin-bottom: 6px; color: ${color};">${item.label}</div>
                         <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
-                        <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
+                        <div style="margin-bottom: 3px;">${currentTab === 'comparison' ? (t('protected') || 'Protected') : t('value')}: <strong>${dollarValue}</strong></div>
                         <div style="margin-bottom: 3px;">${t('share')}: <strong>${percentage.toFixed(2)}%</strong></div>
                         <div style="font-size: 11px; opacity: 0.8;">Rank: #${item.index + 1}</div>
                     `;
@@ -4980,7 +5050,7 @@
                     ${typeLabel ? `<div style="font-size: 11px; font-weight: 600; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.2); color: ${typeColor};">${typeIcon} ${typeLabel}</div>` : ''}
                     <div style="font-weight: 600; margin-bottom: 6px; color: #888;">${item.label}</div>
                     <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
-                    <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
+                    <div style="margin-bottom: 3px;">${currentTab === 'comparison' ? (t('protected') || 'Protected') : t('value')}: <strong>${dollarValue}</strong></div>
                     <div style="margin-bottom: 3px;">${t('share')}: <strong>${percentage.toFixed(2)}%</strong></div>
                     <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2);">
                         <div style="font-size: 11px; margin-bottom: 4px; opacity: 0.9;">${t('includes')}:</div>
@@ -4993,7 +5063,7 @@
                     ${typeLabel ? `<div style="font-size: 11px; font-weight: 600; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.2); color: ${typeColor};">${typeIcon} ${typeLabel}</div>` : ''}
                     <div style="font-weight: 600; margin-bottom: 6px; color: #22c55e;">${item.label}</div>
                     <div style="margin-bottom: 3px;">${t('count')}: <strong>${countValue}</strong></div>
-                    <div style="margin-bottom: 3px;">${t('value')}: <strong>${dollarValue}</strong></div>
+                    <div style="margin-bottom: 3px;">${currentTab === 'comparison' ? (t('protected') || 'Protected') : t('value')}: <strong>${dollarValue}</strong></div>
                     <div>${t('share')}: <strong>${percentage.toFixed(2)}%</strong></div>
                 `;
             }
@@ -5513,11 +5583,14 @@
                     }
                     originalDataForCounting = dataSource;
                 } else if (currentTab === 'comparison') {
-                    // For comparison tab, use soft liquidation data for the pie chart
-                    let dataSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
+                    // For comparison tab, we need both soft and hard data to calculate protected amount
+                    let softSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
                                        (softData?.positions || []);
+                    let hardSource = (filteredHardData?.events?.length > 0) ? filteredHardData.events : 
+                                       (hardData?.events || []);
+                    
                     if (tableDateStart || tableDateEnd) {
-                        dataSource = dataSource.filter(p => {
+                        softSource = softSource.filter(p => {
                             if (!p.first_dt) return false;
                             const openDate = new Date(p.first_dt);
                             const closeDate = p.last_dt ? new Date(p.last_dt) : new Date();
@@ -5528,41 +5601,199 @@
                             
                             return openDate <= rangeEnd && closeDate >= rangeStart;
                         });
+                        
+                        hardSource = hardSource.filter(e => {
+                            if (!e.timestamp) return false;
+                            const date = new Date(e.timestamp);
+                            if (tableDateStart && date < tableDateStart) return false;
+                            if (tableDateEnd && date > tableDateEnd) return false;
+                            return true;
+                        });
                     }
-                    originalDataForCounting = dataSource;
+                    
+                    // Create a map of soft positions for quick lookup
+                    const softPositionsMap = new Map();
+                    softSource.forEach(pos => {
+                        if (pos.user && pos.market_id) {
+                            const key = `${pos.user}_${pos.market_id}`;
+                            if (!softPositionsMap.has(key)) {
+                                softPositionsMap.set(key, []);
+                            }
+                            softPositionsMap.get(key).push({
+                                first_dt: pos.first_dt ? new Date(pos.first_dt) : null,
+                                last_dt: pos.last_dt ? new Date(pos.last_dt) : new Date('2100-01-01'), // Far future for active positions
+                                platform: pos.platform,
+                                network: pos.chain,
+                                token: pos.collateral_token
+                            });
+                        }
+                    });
+                    
+                    console.log('Comparison mode: Soft positions map created with', softPositionsMap.size, 'unique user-market combinations');
+                    
+                    // Process hard liquidations and identify which ones are duplicates
+                    const hardDebts = {
+                        byPlatform: {},
+                        byNetwork: {},
+                        byToken: {}
+                    };
+                    const hardCounts = {
+                        byPlatform: {},
+                        byNetwork: {},
+                        byToken: {}
+                    };
+                    
+                    let duplicateCount = 0;
+                    let uniqueCount = 0;
+                    
+                    hardSource.forEach(event => {
+                        const debt = parseFloat(event.debt_with_discount || event.debt || 0);
+                        
+                        // Check if this hard liquidation corresponds to a soft position
+                        let isDuplicate = false;
+                        if (event.user && event.market_id && event.timestamp) {
+                            const key = `${event.user}_${event.market_id}`;
+                            const eventTime = new Date(event.timestamp);
+                            const positions = softPositionsMap.get(key);
+                            
+                            if (positions) {
+                                // Check if any position's lifetime contains this hard liquidation
+                                isDuplicate = positions.some(pos => {
+                                    return pos.first_dt && eventTime >= pos.first_dt && eventTime <= pos.last_dt;
+                                });
+                                
+                                if (isDuplicate) {
+                                    duplicateCount++;
+                                } else {
+                                    uniqueCount++;
+                                }
+                            } else {
+                                uniqueCount++;
+                            }
+                        } else {
+                            uniqueCount++;
+                        }
+                        
+                        // Always add debt (financial loss)
+                        if (event.platform) {
+                            hardDebts.byPlatform[event.platform] = (hardDebts.byPlatform[event.platform] || 0) + debt;
+                            // Only count if not a duplicate
+                            if (!isDuplicate) {
+                                hardCounts.byPlatform[event.platform] = (hardCounts.byPlatform[event.platform] || 0) + 1;
+                            }
+                        }
+                        if (event.chain) {
+                            hardDebts.byNetwork[event.chain] = (hardDebts.byNetwork[event.chain] || 0) + debt;
+                            // Only count if not a duplicate
+                            if (!isDuplicate) {
+                                hardCounts.byNetwork[event.chain] = (hardCounts.byNetwork[event.chain] || 0) + 1;
+                            }
+                        }
+                        if (event.collateral_token) {
+                            hardDebts.byToken[event.collateral_token] = (hardDebts.byToken[event.collateral_token] || 0) + debt;
+                            // Only count if not a duplicate
+                            if (!isDuplicate) {
+                                hardCounts.byToken[event.collateral_token] = (hardCounts.byToken[event.collateral_token] || 0) + 1;
+                            }
+                        }
+                    });
+                    
+                    console.log(`Comparison mode: Hard liquidations - ${duplicateCount} duplicates (same position), ${uniqueCount} unique positions`);
+                    
+                    // Now process soft liquidations and calculate protected amounts
+                    softSource.forEach(item => {
+                        const platform = item.platform;
+                        const network = item.chain;
+                        const token = item.collateral_token;
+                        const softTVL = parseFloat(item.tvl || item.collateral_usd || 0);
+                        
+                        // For dollars, calculate protected amount (soft TVL - hard debt)
+                        // For count, just use the soft position count
+                        if (platform) {
+                            if (!platformData[platform]) {
+                                platformData[platform] = { count: 0, dollars: 0 };
+                            }
+                            platformData[platform].count += 1;
+                            // Protected amount for this platform
+                            const hardDebt = hardDebts.byPlatform[platform] || 0;
+                            // Add soft TVL to platform total
+                            platformData[platform].dollars += softTVL;
+                        }
+                        if (network) {
+                            if (!networkData[network]) {
+                                networkData[network] = { count: 0, dollars: 0 };
+                            }
+                            networkData[network].count += 1;
+                            // Add soft TVL to network total
+                            networkData[network].dollars += softTVL;
+                        }
+                        if (token) {
+                            if (!tokenData[token]) {
+                                tokenData[token] = { count: 0, dollars: 0 };
+                            }
+                            tokenData[token].count += 1;
+                            // Add soft TVL to token total
+                            tokenData[token].dollars += softTVL;
+                        }
+                    });
+                    
+                    // Now subtract hard debts AND counts from the totals to get protected amounts
+                    Object.keys(hardDebts.byPlatform).forEach(platform => {
+                        if (platformData[platform]) {
+                            platformData[platform].dollars = Math.max(0, platformData[platform].dollars - hardDebts.byPlatform[platform]);
+                            platformData[platform].count = Math.max(0, platformData[platform].count - (hardCounts.byPlatform[platform] || 0));
+                        }
+                    });
+                    Object.keys(hardDebts.byNetwork).forEach(network => {
+                        if (networkData[network]) {
+                            networkData[network].dollars = Math.max(0, networkData[network].dollars - hardDebts.byNetwork[network]);
+                            networkData[network].count = Math.max(0, networkData[network].count - (hardCounts.byNetwork[network] || 0));
+                        }
+                    });
+                    Object.keys(hardDebts.byToken).forEach(token => {
+                        if (tokenData[token]) {
+                            tokenData[token].dollars = Math.max(0, tokenData[token].dollars - hardDebts.byToken[token]);
+                            tokenData[token].count = Math.max(0, tokenData[token].count - (hardCounts.byToken[token] || 0));
+                        }
+                    });
+                    
+                    // Skip the regular aggregation for comparison mode
+                    originalDataForCounting = [];
                 }
                 
-                // Aggregate both count and dollar values
-                originalDataForCounting.forEach(item => {
-                    const platform = item.platform;
-                    const network = item.chain;
-                    const token = item.collateral_token;
-                    const dollarValue = currentTab === 'soft' ? 
-                        parseFloat(item.tvl || item.collateral_usd || 0) :
-                        parseFloat(item.debt || 0);
+                // Aggregate both count and dollar values (skip for comparison mode as we already did it)
+                if (currentTab !== 'comparison') {
+                    originalDataForCounting.forEach(item => {
+                        const platform = item.platform;
+                        const network = item.chain;
+                        const token = item.collateral_token;
+                        const dollarValue = currentTab === 'soft' ? 
+                            parseFloat(item.tvl || item.collateral_usd || 0) :
+                            parseFloat(item.debt || 0);
                     
-                    if (platform) {
-                        if (!platformData[platform]) {
-                            platformData[platform] = { count: 0, dollars: 0 };
+                        if (platform) {
+                            if (!platformData[platform]) {
+                                platformData[platform] = { count: 0, dollars: 0 };
+                            }
+                            platformData[platform].count += 1;
+                            platformData[platform].dollars += dollarValue;
                         }
-                        platformData[platform].count += 1;
-                        platformData[platform].dollars += dollarValue;
-                    }
-                    if (network) {
-                        if (!networkData[network]) {
-                            networkData[network] = { count: 0, dollars: 0 };
+                        if (network) {
+                            if (!networkData[network]) {
+                                networkData[network] = { count: 0, dollars: 0 };
+                            }
+                            networkData[network].count += 1;
+                            networkData[network].dollars += dollarValue;
                         }
-                        networkData[network].count += 1;
-                        networkData[network].dollars += dollarValue;
-                    }
-                    if (token) {
-                        if (!tokenData[token]) {
-                            tokenData[token] = { count: 0, dollars: 0 };
+                        if (token) {
+                            if (!tokenData[token]) {
+                                tokenData[token] = { count: 0, dollars: 0 };
+                            }
+                            tokenData[token].count += 1;
+                            tokenData[token].dollars += dollarValue;
                         }
-                        tokenData[token].count += 1;
-                        tokenData[token].dollars += dollarValue;
-                    }
-                });
+                    });
+                }
             }
             
             // Convert to array format and sort based on current chart mode
