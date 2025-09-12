@@ -2385,9 +2385,9 @@
             // Рисуем диаграмму
             let html = '';
             
-            // Добавляем легенду в верхний левый угол графика
+            // Добавляем легенду в верхний правый угол графика
             html += `
-                <div style="position: absolute; top: 10px; left: 60px; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; font-size: 12px;">
+                <div style="position: absolute; top: 5px; right: 5px; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; font-size: 12px;">
                     <div style="display: flex; align-items: center; margin-bottom: 4px;">
                         <div style="width: 12px; height: 12px; background: rgba(76, 175, 80, 0.8); border-radius: 2px; margin-right: 6px;"></div>
                         <span>${t('softLiquidations')}</span>
@@ -4115,6 +4115,21 @@
         
         // Автозагрузка при открытии страницы
         window.addEventListener('DOMContentLoaded', async () => {
+            // Initialize language button states based on saved language
+            const enBtn = document.getElementById('langEn');
+            const ruBtn = document.getElementById('langRu');
+            if (currentLang === 'ru') {
+                ruBtn.style.background = 'white';
+                ruBtn.style.color = '#333';
+                enBtn.style.background = 'rgba(255,255,255,0.2)';
+                enBtn.style.color = 'white';
+            } else {
+                enBtn.style.background = 'white';
+                enBtn.style.color = '#333';
+                ruBtn.style.background = 'rgba(255,255,255,0.2)';
+                ruBtn.style.color = 'white';
+            }
+            
             // Добавляем обработчики для двустороннего слайдера
             const rangeStart = document.getElementById('rangeStart');
             const rangeEnd = document.getElementById('rangeEnd');
@@ -5591,10 +5606,12 @@
         
         // Methodology popup functions
         function showMethodologyPopup() {
-            const modal = document.getElementById('methodologyModal');
-            if (!modal) {
-                createMethodologyModal();
+            // Always recreate modal to ensure correct language
+            const existingModal = document.getElementById('methodologyModal');
+            if (existingModal) {
+                existingModal.remove();
             }
+            createMethodologyModal();
             document.getElementById('methodologyModal').style.display = 'flex';
         }
         
@@ -5621,11 +5638,11 @@
                                 <p>Curve Finance has a unique liquidation protection system. Instead of instant collateral loss, the system gradually converts it, allowing position recovery.</p>
                                 <p><strong>Protected Funds</strong> = user funds that the system saved from loss.</p>
                                 
-                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">How are funds in soft liquidation calculated?</h3>
-                                <p>For each position in soft liquidation:</p>
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">How are funds in liquidation protection mode (soft liquidation) calculated?</h3>
+                                <p>For each position active in liquidation protection mode in the selected time period:</p>
                                 <ol style="margin-left: 20px;">
                                     <li>Take the amount of collateral tokens in the position</li>
-                                    <li>Multiply by the maximum oracle price during the position's time in soft liquidation</li>
+                                    <li>Multiply by the maximum oracle price during the position's time in liquidation protection mode</li>
                                     <li>Sum the values of all active positions for the selected time period</li>
                                 </ol>
                                 <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 10px;">
@@ -5642,13 +5659,13 @@
                                 
                                 <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Formula</h3>
                                 <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center; margin: 15px 0;">
-                                    Protected Funds = Total Value in Soft Liquidation - Losses from Hard Liquidations
+                                    Protected Funds = Total Value in Liquidation Protection Mode - Losses from Hard Liquidations
                                 </div>
                                 
                                 <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Example</h3>
                                 <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
                                     <p style="margin: 5px 0;">For August 2025 (range: 01.08.2025 - 31.08.2025):</p>
-                                    <p style="margin: 5px 0;">In soft liquidation: <strong>$7.11M</strong></p>
+                                    <p style="margin: 5px 0;">In liquidation protection mode (soft liquidation): <strong>$7.11M</strong></p>
                                     <p style="margin: 5px 0;">Losses over selected period: <strong>$676.57K</strong></p>
                                     <p style="margin: 10px 0 5px 0; font-size: 18px; color: #3b82f6;"><strong>Protected: $6.43M (90.5%)</strong></p>
                                     <p style="margin: 5px 0; font-size: 14px; color: #666;">This means 90.5% of funds were protected from loss thanks to the LLAMMA system.</p>
@@ -5658,11 +5675,11 @@
                                 <p>В Curve Finance есть уникальная система защиты от ликвидаций. Вместо мгновенной потери залога, система постепенно конвертирует его, давая возможность восстановления позиции.</p>
                                 <p><strong>Защищенные средства</strong> = средства пользователей, которые система уберегла от потери.</p>
                                 
-                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Как считаются средства в мягкой ликвидации?</h3>
-                                <p>Для каждой позиции в мягкой ликвидации:</p>
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Как считаются средства в режиме защиты от ликвидации (в мягкой ликвидации)?</h3>
+                                <p>Для каждой позиции находящейся в режиме защиты от ликвидации за выбранный промежуток времени:</p>
                                 <ol style="margin-left: 20px;">
                                     <li>Берется количество залоговых токенов в позиции</li>
-                                    <li>Умножается на максимальную цену oracle за время нахождения позиции в мягкой ликвидации</li>
+                                    <li>Умножается на максимальную цену oracle за время нахождения позиции в режиме защиты от ликвидации</li>
                                     <li>Суммируются стоимости всех активных позиций за выбранный промежуток времени</li>
                                 </ol>
                                 <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 10px;">
@@ -5679,13 +5696,13 @@
                                 
                                 <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Формула</h3>
                                 <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center; margin: 15px 0;">
-                                    Защищенные средства = Общая стоимость в мягкой ликвидации - Потери от жестких ликвидаций
+                                    Защищенные средства = Общая стоимость в режиме защиты от ликвидации - Потери от жестких ликвидаций
                                 </div>
                                 
                                 <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Пример</h3>
                                 <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
                                     <p style="margin: 5px 0;">За Август 2025 (диапазон: 01.08.2025 - 31.08.2025):</p>
-                                    <p style="margin: 5px 0;">В мягкой ликвидации находится: <strong>$7.11M</strong></p>
+                                    <p style="margin: 5px 0;">В режиме защиты от ликвидации (мягкой ликвидации) находится: <strong>$7.11M</strong></p>
                                     <p style="margin: 5px 0;">Потери за выбранный период: <strong>$676.57K</strong></p>
                                     <p style="margin: 10px 0 5px 0; font-size: 18px; color: #3b82f6;"><strong>Защищено: $6.43M (90.5%)</strong></p>
                                     <p style="margin: 5px 0; font-size: 14px; color: #666;">Это означает, что 90.5% средств были защищены от потери благодаря системе LLAMMA.</p>
