@@ -2429,45 +2429,22 @@
                 // Уменьшаем максимальную высоту для мобильных устройств
                 const chartHeight = window.innerWidth <= 768 ? 150 : 200;
                 const softHeight = maxValue > 0 ? (softValue / maxValue * chartHeight) : 0;
-                let hardHeight = maxValue > 0 ? (hardValue / maxValue * chartHeight) : 0;
+                const hardHeight = maxValue > 0 ? (hardValue / maxValue * chartHeight) : 0;
                 
-                // Минимальная высота для видимости
-                const minVisibleHeight = 3;
-                
-                // Если есть хард события, но их высота слишком мала, делаем их видимыми
-                // Проверяем и для количества, и для суммы
-                const hasHardData = chartMode === 'sum' ? (period.hardDebt > 0) : (period.hard > 0);
-                const hasSoftData = chartMode === 'sum' ? (period.softTVL > 0) : (period.soft > 0);
-                
-                if (hasHardData && hardHeight < minVisibleHeight) {
-                    hardHeight = minVisibleHeight;
-                }
-                
-                // Если есть и софт и хард, и софт намного больше, уменьшаем софт чтобы хард был виден
-                let adjustedSoftHeight = softHeight;
-                if (hasHardData && hasSoftData && softHeight > 0) {
-                    // Убеждаемся что хард всегда виден
-                    if (softHeight + hardHeight > chartHeight) {
-                        adjustedSoftHeight = Math.max(0, chartHeight - hardHeight - 1);
-                    }
-                }
-                
-                // Определяем порядок столбиков
+                // Определяем порядок столбиков - меньший сзади, больший спереди
                 let barsHtml = '';
-                if (hasSoftData || hasHardData) {
-                    if (hasHardData && hasSoftData) {
-                        // Есть оба - рисуем их стопкой (stacked)
-                        barsHtml = `
-                            <div class="bar-soft" style="height: ${adjustedSoftHeight}px; position: absolute; bottom: ${hardHeight}px; width: 100%; z-index: 1; background: rgba(76, 175, 80, 0.8);"></div>
-                            <div class="bar-hard" style="height: ${hardHeight}px; position: absolute; bottom: 0; width: 100%; z-index: 2; background: rgba(255, 107, 107, 0.9);"></div>
-                        `;
-                    } else if (hasSoftData) {
-                        // Только софт
-                        barsHtml = `<div class="bar-soft" style="height: ${softHeight}px; z-index: 1;"></div>`;
-                    } else {
-                        // Только хард
-                        barsHtml = `<div class="bar-hard" style="height: ${hardHeight}px; z-index: 1;"></div>`;
-                    }
+                if (hardValue > softValue) {
+                    // Если хард больше - сначала рисуем хард (сзади), потом софт (спереди)
+                    barsHtml = `
+                        <div class="bar-hard" style="height: ${hardHeight}px; z-index: 1;"></div>
+                        <div class="bar-soft" style="height: ${softHeight}px; z-index: 2;"></div>
+                    `;
+                } else {
+                    // Если софт больше или равен - сначала рисуем софт (сзади), потом хард (спереди)
+                    barsHtml = `
+                        <div class="bar-soft" style="height: ${softHeight}px; z-index: 1;"></div>
+                        <div class="bar-hard" style="height: ${hardHeight}px; z-index: 2;"></div>
+                    `;
                 }
                 
                 html += `
@@ -3547,6 +3524,10 @@
                 }
                 
                 // Build soft positions map for duplicate detection
+                console.log('Building soft positions map from', positions.length, 'positions');
+                if (positions.length > 0) {
+                    console.log('Sample soft position:', positions[0]);
+                }
                 positions.forEach(pos => {
                     if (pos.user && pos.market_id) {
                         const key = `${pos.user}_${pos.market_id}`;
@@ -3617,9 +3598,16 @@
                     });
                 }
                 
-                events.forEach(event => {
+                console.log('Processing', events.length, 'hard events. SoftPositionsMap size:', softPositionsMap.size);
+                if (events.length > 0) {
+                    console.log('Sample hard event:', events[0]);
+                }
+                events.forEach((event, idx) => {
                     // Check if this hard liquidation is a duplicate of a soft position
                     let isDuplicate = false;
+                    if (idx === 0) {
+                        console.log('Hard event fields - user:', event.user, 'market_id:', event.market_id, 'timestamp:', event.timestamp);
+                    }
                     if (event.user && event.market_id && event.timestamp) {
                         const posKey = `${event.user}_${event.market_id}`;
                         const eventTime = new Date(event.timestamp);
@@ -3627,7 +3615,17 @@
                         
                         if (positions) {
                             isDuplicate = positions.some(pos => {
-                                return pos.first_dt && eventTime >= pos.first_dt && eventTime <= pos.last_dt;
+                                const match = pos.first_dt && eventTime >= pos.first_dt && eventTime <= pos.last_dt;
+                                if (match) {
+                                    console.log('Duplicate found:', {
+                                        user: event.user,
+                                        market: event.market_id,
+                                        hardTime: eventTime,
+                                        softStart: pos.first_dt,
+                                        softEnd: pos.last_dt
+                                    });
+                                }
+                                return match;
                             });
                         }
                     }
@@ -3674,6 +3672,11 @@
                         stats[key].hardDuplicates++;
                     }
                 });
+                
+                // Log duplicate summary
+                let totalDuplicates = 0;
+                Object.values(stats).forEach(s => totalDuplicates += s.hardDuplicates || 0);
+                console.log('Total duplicates found:', totalDuplicates, 'out of', events.length, 'hard events');
             }
             
             let statsArray = Object.values(stats);
