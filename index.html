@@ -1103,7 +1103,7 @@
                                 <span id="networkBtnText2">Сети</span>
                             </label>
                         </div>
-                        <div style="height: 260px; display: flex; align-items: center; justify-content: center;">
+                        <div style="height: 224px; display: flex; align-items: center; justify-content: center;">
                             <canvas id="distributionChart" width="280" height="260"></canvas>
                         </div>
                     </div>
@@ -2598,10 +2598,14 @@
                     if (tableDateStart || tableDateEnd) {
                         positions = positions.filter(pos => {
                             if (!pos.first_dt) return false;
-                            const date = new Date(pos.first_dt);
-                            if (tableDateStart && date < tableDateStart) return false;
-                            if (tableDateEnd && date > tableDateEnd) return false;
-                            return true;
+                            const openDate = new Date(pos.first_dt);
+                            const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                            
+                            // Position is active if it overlaps with the date range
+                            const rangeEnd = tableDateEnd || new Date();
+                            const rangeStart = tableDateStart || new Date(0);
+                            
+                            return openDate <= rangeEnd && closeDate >= rangeStart;
                         });
                     }
                     softTVL = positions.reduce((sum, pos) => sum + parseFloat(pos.tvl || pos.collateral_usd || 0), 0);
@@ -2644,10 +2648,13 @@
             if (softData && hardData) {
                 const isPositive = protectedAmount > 0;
                 html += `
-                    <div class="stat-card protection ${!isPositive ? 'negative' : ''}">
+                    <div class="stat-card protection ${!isPositive ? 'negative' : ''}" style="position: relative;">
+                        <span onclick="showMethodologyPopup()" style="position: absolute; top: 15px; right: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: rgba(255,255,255,0.8); border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; width: 28px; height: 28px; line-height: 1; font-weight: bold; transition: all 0.3s; z-index: 10; background: rgba(255,255,255,0.1);" onmouseover="this.style.color='white'; this.style.borderColor='white'; this.style.transform='scale(1.1)'; this.style.background='rgba(255,255,255,0.2)';" onmouseout="this.style.color='rgba(255,255,255,0.8)'; this.style.borderColor='rgba(255,255,255,0.4)'; this.style.transform='scale(1)'; this.style.background='rgba(255,255,255,0.1)';" title="${currentLang === 'en' ? 'Methodology' : 'Методология'}">?</span>
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
                             <div style="flex: 1; text-align: left;">
-                                <div class="stat-label">${t('protectedFromLiquidation')}</div>
+                                <div class="stat-label">
+                                    ${t('protectedFromLiquidation')}
+                                </div>
                                 <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
                                 <div class="protection-percent">
                                     <span>${isPositive ? '✅' : '⚠️'} ${protectionPercent.toFixed(1)}% ${t('ofTVLInSoft').split('<br>')[0]}</span>
@@ -2784,10 +2791,14 @@
                         if (tableDateStart || tableDateEnd) {
                             positions = positions.filter(pos => {
                                 if (!pos.first_dt) return false;
-                                const date = new Date(pos.first_dt);
-                                if (tableDateStart && date < tableDateStart) return false;
-                                if (tableDateEnd && date > tableDateEnd) return false;
-                                return true;
+                                const openDate = new Date(pos.first_dt);
+                                const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                                
+                                // Position is active if it overlaps with the date range
+                                const rangeEnd = tableDateEnd || new Date();
+                                const rangeStart = tableDateStart || new Date(0);
+                                
+                                return openDate <= rangeEnd && closeDate >= rangeStart;
                             });
                         }
                         
@@ -2821,10 +2832,14 @@
                     if (tableDateStart || tableDateEnd) {
                         positions = positions.filter(pos => {
                             if (!pos.first_dt) return false;
-                            const date = new Date(pos.first_dt);
-                            if (tableDateStart && date < tableDateStart) return false;
-                            if (tableDateEnd && date > tableDateEnd) return false;
-                            return true;
+                            const openDate = new Date(pos.first_dt);
+                            const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                            
+                            // Position is active if it overlaps with the date range
+                            const rangeEnd = tableDateEnd || new Date();
+                            const rangeStart = tableDateStart || new Date(0);
+                            
+                            return openDate <= rangeEnd && closeDate >= rangeStart;
                         });
                     }
                     positions.forEach(pos => {
@@ -2988,10 +3003,14 @@
                         if (tableDateStart || tableDateEnd) {
                             positions = positions.filter(pos => {
                                 if (!pos.first_dt) return false;
-                                const date = new Date(pos.first_dt);
-                                if (tableDateStart && date < tableDateStart) return false;
-                                if (tableDateEnd && date > tableDateEnd) return false;
-                                return true;
+                                const openDate = new Date(pos.first_dt);
+                                const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                                
+                                // Position is active if it overlaps with the date range
+                                const rangeEnd = tableDateEnd || new Date();
+                                const rangeStart = tableDateStart || new Date(0);
+                                
+                                return openDate <= rangeEnd && closeDate >= rangeStart;
                             });
                         }
                         
@@ -3504,10 +3523,14 @@
                 if (tableDateStart || tableDateEnd) {
                     positions = positions.filter(pos => {
                         if (!pos.first_dt) return false;
-                        const date = new Date(pos.first_dt);
-                        if (tableDateStart && date < tableDateStart) return false;
-                        if (tableDateEnd && date > tableDateEnd) return false;
-                        return true;
+                        const openDate = new Date(pos.first_dt);
+                        const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                        
+                        // Position is active if it overlaps with the date range
+                        const rangeEnd = tableDateEnd || new Date();
+                        const rangeStart = tableDateStart || new Date(0);
+                        
+                        return openDate <= rangeEnd && closeDate >= rangeStart;
                     });
                 }
                 
@@ -5242,14 +5265,20 @@
                 let dataSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
                                    (softData?.positions || []);
                 
-                // Apply date filter
+                // Apply date filter - position is active if it overlaps with the date range
                 if (tableDateStart || tableDateEnd) {
                     dataSource = dataSource.filter(p => {
                         if (!p.first_dt) return false;
-                        const date = new Date(p.first_dt);
-                        if (tableDateStart && date < tableDateStart) return false;
-                        if (tableDateEnd && date > tableDateEnd) return false;
-                        return true;
+                        const openDate = new Date(p.first_dt);
+                        const closeDate = p.last_dt ? new Date(p.last_dt) : new Date();
+                        
+                        // Position is active if:
+                        // - opened before the end of the range AND
+                        // - closed after the start of the range (or still open)
+                        const rangeEnd = tableDateEnd || new Date();
+                        const rangeStart = tableDateStart || new Date(0);
+                        
+                        return openDate <= rangeEnd && closeDate >= rangeStart;
                     });
                 }
                 
@@ -5282,22 +5311,25 @@
                     value: chartMode === 'count' ? 1 : parseFloat(e.debt || 0)
                 }));
             } else if (currentTab === 'comparison') {
-                // For comparison tab, show the DIFFERENCE between soft and hard
-                // Store both count and dollar differences
+                // For comparison tab, calculate the difference (protected funds = soft - hard)
                 
                 let softSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
                                    (softData?.positions || []);
                 let hardSource = (filteredHardData?.events?.length > 0) ? filteredHardData.events : 
                                    (hardData?.events || []);
                 
-                // Apply date filter to soft data
+                // Apply date filter to soft data - position is active if it overlaps with the date range
                 if (tableDateStart || tableDateEnd) {
                     softSource = softSource.filter(p => {
                         if (!p.first_dt) return false;
-                        const date = new Date(p.first_dt);
-                        if (tableDateStart && date < tableDateStart) return false;
-                        if (tableDateEnd && date > tableDateEnd) return false;
-                        return true;
+                        const openDate = new Date(p.first_dt);
+                        const closeDate = p.last_dt ? new Date(p.last_dt) : new Date();
+                        
+                        // Position is active if it overlaps with the date range
+                        const rangeEnd = tableDateEnd || new Date();
+                        const rangeStart = tableDateStart || new Date(0);
+                        
+                        return openDate <= rangeEnd && closeDate >= rangeStart;
                     });
                     
                     hardSource = hardSource.filter(e => {
@@ -5309,66 +5341,113 @@
                     });
                 }
                 
-                // Aggregate soft data by platform, network, and token
-                const softAgg = { platform: {}, network: {}, token: {} };
+                // Aggregate soft liquidations
+                const softAgg = {};
                 softSource.forEach(p => {
-                    // Platform
-                    if (p.platform) {
-                        if (!softAgg.platform[p.platform]) {
-                            softAgg.platform[p.platform] = { count: 0, dollars: 0 };
-                        }
-                        softAgg.platform[p.platform].count += 1;
-                        softAgg.platform[p.platform].dollars += parseFloat(p.tvl || p.collateral_usd || 0);
+                    const key = p.collateral_token || 'Unknown';
+                    if (!softAgg[key]) {
+                        softAgg[key] = { count: 0, tvl: 0, positions: [] };
                     }
-                    // Network
-                    if (p.chain) {
-                        if (!softAgg.network[p.chain]) {
-                            softAgg.network[p.chain] = { count: 0, dollars: 0 };
-                        }
-                        softAgg.network[p.chain].count += 1;
-                        softAgg.network[p.chain].dollars += parseFloat(p.tvl || p.collateral_usd || 0);
+                    softAgg[key].count += 1;
+                    
+                    // Check for data anomalies and log detailed info
+                    const tvl = parseFloat(p.tvl || p.collateral_usd || 0);
+                    
+                    // Log very large values (over 100M) or suspicious values
+                    if (tvl > 1e8) { // More than 100M
+                        console.warn(`Large TVL detected for token ${key}:`, {
+                            tvl: tvl,
+                            tvl_formatted: `$${(tvl/1e6).toFixed(2)}M`,
+                            raw_tvl: p.tvl,
+                            raw_collateral_usd: p.collateral_usd,
+                            collateral: p.collateral,
+                            collateral_up: p.collateral_up,
+                            price_oracle: p.price_oracle,
+                            user: p.user,
+                            market_id: p.market_id,
+                            chain: p.chain,
+                            platform: p.platform
+                        });
                     }
-                    // Token
-                    if (p.collateral_token) {
-                        if (!softAgg.token[p.collateral_token]) {
-                            softAgg.token[p.collateral_token] = { count: 0, dollars: 0 };
-                        }
-                        softAgg.token[p.collateral_token].count += 1;
-                        softAgg.token[p.collateral_token].dollars += parseFloat(p.tvl || p.collateral_usd || 0);
+                    
+                    // Log if either source field is suspicious
+                    if (p.tvl && parseFloat(p.tvl) > 1e12) {
+                        console.error(`CRITICAL: TVL field has extreme value for ${key}: ${p.tvl}`);
                     }
+                    if (p.collateral_usd && parseFloat(p.collateral_usd) > 1e12) {
+                        console.error(`CRITICAL: collateral_usd field has extreme value for ${key}: ${p.collateral_usd}`);
+                    }
+                    
+                    softAgg[key].tvl += tvl;
+                    softAgg[key].positions.push({tvl, user: p.user, market: p.market_id});
                 });
                 
-                // Aggregate hard data by platform, network, and token
-                const hardAgg = { platform: {}, network: {}, token: {} };
+                // Aggregate hard liquidations
+                const hardAgg = {};
                 hardSource.forEach(e => {
-                    // Platform
-                    if (e.platform) {
-                        if (!hardAgg.platform[e.platform]) {
-                            hardAgg.platform[e.platform] = { count: 0, dollars: 0 };
-                        }
-                        hardAgg.platform[e.platform].count += 1;
-                        hardAgg.platform[e.platform].dollars += parseFloat(e.debt_with_discount || e.debt || 0);
+                    const key = e.collateral_token || 'Unknown';
+                    if (!hardAgg[key]) {
+                        hardAgg[key] = { count: 0, debt: 0 };
                     }
-                    // Network
-                    if (e.chain) {
-                        if (!hardAgg.network[e.chain]) {
-                            hardAgg.network[e.chain] = { count: 0, dollars: 0 };
-                        }
-                        hardAgg.network[e.chain].count += 1;
-                        hardAgg.network[e.chain].dollars += parseFloat(e.debt_with_discount || e.debt || 0);
+                    hardAgg[key].count += 1;
+                    
+                    // Check for data anomalies
+                    const debt = parseFloat(e.debt_with_discount || e.debt || 0);
+                    if (debt > 1e12) { // More than 1 trillion is suspicious
+                        console.warn(`Suspicious debt for ${key}: ${debt}`, e);
                     }
-                    // Token
-                    if (e.collateral_token) {
-                        if (!hardAgg.token[e.collateral_token]) {
-                            hardAgg.token[e.collateral_token] = { count: 0, dollars: 0 };
-                        }
-                        hardAgg.token[e.collateral_token].count += 1;
-                        hardAgg.token[e.collateral_token].dollars += parseFloat(e.debt_with_discount || e.debt || 0);
+                    hardAgg[key].debt += debt;
+                });
+                
+                // Calculate differences for pie chart
+                dataToAnalyze = [];
+                const allTokens = new Set([...Object.keys(softAgg), ...Object.keys(hardAgg)]);
+                
+                // Log aggregated values for debugging
+                console.log('Comparison Mode Aggregation Summary:');
+                allTokens.forEach(token => {
+                    const soft = softAgg[token] || { count: 0, tvl: 0, positions: [] };
+                    const hard = hardAgg[token] || { count: 0, debt: 0 };
+                    
+                    if (soft.tvl > 1e8 || hard.debt > 1e8) { // Log if over 100M
+                        console.log(`Token: ${token}`, {
+                            soft_tvl: `$${(soft.tvl/1e6).toFixed(2)}M`,
+                            soft_count: soft.count,
+                            hard_debt: `$${(hard.debt/1e6).toFixed(2)}M`,
+                            hard_count: hard.count,
+                            protected: `$${(Math.max(0, soft.tvl - hard.debt)/1e6).toFixed(2)}M`,
+                            top_positions: soft.positions?.slice(0, 5) // Show top 5 positions
+                        });
                     }
                 });
                 
-                // Store aggregated data for comparison
-                window.comparisonAggData = { softAgg, hardAgg };
+                allTokens.forEach(token => {
+                    const soft = softAgg[token] || { count: 0, tvl: 0 };
+                    const hard = hardAgg[token] || { count: 0, debt: 0 };
+                    
+                    // For comparison, we subtract hard from soft
+                    let value;
+                    if (chartMode === 'count') {
+                        // For count mode, just use soft count (positions in protection)
+                        // Don't subtract hard events as they are different units
+                        value = soft.count;
+                    } else {
+                        // For sum mode, calculate protected value (TVL - losses)
+                        value = Math.max(0, soft.tvl - hard.debt);
+                    }
+                    
+                    if (value > 0) {
+                        // Find the platform/network for this token from soft data
+                        const samplePos = softSource.find(p => p.collateral_token === token);
+                        
+                        dataToAnalyze.push({
+                            platform: samplePos?.platform || 'Unknown',
+                            network: samplePos?.chain || 'Unknown',
+                            token: token,
+                            value: value
+                        });
+                    }
+                });
             }
             
             // Aggregate by platform - store both count and dollar values
@@ -5376,56 +5455,8 @@
             const networkData = {};
             const tokenData = {};
             
-            if (currentTab === 'comparison') {
-                // For comparison, calculate differences using stored data
-                const { softAgg, hardAgg } = window.comparisonAggData || { softAgg: { platform: {}, network: {}, token: {} }, hardAgg: { platform: {}, network: {}, token: {} } };
-                
-                // We already aggregated above, now calculate differences
-                const allPlatforms = new Set([...Object.keys(softAgg.platform), ...Object.keys(hardAgg.platform)]);
-                allPlatforms.forEach(platform => {
-                    const soft = softAgg.platform[platform] || { count: 0, dollars: 0 };
-                    const hard = hardAgg.platform[platform] || { count: 0, dollars: 0 };
-                    const diffCount = soft.count - hard.count;
-                    const diffDollars = soft.dollars - hard.dollars;
-                    
-                    if (diffCount > 0 || diffDollars > 0) {
-                        platformData[platform] = {
-                            count: Math.max(0, diffCount),
-                            dollars: Math.max(0, diffDollars)
-                        };
-                    }
-                });
-                
-                const allNetworks = new Set([...Object.keys(softAgg.network), ...Object.keys(hardAgg.network)]);
-                allNetworks.forEach(network => {
-                    const soft = softAgg.network[network] || { count: 0, dollars: 0 };
-                    const hard = hardAgg.network[network] || { count: 0, dollars: 0 };
-                    const diffCount = soft.count - hard.count;
-                    const diffDollars = soft.dollars - hard.dollars;
-                    
-                    if (diffCount > 0 || diffDollars > 0) {
-                        networkData[network] = {
-                            count: Math.max(0, diffCount),
-                            dollars: Math.max(0, diffDollars)
-                        };
-                    }
-                });
-                
-                const allTokens = new Set([...Object.keys(softAgg.token), ...Object.keys(hardAgg.token)]);
-                allTokens.forEach(token => {
-                    const soft = softAgg.token[token] || { count: 0, dollars: 0 };
-                    const hard = hardAgg.token[token] || { count: 0, dollars: 0 };
-                    const diffCount = soft.count - hard.count;
-                    const diffDollars = soft.dollars - hard.dollars;
-                    
-                    if (diffCount > 0 || diffDollars > 0) {
-                        tokenData[token] = {
-                            count: Math.max(0, diffCount),
-                            dollars: Math.max(0, diffDollars)
-                        };
-                    }
-                });
-            } else {
+            // For all tabs including comparison, aggregate the dataToAnalyze normally
+            {
                 // First, get the original data to calculate both count and dollar values
                 let originalDataForCounting = [];
                 if (currentTab === 'soft') {
@@ -5434,10 +5465,14 @@
                     if (tableDateStart || tableDateEnd) {
                         dataSource = dataSource.filter(p => {
                             if (!p.first_dt) return false;
-                            const date = new Date(p.first_dt);
-                            if (tableDateStart && date < tableDateStart) return false;
-                            if (tableDateEnd && date > tableDateEnd) return false;
-                            return true;
+                            const openDate = new Date(p.first_dt);
+                            const closeDate = p.last_dt ? new Date(p.last_dt) : new Date();
+                            
+                            // Position is active if it overlaps with the date range
+                            const rangeEnd = tableDateEnd || new Date();
+                            const rangeStart = tableDateStart || new Date(0);
+                            
+                            return openDate <= rangeEnd && closeDate >= rangeStart;
                         });
                     }
                     originalDataForCounting = dataSource;
@@ -5451,6 +5486,24 @@
                             if (tableDateStart && date < tableDateStart) return false;
                             if (tableDateEnd && date > tableDateEnd) return false;
                             return true;
+                        });
+                    }
+                    originalDataForCounting = dataSource;
+                } else if (currentTab === 'comparison') {
+                    // For comparison tab, use soft liquidation data for the pie chart
+                    let dataSource = (filteredSoftData?.positions?.length > 0) ? filteredSoftData.positions : 
+                                       (softData?.positions || []);
+                    if (tableDateStart || tableDateEnd) {
+                        dataSource = dataSource.filter(p => {
+                            if (!p.first_dt) return false;
+                            const openDate = new Date(p.first_dt);
+                            const closeDate = p.last_dt ? new Date(p.last_dt) : new Date();
+                            
+                            // Position is active if it overlaps with the date range
+                            const rangeEnd = tableDateEnd || new Date();
+                            const rangeStart = tableDateStart || new Date(0);
+                            
+                            return openDate <= rangeEnd && closeDate >= rangeStart;
                         });
                     }
                     originalDataForCounting = dataSource;
@@ -5534,6 +5587,124 @@
                 // Update protection chart
                 updateProtectionChart();
             }, 100);
+        }
+        
+        // Methodology popup functions
+        function showMethodologyPopup() {
+            const modal = document.getElementById('methodologyModal');
+            if (!modal) {
+                createMethodologyModal();
+            }
+            document.getElementById('methodologyModal').style.display = 'flex';
+        }
+        
+        function closeMethodologyPopup() {
+            const modal = document.getElementById('methodologyModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        function createMethodologyModal() {
+            const modalHTML = `
+                <div id="methodologyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 15px; padding: 30px; max-width: 600px; max-height: 80vh; overflow-y: auto; margin: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); position: relative;">
+                        <button onclick="closeMethodologyPopup()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666; transition: color 0.3s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='#666'">×</button>
+                        
+                        <h2 style="margin: 0 0 20px 0; color: #333; font-size: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                            ${currentLang === 'en' ? 'How are Protected Funds Calculated?' : 'Как рассчитываются защищенные средства?'}
+                        </h2>
+                        
+                        <div style="color: #555; line-height: 1.6;">
+                            ${currentLang === 'en' ? `
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">What does it mean?</h3>
+                                <p>Curve Finance has a unique liquidation protection system. Instead of instant collateral loss, the system gradually converts it, allowing position recovery.</p>
+                                <p><strong>Protected Funds</strong> = user funds that the system saved from loss.</p>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">How are funds in soft liquidation calculated?</h3>
+                                <p>For each position in soft liquidation:</p>
+                                <ol style="margin-left: 20px;">
+                                    <li>Take the amount of collateral tokens in the position</li>
+                                    <li>Multiply by the maximum oracle price during the position's time in soft liquidation</li>
+                                    <li>Sum the values of all active positions for the selected time period</li>
+                                </ol>
+                                <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                                    Using the maximum price shows the maximum value the position had and how much the user could have lost in a hard liquidation.
+                                </p>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">How are losses from hard liquidations calculated?</h3>
+                                <p>For each hard liquidation in the selected period:</p>
+                                <ol style="margin-left: 20px;">
+                                    <li>Take the debt amount that was liquidated plus the liquidator's discount</li>
+                                    <li>Sum all such losses for the selected time period</li>
+                                </ol>
+                                <p>These are user losses from positions that couldn't be recovered.</p>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Formula</h3>
+                                <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center; margin: 15px 0;">
+                                    Protected Funds = Total Value in Soft Liquidation - Losses from Hard Liquidations
+                                </div>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Example</h3>
+                                <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                                    <p style="margin: 5px 0;">For August 2025 (range: 01.08.2025 - 31.08.2025):</p>
+                                    <p style="margin: 5px 0;">In soft liquidation: <strong>$7.11M</strong></p>
+                                    <p style="margin: 5px 0;">Losses over selected period: <strong>$676.57K</strong></p>
+                                    <p style="margin: 10px 0 5px 0; font-size: 18px; color: #3b82f6;"><strong>Protected: $6.43M (90.5%)</strong></p>
+                                    <p style="margin: 5px 0; font-size: 14px; color: #666;">This means 90.5% of funds were protected from loss thanks to the LLAMMA system.</p>
+                                </div>
+                            ` : `
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Что это значит?</h3>
+                                <p>В Curve Finance есть уникальная система защиты от ликвидаций. Вместо мгновенной потери залога, система постепенно конвертирует его, давая возможность восстановления позиции.</p>
+                                <p><strong>Защищенные средства</strong> = средства пользователей, которые система уберегла от потери.</p>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Как считаются средства в мягкой ликвидации?</h3>
+                                <p>Для каждой позиции в мягкой ликвидации:</p>
+                                <ol style="margin-left: 20px;">
+                                    <li>Берется количество залоговых токенов в позиции</li>
+                                    <li>Умножается на максимальную цену oracle за время нахождения позиции в мягкой ликвидации</li>
+                                    <li>Суммируются стоимости всех активных позиций за выбранный промежуток времени</li>
+                                </ol>
+                                <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                                    Использование максимальной цены показывает, какую максимальную стоимость имела позиция и сколько пользователь мог бы потерять при жесткой ликвидации.
+                                </p>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Как считаются потери от жестких ликвидаций?</h3>
+                                <p>Для каждой жесткой ликвидации в выбранном периоде:</p>
+                                <ol style="margin-left: 20px;">
+                                    <li>Берется сумма долга, который был ликвидирован, плюс дисконт ликвидатору</li>
+                                    <li>Суммируются все такие потери за выбранный промежуток времени</li>
+                                </ol>
+                                <p>Это потери пользователей, которые не смогли восстановить свои позиции.</p>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Формула</h3>
+                                <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center; margin: 15px 0;">
+                                    Защищенные средства = Общая стоимость в мягкой ликвидации - Потери от жестких ликвидаций
+                                </div>
+                                
+                                <h3 style="color: #444; margin-top: 20px; font-size: 18px;">Пример</h3>
+                                <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                                    <p style="margin: 5px 0;">За Август 2025 (диапазон: 01.08.2025 - 31.08.2025):</p>
+                                    <p style="margin: 5px 0;">В мягкой ликвидации находится: <strong>$7.11M</strong></p>
+                                    <p style="margin: 5px 0;">Потери за выбранный период: <strong>$676.57K</strong></p>
+                                    <p style="margin: 10px 0 5px 0; font-size: 18px; color: #3b82f6;"><strong>Защищено: $6.43M (90.5%)</strong></p>
+                                    <p style="margin: 5px 0; font-size: 14px; color: #666;">Это означает, что 90.5% средств были защищены от потери благодаря системе LLAMMA.</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Close on background click
+            document.getElementById('methodologyModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeMethodologyPopup();
+                }
+            });
         }
     </script>
 </body>
