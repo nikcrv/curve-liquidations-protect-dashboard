@@ -6,11 +6,11 @@ Curve Finance has a unique liquidation protection system. Instead of instant col
 
 **Protected Funds** = user funds that the system saved from loss.
 
-## How are funds in soft liquidation calculated?
+## How are funds in liquidation protection mode (soft liquidation) calculated?
 
-For each position in soft liquidation:
+For each position active in liquidation protection mode in the selected time period:
 1. Take the amount of collateral tokens in the position
-2. Multiply by the maximum oracle price during the position's time in soft liquidation
+2. Multiply by the maximum oracle price during the position's time in liquidation protection mode
 3. Sum the values of all active positions for the selected time period
 
 Using the maximum price shows the maximum value the position had and how much the user could have lost in a hard liquidation.
@@ -26,13 +26,13 @@ These are user losses from positions that couldn't be recovered.
 ## Formula
 
 ```
-Protected Funds = Total Value in Soft Liquidation - Losses from Hard Liquidations
+Protected Funds = Total Value in Liquidation Protection Mode - Losses from Hard Liquidations
 ```
 
 ## Example
 
 For August 2025 (range: 01.08.2025 - 31.08.2025):
-- In soft liquidation: $7.11M
+- In liquidation protection mode (soft liquidation): $7.11M
 - Losses over selected period: $676.57K
 - **Protected: $7.11M (90.5%)**
 
