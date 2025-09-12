@@ -2429,7 +2429,12 @@
                 // Уменьшаем максимальную высоту для мобильных устройств
                 const chartHeight = window.innerWidth <= 768 ? 150 : 200;
                 const softHeight = maxValue > 0 ? (softValue / maxValue * chartHeight) : 0;
-                const hardHeight = maxValue > 0 ? (hardValue / maxValue * chartHeight) : 0;
+                let hardHeight = maxValue > 0 ? (hardValue / maxValue * chartHeight) : 0;
+                
+                // Минимальная высота 1px для хард событий, чтобы они были видны
+                if (hardValue > 0 && hardHeight < 1) {
+                    hardHeight = 1;
+                }
                 
                 // Определяем порядок столбиков - меньший сзади, больший спереди
                 let barsHtml = '';
