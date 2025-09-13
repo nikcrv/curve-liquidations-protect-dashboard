@@ -1620,7 +1620,6 @@
         
         // Функция предварительной обработки данных
         function preprocessData() {
-            console.log('Preprocessing data for optimization...');
             const startTime = performance.now();
             
             // Находим диапазон дат
@@ -1703,7 +1702,6 @@
             }
             
             const endTime = performance.now();
-            console.log(`Data preprocessing completed in ${(endTime - startTime).toFixed(2)}ms`);
         }
 
         function processLoadedData(data) {
@@ -1836,7 +1834,6 @@
                             option.textContent = network;
                             networkFilter.appendChild(option);
                         });
-                        console.log('Networks populated:', availableNetworks.size);
                     }
                     networkUpdated = true;
                 }
@@ -1852,7 +1849,6 @@
                             option.textContent = token;
                             tokenFilter.appendChild(option);
                         });
-                        console.log('Tokens populated:', availableTokens.size);
                     }
                     tokenUpdated = true;
                 }
@@ -2170,8 +2166,42 @@
             const chartContainer = document.getElementById('liquidationChart');
             
             // Используем отфильтрованные данные если они есть, иначе полные
-            const softDataToUse = filteredSoftData || softData;
-            const hardDataToUse = filteredHardData || hardData;
+            let softDataToUse = filteredSoftData || softData;
+            let hardDataToUse = filteredHardData || hardData;
+            
+            // Если выбран конкретный диапазон дат через слайдеры, фильтруем данные по датам
+            // чтобы график использовал те же данные, что и верхняя карточка
+            if (selectedStartDate && selectedEndDate) {
+                if (softDataToUse?.positions) {
+                    const filteredPositions = softDataToUse.positions.filter(pos => {
+                        if (!pos.first_dt) return false;
+                        const openDate = new Date(pos.first_dt);
+                        const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
+                        
+                        // Позиция активна если пересекается с выбранным периодом
+                        return openDate <= selectedEndDate && closeDate >= selectedStartDate;
+                    });
+                    
+                    softDataToUse = {
+                        ...softDataToUse,
+                        positions: filteredPositions
+                    };
+                }
+                
+                if (hardDataToUse?.events) {
+                    const filteredEvents = hardDataToUse.events.filter(event => {
+                        if (!event.timestamp) return false;
+                        const date = new Date(event.timestamp);
+                        return date >= selectedStartDate && date <= selectedEndDate;
+                    });
+                    
+                    hardDataToUse = {
+                        ...hardDataToUse,
+                        events: filteredEvents
+                    };
+                }
+            }
+            
             
             if (!softDataToUse || !hardDataToUse) {
                 chartContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;">${t('noData')}</div>`;
@@ -2290,23 +2320,10 @@
                 }
             }
             
-            // Считаем софт ликвидации используя предварительно обработанные данные
-            if (actualPeriod === 'day' && preprocessedData.dailyPositions) {
-                // Используем предварительно обработанные индексы для дневного вида
-                Object.keys(periodData).forEach(dayKey => {
-                    const positionIndices = preprocessedData.dailyPositions[dayKey];
-                    if (positionIndices) {
-                        positionIndices.forEach(index => {
-                            const pos = softDataToUse.positions[index];
-                            if (pos) {
-                                periodData[dayKey].soft++;
-                                periodData[dayKey].softTVL += pos.cachedTVL || parseFloat(pos.tvl || pos.collateral_usd || 0);
-                            }
-                        });
-                    }
-                });
-            } else if (softDataToUse.positions) {
-                // Для недель и месяцев используем старый алгоритм (меньше периодов)
+            // Считаем софт ликвидации
+            // Не используем предобработанные данные, так как они не учитывают фильтрацию по датам
+            if (softDataToUse.positions) {
+                // Обрабатываем все периоды одинаково
                 softDataToUse.positions.forEach(pos => {
                     if (!pos.first_dt) return;
                     
@@ -2315,7 +2332,9 @@
                     const tvl = pos.cachedTVL || parseFloat(pos.tvl || pos.collateral_usd || 0);
                     
                     // Пропускаем позиции вне диапазона
-                    if (closeDate < startDate || openDate > endDate) return;
+                    if (closeDate < startDate || openDate > endDate) {
+                        return;
+                    }
                     
                     Object.keys(periodData).forEach(periodKey => {
                         const periodDate = new Date(periodKey);
@@ -2326,6 +2345,9 @@
                             periodEnd.setDate(periodEnd.getDate() + 7);
                         } else if (actualPeriod === 'month') {
                             periodEnd = new Date(periodDate.getFullYear(), periodDate.getMonth() + 1, 1);
+                        } else { // day
+                            periodEnd = new Date(periodDate);
+                            periodEnd.setDate(periodEnd.getDate() + 1);
                         }
                         
                         // Позиция активна если была открыта до конца периода И закрыта после начала периода
@@ -2336,6 +2358,7 @@
                     });
                 });
             }
+            
             
             // Считаем хард ликвидации
             if (hardDataToUse.events) {
@@ -2357,15 +2380,25 @@
             // Находим максимальные значения в зависимости от режима
             let maxSoft = 0;
             let maxHard = 0;
+            let totalChartSoftTVL = 0;
+            let totalChartHardDebt = 0;
+            let maxPeriodSoftTVL = 0;
+            let maxPeriodHardDebt = 0;
             Object.values(periodData).forEach(period => {
                 if (chartMode === 'sum') {
                     maxSoft = Math.max(maxSoft, period.softTVL);
                     maxHard = Math.max(maxHard, period.hardDebt);
+                    // Для отладки: находим максимальные значения одного периода
+                    maxPeriodSoftTVL = Math.max(maxPeriodSoftTVL, period.softTVL);
+                    maxPeriodHardDebt = Math.max(maxPeriodHardDebt, period.hardDebt);
+                    // И суммируем все хард долги (они не пересекаются)
+                    totalChartHardDebt += period.hardDebt;
                 } else {
                     maxSoft = Math.max(maxSoft, period.soft);
                     maxHard = Math.max(maxHard, period.hard);
                 }
             });
+            
             const maxValue = Math.max(maxSoft, maxHard);
             
             // Рисуем диаграмму
@@ -2533,6 +2566,7 @@
             const protectedPercent = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
             const protectedLabel = currentLang === 'ru' ? 'Защищено' : 'Protected';
             
+            
             tooltip.innerHTML = `
                 <strong>${dateDisplay}</strong><br>
                 💧 ${currentLang === 'ru' ? 'Мягких' : 'Soft'}: $${formatNumber(softTVL)} (${soft} ${currentLang === 'ru' ? 'поз.' : 'pos.'})<br>
@@ -2571,16 +2605,6 @@
             const hasFilters = (tableDateStart || tableDateEnd || 
                                (filteredSoftData && filteredSoftData.positions?.length !== softData?.positions?.length) ||
                                (filteredHardData && filteredHardData.events?.length !== hardData?.events?.length));
-            
-            console.log('Filter check:', {
-                tableDateStart,
-                tableDateEnd,
-                filteredSoftLength: filteredSoftData?.positions?.length,
-                softLength: softData?.positions?.length,
-                filteredHardLength: filteredHardData?.events?.length,
-                hardLength: hardData?.events?.length,
-                hasFilters
-            });
             
             if (hasFilters) {
                 // Пересчитываем TVL для soft с учетом всех фильтров
@@ -2625,15 +2649,11 @@
                 hardDebtWithDiscount = hardData?.total?.debt_with_discount || 0;
                 
                 // Отладочный вывод
-                console.log('Using pre-calculated totals (no filters):');
-                console.log('  Soft TVL from summary:', softTVL);
-                console.log('  Hard debt_with_discount from total:', hardDebtWithDiscount);
-                console.log('  Has filters:', hasFilters);
             }
             
             const protectedAmount = softTVL - hardDebtWithDiscount;
             const protectionPercent = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
-            console.log('Protected amount:', protectedAmount, 'Percent:', protectionPercent.toFixed(1) + '%');
+            
             
             // ГЛАВНЫЙ БЛОК - Защищено депозитов с диаграммой (занимает 2 колонки)
             if (softData && hardData) {
@@ -3529,10 +3549,6 @@
                 }
                 
                 // Build soft positions map for duplicate detection
-                console.log('Building soft positions map from', positions.length, 'positions');
-                if (positions.length > 0) {
-                    console.log('Sample soft position:', positions[0]);
-                }
                 positions.forEach(pos => {
                     if (pos.user && pos.market_id) {
                         const key = `${pos.user}_${pos.market_id}`;
@@ -3603,16 +3619,9 @@
                     });
                 }
                 
-                console.log('Processing', events.length, 'hard events. SoftPositionsMap size:', softPositionsMap.size);
-                if (events.length > 0) {
-                    console.log('Sample hard event:', events[0]);
-                }
                 events.forEach((event, idx) => {
                     // Check if this hard liquidation is a duplicate of a soft position
                     let isDuplicate = false;
-                    if (idx === 0) {
-                        console.log('Hard event fields - user:', event.user, 'market_id:', event.market_id, 'timestamp:', event.timestamp);
-                    }
                     if (event.user && event.market_id && event.timestamp) {
                         const posKey = `${event.user}_${event.market_id}`;
                         const eventTime = new Date(event.timestamp);
@@ -3621,15 +3630,6 @@
                         if (positions) {
                             isDuplicate = positions.some(pos => {
                                 const match = pos.first_dt && eventTime >= pos.first_dt && eventTime <= pos.last_dt;
-                                if (match) {
-                                    console.log('Duplicate found:', {
-                                        user: event.user,
-                                        market: event.market_id,
-                                        hardTime: eventTime,
-                                        softStart: pos.first_dt,
-                                        softEnd: pos.last_dt
-                                    });
-                                }
                                 return match;
                             });
                         }
@@ -3677,11 +3677,6 @@
                         stats[key].hardDuplicates++;
                     }
                 });
-                
-                // Log duplicate summary
-                let totalDuplicates = 0;
-                Object.values(stats).forEach(s => totalDuplicates += s.hardDuplicates || 0);
-                console.log('Total duplicates found:', totalDuplicates, 'out of', events.length, 'hard events');
             }
             
             let statsArray = Object.values(stats);
@@ -4336,7 +4331,6 @@
                 if (fileNameElement) {
                     fileNameElement.textContent = currentLang === 'en' ? 'Select file to load' : 'Выберите файл для загрузки';
                 }
-                console.error('Error loading data:', error);
             }
         });
         
@@ -4364,6 +4358,37 @@
             const canvas = document.getElementById('protectionChartInline');
             if (!canvas) return;
             
+            // Read values directly from the protection card to ensure consistency
+            const protectionCard = document.querySelector('.stat-card.protection');
+            if (!protectionCard) return;
+            
+            // Check if card has negative class (this determines the background color)
+            const isCardNegative = protectionCard.classList.contains('negative');
+            
+            // Extract the displayed values from the card
+            const valueElement = protectionCard.querySelector('.stat-value');
+            const percentElement = protectionCard.querySelector('.protection-percent span');
+            
+            let protectedAmount = 0;
+            let protectionPercent = 0;
+            
+            // Parse the displayed value (it's always positive in display, check card class for sign)
+            if (valueElement) {
+                const displayedValue = valueElement.textContent.replace(/[^0-9.]/g, '');
+                protectedAmount = parseFloat(displayedValue) || 0;
+                if (isCardNegative) {
+                    protectedAmount = -protectedAmount;
+                }
+            }
+            
+            // Parse the percentage from the displayed text
+            if (percentElement) {
+                const percentMatch = percentElement.textContent.match(/-?\d+\.?\d*/);
+                if (percentMatch) {
+                    protectionPercent = parseFloat(percentMatch[0]);
+                }
+            }
+            
             // Set canvas size with high DPI support
             const width = 180;
             const height = 180;
@@ -4371,49 +4396,6 @@
             const centerX = width / 2;
             const centerY = height / 2;
             const radius = Math.min(width, height) / 2 - 15;
-            
-            // Calculate protection percentage based on filtered data
-            const softToUse = filteredSoftData || softData;
-            const hardToUse = filteredHardData || hardData;
-            
-            let softTVL = 0;
-            let hardDebtWithDiscount = 0;
-            
-            // If date filter is applied, recalculate sums
-            if (tableDateStart || tableDateEnd) {
-                // Recalculate TVL for soft with date filter
-                if (softToUse?.positions) {
-                    const filteredPositions = softToUse.positions.filter(pos => {
-                        if (!pos.first_dt) return false;
-                        const date = new Date(pos.first_dt);
-                        if (tableDateStart && date < tableDateStart) return false;
-                        if (tableDateEnd && date > tableDateEnd) return false;
-                        return true;
-                    });
-                    softTVL = filteredPositions.reduce((sum, pos) => sum + parseFloat(pos.tvl || pos.collateral_usd || 0), 0);
-                }
-                
-                // Recalculate debt for hard with date filter
-                if (hardToUse?.events) {
-                    const filteredEvents = hardToUse.events.filter(event => {
-                        if (!event.timestamp) return false;
-                        const date = new Date(event.timestamp);
-                        if (tableDateStart && date < tableDateStart) return false;
-                        if (tableDateEnd && date > tableDateEnd) return false;
-                        return true;
-                    });
-                    filteredEvents.forEach(event => {
-                        hardDebtWithDiscount += parseFloat(event.debt_with_discount || event.debt || 0);
-                    });
-                }
-            } else {
-                // Use ready sums from summary/total
-                softTVL = softToUse?.summary?.total_tvl || 0;
-                hardDebtWithDiscount = hardToUse?.total?.debt_with_discount || 0;
-            }
-            
-            const protectedAmount = softTVL - hardDebtWithDiscount;
-            const protectionPercent = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
             
             // Clear canvas
             ctx.clearRect(0, 0, width, height);
@@ -4429,14 +4411,14 @@
             const startAngle = -Math.PI / 2;
             const endAngle = startAngle + (2 * Math.PI * protectionPercent / 100);
             
-            // Create gradient for the arc - use white/light colors for better contrast on green background
+            // Create gradient for the arc - match the card's background color
             const gradient = ctx.createLinearGradient(0, 0, width, height);
-            if (protectedAmount >= 0) {
-                // White to light gray for positive protection
+            if (!isCardNegative) {  // Use card's state directly
+                // White to light gray for positive protection (green background)
                 gradient.addColorStop(0, '#ffffff');
                 gradient.addColorStop(1, '#f0f0f0');
             } else {
-                // Red tones for negative protection
+                // Red tones for negative protection (red background)
                 gradient.addColorStop(0, '#ff6b6b');
                 gradient.addColorStop(1, '#ff4444');
             }
@@ -5085,7 +5067,6 @@
         function drawPieChart(canvasId, data, legendId) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) {
-                console.error('Canvas not found:', canvasId);
                 return;
             }
             
@@ -5166,7 +5147,6 @@
             let currentAngle = -Math.PI / 2; // Start from top
             const labels = [];
             
-            console.log(`[PIE CHART] Drawing ${segments.length} segments`);
             
             // Draw each segment
             for (let i = 0; i < segments.length; i++) {
@@ -5176,14 +5156,12 @@
                 // For the last segment, make sure it closes the circle exactly
                 if (i === segments.length - 1) {
                     sliceAngle = (Math.PI * 2 - Math.PI / 2) - currentAngle;
-                    console.log(`LAST Segment ${i}: ${segment.label}, forcing closure angle: ${(sliceAngle * 180 / Math.PI).toFixed(1)}°`);
                 } else {
                     sliceAngle = (segment.value / total) * 2 * Math.PI;
                 }
                 
                 const percent = (segment.value / total * 100);
                 
-                console.log(`Segment ${i}: ${segment.label}, ${percent.toFixed(1)}%, angle: ${(sliceAngle * 180 / Math.PI).toFixed(1)}°`);
                 
                 // Draw segment
                 ctx.beginPath();
@@ -5209,7 +5187,6 @@
             
             // Verify we drew a complete circle
             const finalAngle = currentAngle + Math.PI / 2; // Adjust back
-            console.log(`[PIE CHART] Final angle: ${(finalAngle * 180 / Math.PI).toFixed(1)}° (should be 360°)`);
             
             // Store segments data for hover interactions
             canvas.pieChartData = {
@@ -5434,33 +5411,8 @@
                     }
                     softAgg[key].count += 1;
                     
-                    // Check for data anomalies and log detailed info
+                    // Check for data anomalies
                     const tvl = parseFloat(p.tvl || p.collateral_usd || 0);
-                    
-                    // Log very large values (over 100M) or suspicious values
-                    if (tvl > 1e8) { // More than 100M
-                        console.warn(`Large TVL detected for token ${key}:`, {
-                            tvl: tvl,
-                            tvl_formatted: `$${(tvl/1e6).toFixed(2)}M`,
-                            raw_tvl: p.tvl,
-                            raw_collateral_usd: p.collateral_usd,
-                            collateral: p.collateral,
-                            collateral_up: p.collateral_up,
-                            price_oracle: p.price_oracle,
-                            user: p.user,
-                            market_id: p.market_id,
-                            chain: p.chain,
-                            platform: p.platform
-                        });
-                    }
-                    
-                    // Log if either source field is suspicious
-                    if (p.tvl && parseFloat(p.tvl) > 1e12) {
-                        console.error(`CRITICAL: TVL field has extreme value for ${key}: ${p.tvl}`);
-                    }
-                    if (p.collateral_usd && parseFloat(p.collateral_usd) > 1e12) {
-                        console.error(`CRITICAL: collateral_usd field has extreme value for ${key}: ${p.collateral_usd}`);
-                    }
                     
                     softAgg[key].tvl += tvl;
                     softAgg[key].positions.push({tvl, user: p.user, market: p.market_id});
@@ -5477,33 +5429,12 @@
                     
                     // Check for data anomalies
                     const debt = parseFloat(e.debt_with_discount || e.debt || 0);
-                    if (debt > 1e12) { // More than 1 trillion is suspicious
-                        console.warn(`Suspicious debt for ${key}: ${debt}`, e);
-                    }
                     hardAgg[key].debt += debt;
                 });
                 
                 // Calculate differences for pie chart
                 dataToAnalyze = [];
                 const allTokens = new Set([...Object.keys(softAgg), ...Object.keys(hardAgg)]);
-                
-                // Log aggregated values for debugging
-                console.log('Comparison Mode Aggregation Summary:');
-                allTokens.forEach(token => {
-                    const soft = softAgg[token] || { count: 0, tvl: 0, positions: [] };
-                    const hard = hardAgg[token] || { count: 0, debt: 0 };
-                    
-                    if (soft.tvl > 1e8 || hard.debt > 1e8) { // Log if over 100M
-                        console.log(`Token: ${token}`, {
-                            soft_tvl: `$${(soft.tvl/1e6).toFixed(2)}M`,
-                            soft_count: soft.count,
-                            hard_debt: `$${(hard.debt/1e6).toFixed(2)}M`,
-                            hard_count: hard.count,
-                            protected: `$${(Math.max(0, soft.tvl - hard.debt)/1e6).toFixed(2)}M`,
-                            top_positions: soft.positions?.slice(0, 5) // Show top 5 positions
-                        });
-                    }
-                });
                 
                 allTokens.forEach(token => {
                     const soft = softAgg[token] || { count: 0, tvl: 0 };
@@ -5620,7 +5551,6 @@
                         }
                     });
                     
-                    console.log('Comparison mode: Soft positions map created with', softPositionsMap.size, 'unique user-market combinations');
                     
                     // Process hard liquidations and identify which ones are duplicates
                     const hardDebts = {
@@ -5689,7 +5619,6 @@
                         }
                     });
                     
-                    console.log(`Comparison mode: Hard liquidations - ${duplicateCount} duplicates (same position), ${uniqueCount} unique positions`);
                     
                     // Now process soft liquidations and calculate protected amounts
                     softSource.forEach(item => {
