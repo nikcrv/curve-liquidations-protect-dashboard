@@ -11,6 +11,7 @@
         // Apply saved theme on load
         if (currentTheme && themeFiles[currentTheme]) {
             document.getElementById('theme-stylesheet').href = themeFiles[currentTheme];
+            document.documentElement.setAttribute('data-theme', currentTheme);
             updateThemeIcon(currentTheme);
         }
         
@@ -35,6 +36,7 @@
             // Apply new theme
             themeLink.href = themeFiles[nextTheme];
             localStorage.setItem('theme', nextTheme);
+            document.documentElement.setAttribute('data-theme', nextTheme);
             updateThemeIcon(nextTheme);
             
             // Update chart colors if chart exists
@@ -52,6 +54,9 @@
             if (window.switchDistributionChart) {
                 switchDistributionChart(distributionType);
             }
+            
+            // Update protection chart with new theme colors
+            updateProtectionChart();
         }
         
         function updateThemeIcon(theme) {
@@ -64,8 +69,8 @@
                 icon.innerHTML = `<path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>`;
                 if (tooltip) tooltip.textContent = 'Mode';
             } else if (theme === 'chad') {
-                // Star icon for Chad theme  
-                icon.innerHTML = `<path d="M12 2.5l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-.51L12 2.5z"/>`;
+                // Chad icon for Chad theme  
+                icon.innerHTML = `<image href="CHAD.png" x="0" y="0" width="24" height="24"/>`;
                 if (tooltip) tooltip.textContent = 'Mode';
             } else {
                 // Sun icon for light theme  
@@ -1753,6 +1758,35 @@
             
             // Минималистичные карточки с нашими данными
             
+            // Карточка Protection Rate (выделенная) - ПЕРВАЯ
+            if (softData && hardData) {
+                const isPositive = protectedAmount > 0;
+                const ofTVL = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
+                
+                html += `
+                    <div class="stat-card protection ${!isPositive ? 'negative' : ''}">
+                        <div class="stat-label">
+                            ${t('protectedFromLiquidation')}
+                            <span class="info-icon" onclick="showMethodologyPopup()" title="${currentLang === 'ru' ? 'Методология' : 'Methodology'}">?</span>
+                        </div>
+                        <div class="protection-content">
+                            <div class="protection-chart-container">
+                                <canvas id="protectionChartInline" width="150" height="150"></canvas>
+                                <div class="chart-center-text">
+                                    <div class="chart-percent">${Math.abs(ofTVL).toFixed(1)}%*</div>
+                                </div>
+                            </div>
+                            <div class="protection-info">
+                                <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
+                                <div class="protection-description">
+                                    <span class="percent-asterisk">*${Math.abs(ofTVL).toFixed(1)}%</span> ${t('ofTVLInSoft')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
             // Карточка Soft Liquidations
             if (softToUse) {
                 const softPositions = softToUse.positions?.length || 0;
@@ -1796,30 +1830,121 @@
                 `;
             }
             
-            // Карточка Protection Rate (выделенная)
-            if (softData && hardData) {
-                const isPositive = protectedAmount > 0;
-                const ofTVL = softTVL > 0 ? (protectedAmount / softTVL * 100) : 0;
-                
-                html += `
-                    <div class="stat-card">
-                        <div class="stat-label">
-                            ${t('protectedFromLiquidation')}
-                            <span class="info-icon" onclick="showMethodologyPopup()" title="${currentLang === 'ru' ? 'Методология' : 'Methodology'}">?</span>
-                        </div>
-                        <div class="stat-value">$${formatNumber(Math.abs(protectedAmount))}</div>
-                        <div class="stat-details">
-                            <div class="stat-row highlight-row"><strong>${ofTVL.toFixed(1)}%</strong> ${t('ofTVLInSoft')}</div>
-                        </div>
-                    </div>
-                `;
-            }
-            
             statsGrid.innerHTML = html;
+            
+            // Draw protection chart if present - use setTimeout to ensure DOM is ready
+            setTimeout(() => updateProtectionChart(), 100);
             
             // Обновляем опции фильтров
             updateFilterOptions();
         }
+
+        // Setup high DPI canvas
+        function setupHighDPICanvas(canvas, width, height) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            
+            return ctx;
+        }
+        
+        // Function to update the protection chart
+        function updateProtectionChart() {
+            const canvas = document.getElementById('protectionChartInline');
+            if (!canvas) return;
+            
+            // Get the protection card to read the percentage
+            const protectionCard = document.querySelector('.stat-card.protection');
+            if (!protectionCard) return;
+            
+            // Check if card has negative class
+            const isCardNegative = protectionCard.classList.contains('negative');
+            
+            // Extract percentage from the chart-percent element
+            const percentElement = protectionCard.querySelector('.chart-percent');
+            let protectionPercent = 0;
+            
+            if (percentElement) {
+                const percentMatch = percentElement.textContent.match(/-?\d+\.?\d*/);
+                if (percentMatch) {
+                    protectionPercent = Math.abs(parseFloat(percentMatch[0]));
+                }
+            }
+            
+            // Debug logging
+            console.log('Protection percent extracted:', protectionPercent);
+            
+            // Set canvas size with high DPI support
+            const width = 150;
+            const height = 150;
+            const ctx = setupHighDPICanvas(canvas, width, height);
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 12;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw background circle (track)
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 16;
+            ctx.stroke();
+            
+            // Draw protection arc only if percentage > 0
+            if (protectionPercent && protectionPercent > 0) {
+                const startAngle = -Math.PI / 2;
+                const endAngle = startAngle + (2 * Math.PI * protectionPercent / 100);
+                
+                console.log('Drawing arc for', protectionPercent + '%');
+                
+                // Create gradient for the arc - match the card's background color
+                const gradient = ctx.createLinearGradient(0, 0, width, height);
+                const theme = localStorage.getItem('theme') || 'light';
+                
+                if (!isCardNegative) {  // Use card's state directly
+                    if (theme === 'chad') {
+                        // Purple gradient for Chad theme
+                        gradient.addColorStop(0, '#9171d8');
+                        gradient.addColorStop(1, '#6b46c1');
+                    } else {
+                        // White to light gray for positive protection (green background)
+                        gradient.addColorStop(0, '#ffffff');
+                        gradient.addColorStop(1, '#f0f0f0');
+                    }
+                } else {
+                    if (theme === 'chad') {
+                        // Darker purple for negative in Chad theme
+                        gradient.addColorStop(0, '#7a5bc0');
+                        gradient.addColorStop(1, '#553399');
+                    } else {
+                        // Red tones for negative protection (red background)
+                        gradient.addColorStop(0, '#ff6b6b');
+                        gradient.addColorStop(1, '#ff4444');
+                    }
+                }
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 16;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            } else {
+                console.log('No percentage to draw - value is:', protectionPercent);
+            }
+        }
+        
+        // Export to window for global access
+        window.updateProtectionChart = updateProtectionChart;
+        window.loadScriptByName = loadScriptByName;
+        window.processLoadedData = processLoadedData;
 
         function renderData() {
             const dataTable = document.getElementById('dataTable');
@@ -3156,7 +3281,8 @@
         }
         
         // Function to update the protection chart
-        function updateProtectionChartInline() {
+        /* Removed duplicate updateProtectionChartInline - using updateProtectionChart instead */
+        function updateProtectionChartInline_REMOVED() {
             const canvas = document.getElementById('protectionChartInline');
             if (!canvas) return;
             
@@ -3209,49 +3335,52 @@
             ctx.lineWidth = 16;
             ctx.stroke();
             
-            // Draw protection arc
-            const startAngle = -Math.PI / 2;
-            const endAngle = startAngle + (2 * Math.PI * protectionPercent / 100);
-            
-            // Create gradient for the arc - match the card's background color
-            const gradient = ctx.createLinearGradient(0, 0, width, height);
-            const theme = localStorage.getItem('theme') || 'light';
-            
-            if (!isCardNegative) {  // Use card's state directly
-                if (theme === 'chad') {
-                    // Purple gradient for Chad theme
-                    gradient.addColorStop(0, '#9171d8');
-                    gradient.addColorStop(1, '#6b46c1');
+            // Draw protection arc only if percentage > 0
+            if (protectionPercent && protectionPercent > 0) {
+                const startAngle = -Math.PI / 2;
+                const endAngle = startAngle + (2 * Math.PI * protectionPercent / 100);
+                
+                console.log('Drawing arc for', protectionPercent + '%');
+                
+                // Create gradient for the arc - match the card's background color
+                const gradient = ctx.createLinearGradient(0, 0, width, height);
+                const theme = localStorage.getItem('theme') || 'light';
+                
+                if (!isCardNegative) {  // Use card's state directly
+                    if (theme === 'chad') {
+                        // Purple gradient for Chad theme
+                        gradient.addColorStop(0, '#9171d8');
+                        gradient.addColorStop(1, '#6b46c1');
+                    } else {
+                        // White to light gray for positive protection (green background)
+                        gradient.addColorStop(0, '#ffffff');
+                        gradient.addColorStop(1, '#f0f0f0');
+                    }
                 } else {
-                    // White to light gray for positive protection (green background)
-                    gradient.addColorStop(0, '#ffffff');
-                    gradient.addColorStop(1, '#f0f0f0');
+                    if (theme === 'chad') {
+                        // Darker purple for negative in Chad theme
+                        gradient.addColorStop(0, '#7a5bc0');
+                        gradient.addColorStop(1, '#553399');
+                    } else {
+                        // Red tones for negative protection (red background)
+                        gradient.addColorStop(0, '#ff6b6b');
+                        gradient.addColorStop(1, '#ff4444');
+                    }
                 }
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 16;
+                ctx.lineCap = 'round';
+                ctx.stroke();
             } else {
-                if (theme === 'chad') {
-                    // Darker purple for negative in Chad theme
-                    gradient.addColorStop(0, '#7a5bc0');
-                    gradient.addColorStop(1, '#553399');
-                } else {
-                    // Red tones for negative protection (red background)
-                    gradient.addColorStop(0, '#ff6b6b');
-                    gradient.addColorStop(1, '#ff4444');
-                }
+                console.log('No percentage to draw - value is:', protectionPercent);
             }
-            
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 16;
-            ctx.lineCap = 'round';
-            ctx.stroke();
             
         }
         
         // Compatibility wrapper for old function name
-        function updateProtectionChart() {
-            updateProtectionChartInline();
-        }
         
         // Function to switch distribution chart type
         function switchDistributionChart(type) {
@@ -4783,6 +4912,23 @@
                 }
             });
         }
+
+// Define loadData function
+async function loadData() {
+    try {
+        await loadScriptByName('latest_liquidations.js');
+        if (window.SOFT_LIQUIDATIONS_DATA) {
+            processLoadedData(window.SOFT_LIQUIDATIONS_DATA);
+            const fileNameElement = document.getElementById('fileName');
+            if (fileNameElement) {
+                fileNameElement.textContent = currentLang === 'en' ? 'latest_liquidations.js loaded' : 'latest_liquidations.js загружен';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+    }
+}
+window.loadData = loadData;
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', async () => {
