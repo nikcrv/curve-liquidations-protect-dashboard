@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Curve Finance Liquidation Analysis Viewer</title>
+    <link rel="stylesheet" href="curve-light-styles.css" id="theme-stylesheet">
+    <script>
+        // Immediate language button initialization
+        (function() {
+            const savedLang = localStorage.getItem('liquidationLang') || 'en';
+            window.addEventListener('DOMContentLoaded', function() {
+                const enBtn = document.getElementById('langEn');
+                const ruBtn = document.getElementById('langRu');
+                if (enBtn && ruBtn) {
+                    if (savedLang === 'en') {
+                        enBtn.classList.add('active');
+                        ruBtn.classList.remove('active');
+                    } else {
+                        ruBtn.classList.add('active');
+                        enBtn.classList.remove('active');
+                    }
+                }
+            });
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="curve-logo.png" alt="Curve Logo" style="height: 40px; width: auto;">
+                Curve Finance Liquidation Analysis
+            </h1>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <!-- Theme Toggle Button Curve Style -->
+                <button onclick="toggleTheme()" class="curve-theme-btn" id="themeToggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28" id="themeIcon">
+                        <!-- Sun icon (light theme) -->
+                        <path d="M6.995 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007-2.246-5.007-5.007-5.007S6.995 9.239 6.995 12zM11 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2H2zm17 0h3v2h-3zM5.637 19.778l-1.414-1.414 2.121-2.121 1.414 1.414zM16.242 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.344 7.759 4.223 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z"/>
+                    </svg>
+                    <span class="tooltip" id="themeTooltip">Light Mode</span>
+                </button>
+                
+                <!-- Language Switcher -->
+                <div class="lang-switcher">
+                    <button onclick="setLanguage('en')" id="langEn" class="lang-btn">EN</button>
+                    <button onclick="setLanguage('ru')" id="langRu" class="lang-btn">RU</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Обертка для контента под закрепленной шапкой -->
+        <div class="content-wrapper">
+        
+        <!-- Минималистичная панель фильтров -->
+        <div class="filter-panel">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label id="platformLabel">Platform</label>
+                    <select id="platformFilter">
+                        <option value="" id="allPlatformsOption">All Platforms</option>
+                        <option value="LlamaLend">LlamaLend</option>
+                        <option value="crvUSD">crvUSD</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label id="networkLabel">Network</label>
+                    <select id="networkFilter">
+                        <option value="" id="allNetworksOption">All Networks</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label id="tokenLabel">Token</label>
+                    <select id="tokenFilter">
+                        <option value="" id="allTokensOption">All Tokens</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label id="userLabel">User</label>
+                    <input type="text" id="addressFilter" placeholder="0x..." onkeyup="if(event.key === 'Enter') applyFilters()">
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()" style="align-self: flex-end; min-width: 100px;" id="applyFiltersBtn">Apply</button>
+                <button class="btn btn-secondary" onclick="resetFilters()" style="align-self: flex-end; min-width: 100px;" id="resetFiltersBtn">Reset</button>
+            </div>
+        </div>
+        
+        <!-- Минималистичные карточки статистики -->
+        <div class="stats-grid" id="statsGrid"></div>
+        
+        <!-- Объединенный блок графика и таблиц -->
+        <div class="combined-container" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 0; padding: 3px; margin-bottom: 20px; box-shadow: none; position: relative; width: 100%; max-width: 100%; overflow: hidden;">
+            <div style="background: white; border-radius: 0; padding: 20px; width: 100%; overflow-x: auto;">
+                <!-- График -->
+                <div class="chart-container" style="margin-bottom: 0; box-shadow: none;">
+                    <div class="chart-inner">
+                <!-- Header with title and controls -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                    <div class="chart-title" id="chartTitle">Chart by Days</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;">
+                        <div class="radio-group" style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 5px; font-size: 13px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartPeriod" value="day" style="margin-right: 3px;">
+                                <span id="dayLabel">Day</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartPeriod" value="week" style="margin-right: 3px;">
+                                <span id="weekLabel">Week</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartPeriod" value="month" checked style="margin-right: 3px;">
+                                <span id="monthLabel">Month</span>
+                            </label>
+                        </div>
+                        <div class="radio-group" style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 5px; font-size: 13px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartMode" value="count" style="margin-right: 3px;">
+                                <span id="countLabel">Count</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="chartMode" value="sum" checked style="margin-right: 3px;">
+                                <span id="sumLabel">Sum ($)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main content area -->
+                <div class="chart-distribution-grid" style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start;">
+                    <!-- Chart area -->
+                    <div class="chart-area-container" style="min-height: 250px; border-radius: 0; padding: 15px;">
+                        <div id="liquidationChart"></div>
+                    </div>
+                    
+                    <!-- Distribution pie chart -->
+                    <div class="distribution-container" style="border-radius: 0; padding: 10px;">
+                        <!-- Distribution type selector -->
+                        <div class="distribution-selector" style="display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 0; font-size: 13px; margin-bottom: 10px; justify-content: center;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="distributionType" value="token" checked style="margin-right: 3px;">
+                                <span id="tokenBtnText2">Tokens</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="distributionType" value="platform" style="margin-right: 3px;">
+                                <span id="platformBtnText2">Platforms</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="distributionType" value="network" style="margin-right: 3px;">
+                                <span id="networkBtnText2">Networks</span>
+                            </label>
+                        </div>
+                        <div style="height: 224px; display: flex; align-items: center; justify-content: center;">
+                            <canvas id="distributionChart" width="280" height="260"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Range slider -->
+                <div class="chart-controls" style="margin-top: 15px; padding: 10px; border-radius: 6px;">
+                    <div style="position: relative; width: 100%; height: 30px; margin: 10px 0;">
+                        <div class="slider-track" style="position: absolute; width: 100%; height: 4px; border-radius: 0; top: 13px;"></div>
+                        <div id="sliderRange" style="position: absolute; height: 4px; border-radius: 0; top: 13px;"></div>
+                        <input type="range" id="rangeStart" min="0" max="1000" value="0" step="1" style="position: absolute; width: 100%; height: 4px; background: transparent; pointer-events: none; -webkit-appearance: none; top: 13px;">
+                        <input type="range" id="rangeEnd" min="0" max="1000" value="30" step="1" style="position: absolute; width: 100%; height: 4px; background: transparent; pointer-events: none; -webkit-appearance: none; top: 13px;">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; color: #666;">
+                        <span id="startLabel" onclick="openDatePicker('start')" class="date-label" style="padding: 2px 6px; border-radius: 3px; font-weight: 500; cursor: pointer; transition: all 0.3s;">Начало</span>
+                        <span id="selectedPeriodLabel" style="color: #999; font-size: 11px;">Выбранный период</span>
+                        <span id="endLabel" onclick="openDatePicker('end')" class="date-label" style="padding: 2px 6px; border-radius: 3px; font-weight: 500; cursor: pointer; transition: all 0.3s;">Конец</span>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                
+                <!-- Календарь для выбора даты -->
+                <div id="datePickerPopup" class="date-picker-popup" style="position: absolute; border-radius: 8px; padding: 10px; display: none; z-index: 10000;">
+                    <input type="date" id="datePickerInput" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <div style="margin-top: 10px; display: flex; gap: 5px;">
+                        <button id="applyDateBtn" onclick="applyDateFromPicker()" style="padding: 8px 16px; background: #0066ff; color: white; border: none; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s ease; font-family: 'Mona Sans', 'Helvetica Neue', 'Helvetica', sans-serif; box-shadow: 0 2px 4px rgba(0, 102, 255, 0.2);" onmouseover="this.style.background='#0052cc'; this.style.boxShadow='0 4px 8px rgba(0, 102, 255, 0.3)';" onmouseout="this.style.background='#0066ff'; this.style.boxShadow='0 2px 4px rgba(0, 102, 255, 0.2)';">Применить</button>
+                        <button id="cancelDateBtn" onclick="closeDatePicker()" style="padding: 8px 16px; background: #f0f0f0; color: #333333; border: none; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s ease; font-family: 'Mona Sans', 'Helvetica Neue', 'Helvetica', sans-serif; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);" onmouseover="this.style.background='#e0e0e0'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.15)';" onmouseout="this.style.background='#f0f0f0'; this.style.boxShadow='0 1px 3px rgba(0, 0, 0, 0.1)'">Отмена</button>
+                    </div>
+                </div>
+                
+                <!-- Таблица -->
+                <div class="data-table" id="dataTable" style="margin-bottom: 0; box-shadow: none; padding-top: 0;">
+                    <div class="loading" id="loadingText">Loading data...</div>
+                </div>
+                
+                <div class="pagination" id="pagination" style="display: none; margin-top: 15px;"></div>
+            </div>
+        </div>
+        
+        <div class="chart-tooltip" id="chartTooltip"></div>
+        <div id="chartsSection" style="display: none;"></div>
+        
+        </div> <!-- Закрытие content-wrapper -->
+    </div>
+    
+    <!-- Подключение Chart.js из CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Подключение данных -->
+    <script src="latest_liquidations.js"></script>
+    
+    <!-- Подключение основного JavaScript -->
+    <script src="curve-light-scripts.js"></script>
+</body>
+</html>
