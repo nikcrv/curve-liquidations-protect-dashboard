@@ -1521,7 +1521,7 @@
         let tableDateStart = null; // Начальная дата для фильтрации таблиц
         let tableDateEnd = null; // Конечная дата для фильтрации таблиц
 
-        // Удален обработчик выбора файла - автозагрузка из latest_liquidations.js
+        // Удален обработчик выбора файла - автозагрузка из latest_liquidations_final.js
 
         // Обработка вкладок
         document.querySelectorAll('.tab').forEach(tab => {
@@ -4318,12 +4318,12 @@
             rangeEnd.addEventListener('input', updateSliderRange);
             
             try {
-                await loadScriptByName('latest_liquidations.js');
+                await loadScriptByName('latest_liquidations_final.js');
                 if (window.SOFT_LIQUIDATIONS_DATA) {
                     processLoadedData(window.SOFT_LIQUIDATIONS_DATA);
                     const fileNameElement = document.getElementById('fileName');
                     if (fileNameElement) {
-                        fileNameElement.textContent = currentLang === 'en' ? 'latest_liquidations.js loaded' : 'latest_liquidations.js загружен';
+                        fileNameElement.textContent = currentLang === 'en' ? 'latest_liquidations_final.js loaded' : 'latest_liquidations_final.js загружен';
                     }
                 }
             } catch (error) {
