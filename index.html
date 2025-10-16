@@ -2271,11 +2271,15 @@
                 if (period === 'day') {
                     return date.toISOString().split('T')[0];
                 } else if (period === 'week') {
-                    // Начало недели (понедельник)
-                    const weekStart = new Date(date);
-                    const day = weekStart.getDay();
-                    const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
-                    weekStart.setDate(diff);
+                    // Начало недели (понедельник) - используем UTC чтобы избежать проблем с часовыми поясами
+                    const weekStart = new Date(Date.UTC(
+                        date.getUTCFullYear(),
+                        date.getUTCMonth(),
+                        date.getUTCDate()
+                    ));
+                    const day = weekStart.getUTCDay();
+                    const diff = weekStart.getUTCDate() - day + (day === 0 ? -6 : 1);
+                    weekStart.setUTCDate(diff);
                     return weekStart.toISOString().split('T')[0];
                 } else if (period === 'month') {
                     // Начало месяца
@@ -2298,14 +2302,25 @@
                     }
                 }
             } else if (actualPeriod === 'week') {
-                // Создаем периоды по неделям
-                let currentDate = new Date(startDate);
-                while (currentDate <= endDate) {
+                // Создаем периоды по неделям - используем миллисекунды для надежности
+                const weekMs = 7 * 24 * 60 * 60 * 1000;
+                let currentTime = startDate.getTime();
+
+                // Расширяем endDate до конца его недели (воскресенья 23:59:59)
+                // чтобы захватить все события этой недели
+                const endWeekKey = getPeriodKey(endDate, 'week');
+                const endWeekDate = new Date(endWeekKey);
+                const extendedEndDate = new Date(endWeekDate.getTime() + 6 * 24 * 60 * 60 * 1000 + 23 * 60 * 60 * 1000 + 59 * 60 * 1000 + 59 * 1000);
+                const endTime = extendedEndDate.getTime();
+
+                // Генерируем все периоды
+                while (currentTime <= endTime) {
+                    const currentDate = new Date(currentTime);
                     const key = getPeriodKey(currentDate, actualPeriod);
                     if (!periodData[key]) {
                         periodData[key] = { soft: 0, hard: 0, softTVL: 0, hardDebt: 0, date: new Date(key) };
                     }
-                    currentDate.setDate(currentDate.getDate() + 7);
+                    currentTime += weekMs;
                 }
             } else if (actualPeriod === 'month') {
                 // Создаем периоды по месяцам
@@ -2326,20 +2341,20 @@
                 // Обрабатываем все периоды одинаково
                 softDataToUse.positions.forEach(pos => {
                     if (!pos.first_dt) return;
-                    
+
                     const openDate = new Date(pos.first_dt);
                     const closeDate = pos.last_dt ? new Date(pos.last_dt) : new Date();
                     const tvl = pos.cachedTVL || parseFloat(pos.tvl || pos.collateral_usd || 0);
-                    
+
                     // Пропускаем позиции вне диапазона
                     if (closeDate < startDate || openDate > endDate) {
                         return;
                     }
-                    
+
                     Object.keys(periodData).forEach(periodKey => {
                         const periodDate = new Date(periodKey);
                         let periodEnd;
-                        
+
                         if (actualPeriod === 'week') {
                             periodEnd = new Date(periodDate);
                             periodEnd.setDate(periodEnd.getDate() + 7);
@@ -2349,7 +2364,7 @@
                             periodEnd = new Date(periodDate);
                             periodEnd.setDate(periodEnd.getDate() + 1);
                         }
-                        
+
                         // Позиция активна если была открыта до конца периода И закрыта после начала периода
                         if (openDate < periodEnd && closeDate >= periodDate) {
                             periodData[periodKey].soft++;
@@ -2384,6 +2399,7 @@
             let totalChartHardDebt = 0;
             let maxPeriodSoftTVL = 0;
             let maxPeriodHardDebt = 0;
+
             Object.values(periodData).forEach(period => {
                 if (chartMode === 'sum') {
                     maxSoft = Math.max(maxSoft, period.softTVL);
@@ -2398,7 +2414,7 @@
                     maxHard = Math.max(maxHard, period.hard);
                 }
             });
-            
+
             const maxValue = Math.max(maxSoft, maxHard);
             
             // Рисуем диаграмму
@@ -2446,11 +2462,11 @@
             
             const dates = Object.keys(periodData).sort();
             const barWidth = Math.min(100 / dates.length, actualPeriod === 'month' ? 8 : actualPeriod === 'week' ? 4 : 2);
-            
+
             dates.forEach((dateStr, index) => {
                 const period = periodData[dateStr];
                 let softValue, hardValue;
-                
+
                 if (chartMode === 'sum') {
                     softValue = period.softTVL;
                     hardValue = period.hardDebt;
@@ -2458,12 +2474,12 @@
                     softValue = period.soft;
                     hardValue = period.hard;
                 }
-                
+
                 // Уменьшаем максимальную высоту для мобильных устройств
                 const chartHeight = window.innerWidth <= 768 ? 150 : 200;
                 const softHeight = maxValue > 0 ? (softValue / maxValue * chartHeight) : 0;
                 let hardHeight = maxValue > 0 ? (hardValue / maxValue * chartHeight) : 0;
-                
+
                 // Минимальная высота 1px для хард событий, чтобы они были видны
                 if (hardValue > 0 && hardHeight < 1) {
                     hardHeight = 1;
@@ -2493,7 +2509,7 @@
                     </div>
                 `;
             });
-            
+
             // Закрываем контейнер для баров
             html += '</div>';
             
