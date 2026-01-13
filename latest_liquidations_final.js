@@ -1,6 +1,6 @@
 // Final corrected liquidations file
 // Date range: 2023-05-01 to 2026-01-14
-// Generated at: 2026-01-13T04:53:46.509949
+// Generated at: 2026-01-13T08:53:50.266003
 // 
 // CORRECTIONS APPLIED:
 // 1. Soft positions with hard liquidations use TVL at hard liquidation date
